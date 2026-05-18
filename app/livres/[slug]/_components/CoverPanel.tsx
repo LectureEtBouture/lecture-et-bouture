@@ -1,0 +1,96 @@
+import type { Livre, Rayon } from '@/lib/data';
+
+function capitalize(str: string) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export function CoverPanel({
+    livre,
+    coverColor,
+    rayon,
+}: {
+    livre: Livre;
+    coverColor: string;
+    rayon?: Rayon;
+}) {
+    const fields = [
+        { label: 'Prix', value: `${livre.prix} €` },
+        ...(rayon ? [{ label: 'Rayon', value: rayon.nom }] : []),
+        { label: 'Éditeur', value: livre.editeur },
+        ...(livre.collection
+            ? [{ label: 'Collection', value: livre.collection }]
+            : []),
+        { label: 'Format', value: capitalize(livre.format) },
+        ...(livre.anneePublication
+            ? [{ label: 'Publication', value: String(livre.anneePublication) }]
+            : []),
+        { label: 'ISBN', value: livre.isbn },
+        ...(livre.edition ? [{ label: 'Édition', value: livre.edition }] : []),
+        ...(livre.serie
+            ? [
+                  {
+                      label: 'Série',
+                      value: `${livre.serie} · Tome ${livre.numeroSerie}`,
+                  },
+              ]
+            : []),
+    ];
+
+    return (
+        <div className="space-y-6">
+            <div
+                className="aspect-2/3 w-full relative overflow-hidden"
+                style={{ backgroundColor: coverColor }}
+            >
+                <div
+                    className="absolute inset-0 opacity-[0.04] mix-blend-multiply"
+                    style={{
+                        backgroundImage:
+                            "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+                    }}
+                />
+                {livre.serie && livre.numeroSerie && (
+                    <span className="absolute bottom-3 left-3 text-[10px] uppercase tracking-widest text-foreground/50">
+                        Tome {livre.numeroSerie}
+                    </span>
+                )}
+            </div>
+
+            <div className="flex items-center gap-2.5">
+                <span
+                    className={`w-2 h-2 rounded-full shrink-0 ${livre.stock > 0 ? 'bg-primary' : 'bg-border'}`}
+                />
+                <span className="text-[10px] uppercase tracking-widest text-muted">
+                    {livre.stock > 0 ? 'Disponible en magasin' : 'Sur commande'}
+                </span>
+            </div>
+
+            <div className="space-y-3">
+                <a
+                    href={`https://www.leslibraires.fr/recherche/?q=${encodeURIComponent(livre.titre + ' ' + livre.auteur)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full py-3 bg-primary text-background text-xs uppercase tracking-widest text-center hover:bg-primary-light transition-colors"
+                >
+                    Voir sur leslibraires.fr
+                </a>
+                <p className="text-xs text-muted text-center">
+                    Achat via notre librairie partenaire
+                </p>
+            </div>
+
+            <dl className="space-y-2 border-t border-border pt-4">
+                {fields.map(({ label, value }) => (
+                    <div key={label} className="flex justify-between gap-4">
+                        <dt className="text-[10px] uppercase tracking-widest text-muted shrink-0">
+                            {label}
+                        </dt>
+                        <dd className="text-xs text-foreground text-right">
+                            {value}
+                        </dd>
+                    </div>
+                ))}
+            </dl>
+        </div>
+    );
+}

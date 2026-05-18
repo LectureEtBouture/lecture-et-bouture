@@ -1,0 +1,48 @@
+services:
+    postgres:
+        image: postgres:16-alpine
+        container_name: leb-db
+        environment:
+            POSTGRES_USER: leb
+            POSTGRES_PASSWORD: leb
+            POSTGRES_DB: leb
+        ports:
+            - '5432:5432'
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+
+    adminer:
+        image: adminer:latest
+        container_name: leb-adminer
+        restart: unless-stopped
+        depends_on:
+            - postgres
+
+    portainer:
+        image: portainer/portainer-ce:latest
+        container_name: leb-portainer
+        restart: unless-stopped
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - portainer_data:/data
+
+    caddy:
+        image: caddy:2-alpine
+        container_name: leb-caddy
+        restart: unless-stopped
+        ports:
+            - '80:80'
+            - '443:443'
+        volumes:
+            - ./Caddyfile:/etc/caddy/Caddyfile:ro
+            - caddy_data:/data
+            - caddy_config:/config
+        depends_on:
+            - adminer
+            - portainer
+
+volumes:
+    postgres_data:
+    portainer_data:
+    caddy_data:
+    caddy_config:

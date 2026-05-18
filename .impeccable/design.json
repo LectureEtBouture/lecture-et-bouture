@@ -1,0 +1,273 @@
+{
+    "schemaVersion": 2,
+    "generatedAt": "2026-05-18T00:00:00Z",
+    "title": "Design System: Lecture & Boutures",
+    "extensions": {
+        "colorMeta": {
+            "primary": {
+                "role": "primary",
+                "displayName": "Vert Forêt Profond",
+                "canonical": "oklch(32% 0.058 162)",
+                "tonalRamp": [
+                    "#0e1f18",
+                    "#1a3328",
+                    "#2d4b3e",
+                    "#3d6354",
+                    "#557a6a",
+                    "#789d8e",
+                    "#a3bfb5",
+                    "#d0e4df"
+                ]
+            },
+            "primary-light": {
+                "role": "primary-hover",
+                "displayName": "Vert Forêt Éclairé",
+                "canonical": "oklch(42% 0.065 162)",
+                "tonalRamp": [
+                    "#1a3328",
+                    "#2d4b3e",
+                    "#3d6354",
+                    "#4e7868",
+                    "#6a9685",
+                    "#8ab5a5",
+                    "#b2cfc8",
+                    "#d8eae6"
+                ]
+            },
+            "background": {
+                "role": "neutral-bg",
+                "displayName": "Sable Vergé",
+                "canonical": "oklch(97% 0.007 88)",
+                "tonalRamp": [
+                    "#c9c8c1",
+                    "#d6d3c8",
+                    "#e2dfd5",
+                    "#ecead4",
+                    "#f5f4ef",
+                    "#f8f7f3",
+                    "#fafaf7",
+                    "#fefefe"
+                ]
+            },
+            "foreground": {
+                "role": "neutral-text",
+                "displayName": "Encre Principale",
+                "canonical": "oklch(16% 0.002 90)",
+                "tonalRamp": [
+                    "#0a0a0a",
+                    "#1a1a1a",
+                    "#2e2e2e",
+                    "#444444",
+                    "#5e5e5e",
+                    "#7a7a7a",
+                    "#a0a0a0",
+                    "#d0d0d0"
+                ]
+            },
+            "muted": {
+                "role": "neutral-secondary",
+                "displayName": "Sauge Atténuée",
+                "canonical": "oklch(66% 0.028 162)",
+                "tonalRamp": [
+                    "#2d4b3e",
+                    "#3d6354",
+                    "#557a6a",
+                    "#6a8f80",
+                    "#8a9e95",
+                    "#a8bab3",
+                    "#c6d4cf",
+                    "#e4ecea"
+                ]
+            },
+            "border": {
+                "role": "neutral-border",
+                "displayName": "Pierre Chaude",
+                "canonical": "oklch(85% 0.007 80)",
+                "tonalRamp": [
+                    "#a8a49a",
+                    "#b8b4a8",
+                    "#c8c4b6",
+                    "#d6d3c8",
+                    "#e0ddd4",
+                    "#e8e6de",
+                    "#f0ede8",
+                    "#f8f6f2"
+                ]
+            },
+            "surface": {
+                "role": "neutral-surface",
+                "displayName": "Blanc Crème",
+                "canonical": "oklch(100% 0 0)",
+                "tonalRamp": [
+                    "#d6d3c8",
+                    "#e2dfd5",
+                    "#ecead4",
+                    "#f5f4ef",
+                    "#f8f7f3",
+                    "#fafaf7",
+                    "#fdfdfc",
+                    "#ffffff"
+                ]
+            }
+        },
+        "typographyMeta": {
+            "display": {
+                "displayName": "Display Serif",
+                "purpose": "Titres héros, immersion visuelle. Noto Serif 700 uniquement."
+            },
+            "headline": {
+                "displayName": "Headline Serif",
+                "purpose": "Titres de page, noms de produit en fiche."
+            },
+            "title": {
+                "displayName": "Title Sans",
+                "purpose": "Sous-titres de section, noms d'auteur, noms d'espèce."
+            },
+            "body": {
+                "displayName": "Body Sans",
+                "purpose": "Descriptions, texte courant. Max 68ch."
+            },
+            "label": {
+                "displayName": "Label Sans Uppercase",
+                "purpose": "Navigation, catégories, filtres, métadonnées."
+            }
+        },
+        "shadows": [
+            {
+                "name": "interaction-signal",
+                "value": "0 2px 12px rgba(26,26,26,0.06)",
+                "purpose": "Hover uniquement sur cards produit. Signal d'interactivité, pas d'élévation."
+            }
+        ],
+        "motion": [
+            {
+                "name": "ease-state",
+                "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+                "purpose": "Transitions d'état (color, border, opacity). 150–200ms."
+            },
+            {
+                "name": "ease-appear",
+                "value": "cubic-bezier(0, 0, 0.2, 1)",
+                "purpose": "Apparition d'éléments (fade-in, slide-in). 250–350ms."
+            }
+        ],
+        "breakpoints": [
+            { "name": "sm", "value": "640px" },
+            { "name": "md", "value": "768px" },
+            { "name": "lg", "value": "1024px" },
+            { "name": "xl", "value": "1280px" }
+        ]
+    },
+    "components": [
+        {
+            "name": "Bouton Primaire",
+            "kind": "button",
+            "refersTo": "button-primary",
+            "description": "CTA principal. Vert forêt, angles droits, label uppercase.",
+            "html": "<button class=\"ds-btn-primary\">DÉCOUVRIR</button>",
+            "css": ".ds-btn-primary { background: #2d4b3e; color: #f5f4ef; padding: 12px 32px; font-family: Manrope, system-ui, sans-serif; font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; border: none; border-radius: 0; cursor: pointer; transition: background 200ms cubic-bezier(0.4,0,0.2,1); } .ds-btn-primary:hover { background: #3d6354; } .ds-btn-primary:focus-visible { outline: 2px solid #2d4b3e; outline-offset: 3px; }"
+        },
+        {
+            "name": "Bouton Ghost",
+            "kind": "button",
+            "refersTo": "button-ghost",
+            "description": "Action secondaire. Contour vert, fond transparent.",
+            "html": "<button class=\"ds-btn-ghost\">EN SAVOIR PLUS</button>",
+            "css": ".ds-btn-ghost { background: transparent; color: #2d4b3e; padding: 11px 31px; font-family: Manrope, system-ui, sans-serif; font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; border: 1px solid #2d4b3e; border-radius: 0; cursor: pointer; transition: color 150ms cubic-bezier(0.4,0,0.2,1), border-color 150ms cubic-bezier(0.4,0,0.2,1); } .ds-btn-ghost:hover { color: #1a1a1a; border-color: #1a1a1a; } .ds-btn-ghost:focus-visible { outline: 2px solid #2d4b3e; outline-offset: 3px; }"
+        },
+        {
+            "name": "Champ de saisie",
+            "kind": "input",
+            "refersTo": "input-field",
+            "description": "Input texte standard. Bordure pierre, focus vert.",
+            "html": "<div class=\"ds-field\"><label class=\"ds-field-label\" for=\"ds-input\">AUTEUR</label><input class=\"ds-field-input\" id=\"ds-input\" type=\"text\" placeholder=\"Rechercher…\" /></div>",
+            "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; } .ds-field-label { font-family: Manrope, system-ui, sans-serif; font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #1a1a1a; } .ds-field-input { background: #ffffff; color: #1a1a1a; border: 1px solid #d6d3c8; border-radius: 2px; padding: 10px 14px; font-family: Manrope, system-ui, sans-serif; font-size: 1rem; font-weight: 400; line-height: 1.5; outline: none; transition: border-color 150ms cubic-bezier(0.4,0,0.2,1); width: 100%; box-sizing: border-box; } .ds-field-input:focus { border-color: #2d4b3e; } .ds-field-input::placeholder { color: #8a9e95; }"
+        },
+        {
+            "name": "Navigation principale",
+            "kind": "nav",
+            "refersTo": null,
+            "description": "Barre sticky, fond sable, logo serif vert, liens sans-serif discrets.",
+            "html": "<header class=\"ds-nav\"><nav class=\"ds-nav-inner\"><a class=\"ds-nav-logo\" href=\"/\">Lecture & Boutures</a><ul class=\"ds-nav-links\"><li><a class=\"ds-nav-link\" href=\"/livres\">Livres</a></li><li><a class=\"ds-nav-link\" href=\"/boutures\">Boutures</a></li><li><a class=\"ds-nav-link\" href=\"/concept\">Concept</a></li></ul></nav></header>",
+            "css": ".ds-nav { position: sticky; top: 0; z-index: 50; background: #f5f4ef; border-bottom: 1px solid #d6d3c8; } .ds-nav-inner { max-width: 72rem; margin: 0 auto; padding: 0 1.5rem; height: 64px; display: flex; align-items: center; justify-content: space-between; } .ds-nav-logo { font-family: 'Noto Serif', Georgia, serif; font-size: 1.125rem; font-weight: 700; color: #2d4b3e; text-decoration: none; letter-spacing: -0.01em; } .ds-nav-links { list-style: none; margin: 0; padding: 0; display: flex; align-items: center; gap: 2rem; } .ds-nav-link { font-family: Manrope, system-ui, sans-serif; font-size: 0.875rem; font-weight: 400; color: rgba(26,26,26,0.7); text-decoration: none; transition: color 150ms cubic-bezier(0.4,0,0.2,1); } .ds-nav-link:hover { color: #2d4b3e; }"
+        },
+        {
+            "name": "Card Produit",
+            "kind": "card",
+            "refersTo": null,
+            "description": "Planche de présentation d'un livre ou d'une plante. Zéro radius, hover subtil.",
+            "html": "<article class=\"ds-product-card\"><div class=\"ds-product-card-img\"></div><div class=\"ds-product-card-body\"><p class=\"ds-product-card-meta\">BOTANIQUE</p><h3 class=\"ds-product-card-title\">Ficus lyrata</h3><p class=\"ds-product-card-sub\">Moraceae</p><p class=\"ds-product-card-price\">À partir de 24 €</p></div></article>",
+            "css": ".ds-product-card { background: #ffffff; border-radius: 0; overflow: hidden; transition: box-shadow 200ms cubic-bezier(0.4,0,0.2,1); cursor: pointer; } .ds-product-card:hover { box-shadow: 0 2px 12px rgba(26,26,26,0.06); } .ds-product-card-img { width: 100%; aspect-ratio: 4/5; background: #f5f4ef; } .ds-product-card-body { padding: 1.5rem; } .ds-product-card-meta { font-family: Manrope, system-ui, sans-serif; font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #8a9e95; margin: 0 0 0.5rem; } .ds-product-card-title { font-family: 'Noto Serif', Georgia, serif; font-size: 1.25rem; font-weight: 700; color: #1a1a1a; margin: 0 0 0.25rem; line-height: 1.2; } .ds-product-card-sub { font-family: Manrope, system-ui, sans-serif; font-size: 0.875rem; font-weight: 400; color: #8a9e95; margin: 0 0 1rem; font-style: italic; } .ds-product-card-price { font-family: Manrope, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; color: #2d4b3e; margin: 0; }"
+        },
+        {
+            "name": "Chip Filtre",
+            "kind": "chip",
+            "refersTo": null,
+            "description": "Filtre de catalogue. Inactif discret, actif en vert forêt.",
+            "html": "<div style=\"display:flex;gap:8px;\"><button class=\"ds-chip\">Botanique</button><button class=\"ds-chip ds-chip--active\">Philosophie</button></div>",
+            "css": ".ds-chip { background: transparent; color: #8a9e95; border: 1px solid #d6d3c8; border-radius: 2px; padding: 6px 14px; font-family: Manrope, system-ui, sans-serif; font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: color 150ms cubic-bezier(0.4,0,0.2,1), border-color 150ms cubic-bezier(0.4,0,0.2,1), background 150ms cubic-bezier(0.4,0,0.2,1); } .ds-chip:hover { color: #2d4b3e; border-color: #2d4b3e; } .ds-chip--active { background: #2d4b3e; color: #f5f4ef; border-color: #2d4b3e; } .ds-chip--active:hover { background: #3d6354; border-color: #3d6354; }"
+        }
+    ],
+    "narrative": {
+        "northStar": "L'Herbier de l'Esprit",
+        "overview": "Chaque écran est une planche d'herbier. Les produits sont des spécimens — classés, nommés, documentés avec soin. Le fond sable (#f5f4ef) est le papier vergé. Le vert profond (#2d4b3e) est l'encre du botaniste. Les blancs entre les éléments ne sont pas des vides : ils séparent les spécimens pour que chacun existe pleinement.\n\nL'interface ne vend pas — elle présente. L'acte commercial est ailleurs (leslibraires.fr) ; ici, c'est la curation et la confiance. La densité est prohibée. Chaque page a le droit d'être presque vide.\n\nCe système rejette catégoriquement : la grille e-commerce dense d'Amazon ou Fnac, le lifestyle décoratif de Pinterest, les clichés SaaS, et la jardinerie mass-market.",
+        "keyCharacteristics": [
+            "Fond sable dominant — la couleur primaire n'est jamais un fond de page",
+            "Serif pour les noms propres, sans-serif sobre pour l'interface",
+            "Espacement section 5rem minimum entre les blocs",
+            "Sharp edges — radius nul sur boutons et cards produit",
+            "Mouvement discret — transitions d'état uniquement",
+            "WCAG AA partout"
+        ],
+        "rules": [
+            {
+                "name": "La Règle du Spécimen Unique",
+                "body": "Le vert forêt profond apparaît sur ≤15% de chaque écran. Sa présence signale quelque chose d'important. Si tout est vert, rien ne l'est.",
+                "section": "colors"
+            },
+            {
+                "name": "La Règle du Papier",
+                "body": "#f5f4ef est le fond universel. Ne jamais le remplacer par du blanc pur sur les pages de contenu.",
+                "section": "colors"
+            },
+            {
+                "name": "La Règle de la Prose",
+                "body": "Corps de texte à max 68ch. Un bloc plus large n'est plus de la lecture.",
+                "section": "typography"
+            },
+            {
+                "name": "La Règle des Familles",
+                "body": "Noto Serif pour les objets (titres, noms de produit, auteurs, espèces). Manrope pour l'interface (navigation, labels, prix, boutons).",
+                "section": "typography"
+            },
+            {
+                "name": "La Règle du Herbier Plat",
+                "body": "Les planches d'herbier ne projettent pas d'ombre. Les surfaces sont au repos. Le mouvement vient du contenu, pas du chrome.",
+                "section": "elevation"
+            },
+            {
+                "name": "La Règle des Planches",
+                "body": "Cards avec border-left colorée ou badge de catégorie en coins arrondis : interdit. Le produit est le sujet, pas son contenant.",
+                "section": "components"
+            }
+        ],
+        "dos": [
+            "Do utiliser #f5f4ef comme fond de page universel",
+            "Do laisser du vide — espacement 5rem entre sections",
+            "Do réserver Noto Serif aux objets nommés",
+            "Do respecter ≤68ch pour tout corps de texte",
+            "Do utiliser reduced-motion pour toutes les animations",
+            "Do tester le contraste WCAG AA à chaque couleur appliquée"
+        ],
+        "donts": [
+            "Don't utiliser le vert forêt comme fond de section ou de page",
+            "Don't créer une grille de cards identiques — référence Amazon/Fnac prohibée",
+            "Don't ajouter badges best-seller, promotions, compteurs d'urgence",
+            "Don't utiliser Inter, glassmorphism, dégradés de texte, hero SaaS — référence Startup SaaS prohibée",
+            "Don't mettre des border-left colorées épaisses sur cards ou list items",
+            "Don't animer des propriétés CSS layout — opacity et transform uniquement",
+            "Don't utiliser vert vif, photos stock jardinerie, ton informel — référence mass-market prohibée",
+            "Don't mettre du texte en dégradé (background-clip: text)"
+        ]
+    }
+}

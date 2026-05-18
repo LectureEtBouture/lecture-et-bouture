@@ -1,0 +1,11 @@
+adminer.localhost {
+  reverse_proxy adminer:8080
+}
+
+portainer.localhost {
+  reverse_proxy portainer:9000
+}
+
+app.localhost {
+  reverse_proxy host.docker.internal:3000
+}
