@@ -112,3 +112,37 @@ Mot de passe minimum 12 caractères.
 ```bash
 docker compose down
 ```
+
+---
+
+## Backlog
+
+### Pages manquantes
+
+- Home (`/`) — sélection conservateur + CTA "Me faire surprendre"
+- Page "Me faire surprendre" — livre aléatoire parmi `choixLibrairie`, avec édito du libraire
+- Contact, concept, mentions légales
+
+### Front — planifié
+
+- **"L'avis de la librairie"** — champ texte séparé en BDD (≠ avis utilisateurs), affiché en évidence sur la fiche. "Pourquoi on aime ce livre."
+- **Open Graph / Satori** — `@vercel/og`, image OG par fiche livre/bouture
+- **LocalStorage historique** — tracker livres/boutures visités → alimenter les recommandations
+- **SEO** — metadata API Next.js, sitemap.xml, robots.txt, sémantique HTML, audit a11y
+
+### Back-office — planifié
+
+- **Google Books API** — back-office uniquement : ISBN → auto-fill titre / auteur / couverture à la création d'un livre (`https://developers.google.com/books/docs/v1/using`)
+- **RTE** — éditeur rich text pour descriptions (`https://tiptap.dev/`)
+- **Avis** — formulaire de soumission front → modération back-office
+
+### Infra — quand nécessaire
+
+- **MinIO** — stockage images boutures (upload admin). Priorité : tester l'API leslibraires.fr pour les couvertures livres d'abord. MinIO = S3-compatible, déployable via Docker.
+- **Meilisearch** — moteur de recherche (analytics, open source, privacy). À envisager quand le catalogue dépasse ~500 entrées ou quand les filtres JSON ne suffisent plus.
+
+### À définir
+
+- Rebrand "newsletter" → terme cohérent avec l'univers librairie (TBD)
+- Choix de la font body (TBD)
+- Validation éco-conception : `https://www.thegreenwebfoundation.org/`

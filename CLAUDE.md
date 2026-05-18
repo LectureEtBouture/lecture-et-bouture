@@ -20,6 +20,10 @@ Pas de lettre seule dans les callbacks (map, filter, find, forEach, etc.).
 
 Format simple `// Titre` uniquement. Jamais de lignes décoratives (`// ─── Titre ───────`). Pas de JSDoc sauf si la signature ne se suffit pas.
 
+## Formatage
+
+Ne jamais reformater le code existant. ESLint + Prettier tournent automatiquement — ne pas perdre de tokens à remettre en forme ce qu'ils gèrent.
+
 ## Longueur des fichiers
 
 Un fichier = une responsabilité. Cible : < 150 lignes.

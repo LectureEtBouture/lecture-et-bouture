@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import type { Livre, Rayon } from '@/lib/data';
 
 function capitalize(str: string) {
@@ -13,6 +14,8 @@ export function CoverPanel({
     coverColor: string;
     rayon?: Rayon;
 }) {
+    const mainImage = livre.images[0] ?? null;
+
     const fields = [
         { label: 'Prix', value: `${livre.prix} €` },
         ...(rayon ? [{ label: 'Rayon', value: rayon.nom }] : []),
@@ -39,18 +42,29 @@ export function CoverPanel({
     return (
         <div className="space-y-6">
             <div
-                className="aspect-2/3 w-full relative overflow-hidden"
+                className="aspect-book w-full relative overflow-hidden"
                 style={{ backgroundColor: coverColor }}
             >
-                <div
-                    className="absolute inset-0 opacity-[0.04] mix-blend-multiply"
-                    style={{
-                        backgroundImage:
-                            "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-                    }}
-                />
+                {mainImage ? (
+                    <Image
+                        src={mainImage}
+                        alt={livre.titre}
+                        fill
+                        className="object-cover"
+                        sizes="280px"
+                        priority
+                    />
+                ) : (
+                    <div
+                        className="absolute inset-0 opacity-[0.04] mix-blend-multiply"
+                        style={{
+                            backgroundImage:
+                                "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+                        }}
+                    />
+                )}
                 {livre.serie && livre.numeroSerie && (
-                    <span className="absolute bottom-3 left-3 text-[10px] uppercase tracking-widest text-foreground/50">
+                    <span className="absolute bottom-3 left-3 text-[10px] uppercase tracking-widest text-foreground/50 drop-shadow-sm">
                         Tome {livre.numeroSerie}
                     </span>
                 )}

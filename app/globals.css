@@ -16,6 +16,9 @@
 
     /* Spacing scale */
     --spacing-section: 5rem;
+
+    /* Aspect ratios */
+    --aspect-book: 2 / 3;
 }
 
 :root {

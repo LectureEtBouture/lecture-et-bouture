@@ -131,7 +131,10 @@
         "numeroSerie": 1,
         "prix": "17.00",
         "description": "La Terre est envahie. Des aliens ont transformé la surface de la planète en donjon télévisé. Carl, ancien marin, se retrouve piégé avec sa chatte Princess Donut dans ce jeu de mort en direct. Tome fondateur du genre LitRPG moderne.",
-        "images": [],
+        "images": [
+          "/dungeon-crawler-carl/main-cover.jpg",
+          "/dungeon-crawler-carl/DCC-1-variant.jpg"
+        ],
         "noteMoyenne": "4.9",
         "choixLibrairie": true,
         "stock": 5,
