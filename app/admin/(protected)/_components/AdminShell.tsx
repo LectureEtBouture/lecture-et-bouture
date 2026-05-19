@@ -13,6 +13,7 @@ const navItems = [
     { href: '/admin/avis', label: 'Avis' },
     { href: '/admin/evenements', label: 'Événements' },
     { href: '/admin/selections', label: 'Sélections' },
+    { href: '/admin/pages', label: 'Pages' },
 ];
 
 function useIsActive(href: string) {
