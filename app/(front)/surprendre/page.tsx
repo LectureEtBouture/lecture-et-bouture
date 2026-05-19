@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getLivresMisEnAvant, getCoverColor, getGenreById } from '@/lib/data';
+import { getLivresMisEnAvant } from '@/lib/queries/livres';
+import { getGenreById } from '@/lib/queries/genres';
+import { getCoverColor } from '@/lib/data';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,8 +16,8 @@ function pickRandom<T>(items: T[]): T | undefined {
     return items[Math.floor(Math.random() * items.length)];
 }
 
-export default function SurprendrePage() {
-    const candidats = getLivresMisEnAvant();
+export default async function SurprendrePage() {
+    const candidats = await getLivresMisEnAvant();
     const livre = pickRandom(candidats);
 
     if (!livre) {
@@ -35,7 +37,7 @@ export default function SurprendrePage() {
     }
 
     const coverColor = getCoverColor(livre.genreId);
-    const genre = getGenreById(livre.genreId ?? 0);
+    const genre = livre.genreId ? await getGenreById(livre.genreId) : null;
     const coverImage = livre.image ?? null;
     const achatUrl = `https://www.leslibraires.fr/recherche/?q=${encodeURIComponent(livre.titre + ' ' + livre.auteur)}`;
 
