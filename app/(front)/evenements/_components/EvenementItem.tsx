@@ -7,6 +7,8 @@ type Evenement = {
     dateFin: Date | null;
 };
 
+export type EvenementStatus = 'upcoming' | 'en_cours' | 'past';
+
 function formatJour(date: Date) {
     return new Date(date).toLocaleDateString('fr-FR', { day: 'numeric' });
 }
@@ -24,14 +26,14 @@ function formatHeure(date: Date) {
 
 export function EvenementItem({
     evenement,
-    past = false,
+    status = 'upcoming',
 }: {
     evenement: Evenement;
-    past?: boolean;
+    status?: EvenementStatus;
 }) {
     return (
         <article
-            className={`flex gap-8 py-8 border-b border-border ${past ? 'opacity-50' : ''}`}
+            className={`flex gap-8 py-8 border-b border-border ${status === 'past' ? 'opacity-40' : ''}`}
         >
             <div className="shrink-0 w-16 text-center pt-0.5">
                 <p className="font-serif text-3xl font-bold text-foreground leading-none tabular-nums">
@@ -42,9 +44,16 @@ export function EvenementItem({
                 </p>
             </div>
             <div className="min-w-0 space-y-2">
-                <h2 className="font-serif text-xl font-bold text-foreground leading-snug">
-                    {evenement.titre}
-                </h2>
+                <div className="flex flex-wrap items-center gap-3">
+                    <h2 className="font-serif text-xl font-bold text-foreground leading-snug">
+                        {evenement.titre}
+                    </h2>
+                    {status === 'en_cours' && (
+                        <span className="text-[9px] uppercase tracking-[0.12em] font-medium text-primary border border-primary/40 px-2 py-0.5 leading-none">
+                            En cours
+                        </span>
+                    )}
+                </div>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
                     <span className="text-[11px] uppercase tracking-[0.1em] text-muted">
                         {formatHeure(evenement.dateDebut)}

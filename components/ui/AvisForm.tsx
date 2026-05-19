@@ -66,7 +66,7 @@ export function AvisForm({ itemId, type }: Props) {
         return (
             <div className="border border-border bg-surface px-6 py-4">
                 <p className="text-sm text-foreground">
-                    Merci — votre avis sera publié après relecture.
+                    Merci — votre avis sera visible sous peu.
                 </p>
             </div>
         );

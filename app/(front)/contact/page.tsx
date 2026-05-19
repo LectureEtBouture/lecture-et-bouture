@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { sendContactEmail } from '@/services/resend';
+import { MapWrapper } from './_components/MapWrapper';
 
 export const metadata: Metadata = {
     title: 'Contact',
@@ -104,6 +105,30 @@ export default async function ContactPage({ searchParams }: Props) {
                     </button>
                 </form>
             )}
+
+            <section className="mt-20 pt-10 border-t border-border">
+                <p className="text-[11px] uppercase tracking-[0.14em] text-muted mb-6">
+                    Nous trouver
+                </p>
+                <div className="grid md:grid-cols-2 gap-10 items-start mb-8">
+                    <div className="space-y-1">
+                        <p className="text-base font-medium text-foreground">Lecture &amp; Boutures</p>
+                        <p className="text-sm text-muted leading-relaxed">
+                            12 rue des Plantes<br />
+                            75014 Paris
+                        </p>
+                        <p className="text-sm text-muted mt-3">
+                            Mar&mdash;Sam : 10h&ndash;19h<br />
+                            Dim&mdash;Lun : fermé
+                        </p>
+                    </div>
+                    <div className="text-sm text-muted space-y-1">
+                        <p>Métro : <span className="text-foreground">Mouton-Duvernet</span> (ligne 13)</p>
+                        <p>Bus : <span className="text-foreground">58, 68</span></p>
+                    </div>
+                </div>
+                <MapWrapper />
+            </section>
         </section>
     );
 }

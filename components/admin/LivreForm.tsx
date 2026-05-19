@@ -4,6 +4,7 @@ import { LivreFormIdentite } from './LivreFormIdentite';
 import { LivreFormClassification } from './LivreFormClassification';
 import { LivreFormCommerce } from './LivreFormCommerce';
 import { LivreFormContenu } from './LivreFormContenu';
+import { LivreFormLibrairie } from './LivreFormLibrairie';
 
 type Livre = InferSelectModel<typeof livres>;
 type Genre = InferSelectModel<typeof genres>;
@@ -27,6 +28,7 @@ export function LivreForm({ action, livre, genresList, rayonsList }: Props) {
             />
             <LivreFormCommerce livre={livre} />
             <LivreFormContenu livre={livre} />
+            <LivreFormLibrairie livre={livre} />
             <div className="flex items-center gap-4 pt-2">
                 <button
                     type="submit"

@@ -119,6 +119,8 @@ const statements = [
         contenu text,
         updated_at timestamp NOT NULL DEFAULT now()
     )`,
+    `ALTER TABLE evenements ADD COLUMN IF NOT EXISTS publie boolean NOT NULL DEFAULT true`,
+    `ALTER TABLE pages_editoriales ADD COLUMN IF NOT EXISTS publiee boolean NOT NULL DEFAULT true`,
 ];
 
 async function main() {

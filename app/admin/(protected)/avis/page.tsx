@@ -92,8 +92,8 @@ export default async function AdminAvisPage({
                                 'use server';
                                 await masquerAvis(a.id);
                             }}
-                            label="Masquer"
-                            variant="secondary"
+                            label="Visible"
+                            variant="toggle-on"
                         />
                         <ActionBtn
                             action={async () => {
@@ -118,8 +118,8 @@ export default async function AdminAvisPage({
                                 'use server';
                                 await remettreEnLigneAvis(a.id);
                             }}
-                            label="Remettre en ligne"
-                            variant="secondary"
+                            label="Masqué"
+                            variant="toggle-off"
                         />
                         <ActionBtn
                             action={async () => {

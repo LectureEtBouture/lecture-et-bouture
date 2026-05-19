@@ -37,21 +37,6 @@ export function LivreFormCommerce({ livre }: { livre?: Livre }) {
                     />
                 </div>
             </div>
-            <div className="flex items-center gap-3">
-                <input
-                    type="checkbox"
-                    name="choixLibrairie"
-                    id="choixLibrairie"
-                    defaultChecked={livre?.choixLibrairie ?? false}
-                    className="w-4 h-4 border-border accent-primary"
-                />
-                <label
-                    htmlFor="choixLibrairie"
-                    className="text-sm text-foreground cursor-pointer"
-                >
-                    Choix de la librairie
-                </label>
-            </div>
         </fieldset>
     );
 }

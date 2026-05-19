@@ -43,6 +43,7 @@ Concept hybride : livres académiques + boutures végétales. Expérience d'acha
 | `/admin/avis`                   | Modération avis                                                                                                           |
 | `/admin/selections`             | Gestion sélections du conservateur                                                                                        |
 | `/admin/evenements`             | CRUD événements                                                                                                           |
+| `/admin/pages`                  | Éditeur RTE pages éditoriales (concept, mentions légales, CGV, CGU, cookies, politique)                                   |
 
 ---
 
@@ -60,6 +61,9 @@ Concept hybride : livres académiques + boutures végétales. Expérience d'acha
 - **Achat** : redirection leslibraires.fr (v1) → API stocks/panier (v2+)
 - **Saisie livre assistée (back-office)** : deux modes d'aide à la saisie via Google Books API — (1) recherche par titre avec autocomplete (suggestions : titre + auteur + éditeur + année + édition) puis préremplissage complet du formulaire au choix ; (2) saisie ISBN seul → préremplissage complet (titre, auteur, éditeur, année, édition, image de couverture, description). Les champs restent éditables après import.
 - **RTE descriptions** : éditeur rich text (Tiptap) pour les champs `description` des livres et boutures. Rendu en HTML côté front.
+- **Pages éditoriales** : concept, mentions légales, CGV, CGU, cookies, politique de confidentialité — contenu rédigé via RTE en back-office, stocké en DB, sanitizé côté serveur avant rendu (`sanitize-html`). Éditeur complet : H1–H6, listes, couleurs texte/fond, alignement, surlignage, taille de police, liens (avec option nouvel onglet), accordéon, saut de ligne, bubble menu contextuel, drag handle.
+- **Événements** : agenda administrable, état calculé à la volée (passé / en cours / à venir), événement mis en avant sur la home (en cours prioritaire, sinon prochain).
+- **Erreurs custom** : 404 et 500 dans le thème.
 - **Contact** : formulaire → Resend
 - **Newsletter** : Loops
 - **Analytics** : Umami (privacy-first)
@@ -98,10 +102,4 @@ Concept hybride : livres académiques + boutures végétales. Expérience d'acha
 
 ---
 
-## TO REFINE
 
-- Intégration API leslibraires.fr (stocks / panier) / Google books ? A voir si une alternative est possible (et prix des API / disponibilités)
-- Infinite scroll sur /livres et /boutures (avec cache + optimisations perf — à faire après migration vers PostgreSQL)
-- Utilisation de font Dancing Script pour les avis de la libraire
-- Utilisation de font Raleway pour tout le reste (par défaut)
-- Formbricks ? Surveys

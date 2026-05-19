@@ -155,6 +155,7 @@ export const evenements = pgTable('evenements', {
     lieu: varchar('lieu', { length: 300 }),
     dateDebut: timestamp('date_debut').notNull(),
     dateFin: timestamp('date_fin'),
+    publie: boolean('publie').notNull().default(true),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -174,5 +175,6 @@ export const pagesEditoriales = pgTable('pages_editoriales', {
     slug: varchar('slug', { length: 100 }).primaryKey(),
     titre: varchar('titre', { length: 200 }).notNull(),
     contenu: text('contenu'),
+    publiee: boolean('publiee').notNull().default(true),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

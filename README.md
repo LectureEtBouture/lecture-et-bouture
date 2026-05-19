@@ -6,9 +6,12 @@ Boutique hybride livres académiques + boutures végétales.
 
 - **Next.js 16** (App Router) — front + back-office + API
 - **PostgreSQL 16** — base de données
-- **Drizzle ORM** — schéma et migrations
+- **Drizzle ORM** — schéma typé
 - **NextAuth v5** — auth back-office (JWT, httpOnly cookies)
 - **Argon2id** — hashing mots de passe
+- **Tiptap** — éditeur rich text (pages éditoriales, descriptions)
+- **Raleway** — police principale (corps, UI)
+- **Dancing Script** — police manuscrite (note de la librairie)
 - **Caddy** — reverse proxy HTTPS local
 - **Adminer** — interface BDD
 - **Portainer** — interface Docker
@@ -48,11 +51,11 @@ npm run dev
 
 ## URLs
 
-| Service   | URL                   |
-| --------- | --------------------- |
-| App       | http://localhost:3000 |
-| Adminer   | http://localhost:8080 |
-| Portainer | http://localhost:9000 |
+| Service   | URL                    |
+| --------- |------------------------|
+| App       | https://localhost:3000 |
+| Adminer   | http://localhost:8080  |
+| Portainer | http://localhost:9000  |
 
 **Adminer** : serveur `leb-db` · user `leb` · password `leb` · db `leb`
 
@@ -61,19 +64,23 @@ npm run dev
 ## Base de données
 
 ```bash
-# Générer une migration après modif du schéma
-npm run db:generate
-
-# Appliquer les migrations
+# Créer les tables (idempotent — safe à rejouer)
 npm run db:migrate
+
+# Peupler avec les données de démo
+npm run db:seed
+
+# Reset complet (drop + migrate + seed)
+npm run db:reset
 
 # Interface Drizzle Studio
 npm run db:studio
 ```
 
 Schéma : `db/schema.ts`  
-Connexion : `db/index.ts`  
-Config : `drizzle.config.ts`
+Migration : `db/migrate.ts` (SQL brut idempotent, une table à la fois)  
+Seed : `db/seed.ts`  
+Connexion : `db/index.ts`
 
 Variables d'environnement dans `.env.local` :
 
@@ -108,47 +115,47 @@ docker compose down
 
 ## État du projet
 
-### Back-office — fait
+### Front public
 
-- Dashboard : stats, alertes ruptures/avis, agenda événements
-- Livres : CRUD complet, filtres rayon/choix librairie, tri, responsive mobile
-- Boutures : CRUD complet, filtres difficulté/choix librairie, tri, responsive mobile
-- Avis : modération (approuver, masquer), tri par date/note/type
-- Événements : CRUD complet, distinction passé/à venir, responsive mobile
-- Sélections : CRUD, drag-and-drop pour l'ordre (sélections et items), visibilité publique/privée
-- Navigation admin : burger menu mobile, sidebar desktop
+- Accueil — sections livres thématiques + événement mis en avant + CTA "Surprendre"
+- `/livres` — catalogue avec filtres complets (rayon, genre, série, éditeur, format, tri, choix)
+- `/livres/[slug]` — fiche avec avis et recommandations
+- `/boutures` — vitrine bento (grande/petite carte alternées, section explicative)
+- `/boutures/[slug]` — fiche avec avis
+- `/surprendre` — livre aléatoire parmi les choix de la librairie
+- `/evenements` — agenda avec état en cours / à venir / passé
+- `/selections` — sélections actives du conservateur
+- `/contact` — formulaire + section "Nous trouver" avec adresse et carte Leaflet (CartoDB light, SSR:false)
+- `/concept`, `/mentions-legales`, `/cgv`, `/cgu`, `/cookies`, `/politique-de-confidentialite` — pages éditoriales (contenu géré via RTE en back-office)
+- 404 et 500 custom
 
-### Front public — fait (v1)
+### Back-office
 
-- Page d'accueil
-- Catalogue livres avec filtres (genre, rayon) et tri
-- Fiche livre avec avis
-- Catalogue boutures avec filtres (difficulté) et tri
-- Fiche bouture avec avis
-- Page "Surprendre" (sélection aléatoire)
-- Page événements (`/evenements`) — à venir + passés récents
-- Page sélections (`/selections`) — sélections actives du conservateur, items livres + boutures cliquables
-- Avis : formulaire de dépôt sur les fiches produit (livres + boutures)
-- Navigation publique (Livres, Boutures, Sélections, Événements, Concept, Contact)
+- Dashboard — stats, alertes, agenda
+- Logo `leb-nobg.png` — nav + footer
+- Navbar responsive — burger menu mobile (overlay, animation X)
+- Livres — CRUD complet + filtres + tri
+- Boutures — CRUD complet + filtres + tri
+- Genres, Rayons — CRUD
+- Avis — modération (3 états : en attente / visible / masqué) + toggle rapide par ligne
+- Sélections — CRUD + ordre drag-and-drop
+- Événements — CRUD + filtre état + tri date + toggle publié/privé par ligne
+- Pages éditoriales — éditeur Tiptap riche + toggle publiée/privée par ligne
+- Formulaire livre — section "Sélection librairie" repliable (choix librairie + note, indépendants)
+
+### Infra
+
+- PostgreSQL + Drizzle — migration SQL brute idempotente (pas de drizzle-kit push)
+- Seed — livres, boutures, genres, rayons, avis, pages éditoriales, admin user
+- sanitize-html côté serveur pour tout contenu RTE affiché en front
 
 ---
 
 ## Backlog
 
-### Back-office — à faire
-
-- **Google Books API** — ISBN → auto-fill titre / auteur / couverture ([doc](https://developers.google.com/books/docs/v1/using))
-- **Upload images boutures** — MinIO ou stockage local
-- **RTE** — éditeur rich text pour descriptions ([Tiptap](https://tiptap.dev/))
-
-### Infra — quand nécessaire
-
-- **MinIO** — stockage images boutures (upload admin). Tester l'API leslibraires.fr pour les couvertures livres d'abord.
-- **Meilisearch** — quand le catalogue dépasse ~500 entrées ou quand les filtres ne suffisent plus.
-
-### À définir
-
-- Rebrand "newsletter" → terme cohérent avec l'univers librairie
-- Choix de la font body
-- Contenu pages légales (mentions légales, CGV, CGU, cookies, politique de confidentialité)
-- Validation éco-conception : [thegreenwebfoundation.org](https://www.thegreenwebfoundation.org/)
+- Google Books API — ISBN → auto-fill + recherche titre autocomplete
+- MinIO — stockage images boutures
+- Meilisearch — recherche full-text (> ~500 entrées)
+- Analytics Umami
+- Newsletter Loops
+- Éco-conception

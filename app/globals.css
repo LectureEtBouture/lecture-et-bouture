@@ -12,7 +12,7 @@
 
     /* Typography */
     --font-serif: var(--font-noto-serif);
-    --font-sans: var(--font-manrope);
+    --font-sans: var(--font-raleway);
 
     /* Spacing scale */
     --spacing-section: 5rem;
@@ -20,8 +20,7 @@
     /* Aspect ratios */
     --aspect-book: 2 / 3;
 
-    /* Police manuscrite — remplacer par une cursive quand disponible */
-    --font-manuscript: var(--font-noto-serif);
+    --font-manuscript: var(--font-dancing-script);
 
     /* Fond note de la librairie — papier vergé chaud, distinct du sable et du blanc */
     --color-note: #fdf9f2;
@@ -41,47 +40,77 @@ body {
 }
 
 .prose {
-    & h2 {
-        @apply font-serif text-xl font-bold text-foreground mt-8 mb-4;
-    }
+    & h1 { @apply font-serif text-3xl font-bold text-foreground mt-10 mb-5; }
+    & h2 { @apply font-serif text-xl font-bold text-foreground mt-8 mb-4; }
+    & h3 { @apply font-serif text-lg font-bold text-foreground mt-6 mb-3; }
+    & h4 { @apply font-serif text-base font-bold text-foreground mt-5 mb-2; }
+    & h5 { @apply text-sm font-bold text-foreground mt-4 mb-1 uppercase tracking-wide; }
+    & h6 { @apply text-xs font-bold text-muted mt-3 mb-1 uppercase tracking-wider; }
 
-    & h3 {
-        @apply font-serif text-lg font-bold text-foreground mt-6 mb-3;
-    }
+    & p { @apply text-base leading-[1.75] max-w-[68ch] mb-4 text-foreground; }
 
-    & p {
-        @apply text-base leading-[1.75] max-w-[68ch] mb-4 text-foreground;
-    }
+    & ul { @apply list-disc pl-6 mb-4 space-y-1; }
+    & ol { @apply list-decimal pl-6 mb-4 space-y-1; }
+    & li { @apply text-base leading-[1.75] text-foreground; }
 
-    & ul {
-        @apply list-disc pl-6 mb-4 space-y-1;
-    }
+    & strong { @apply font-semibold; }
+    & em { @apply italic; }
+    & u { @apply underline underline-offset-2; }
+    & s { @apply line-through; }
 
-    & ol {
-        @apply list-decimal pl-6 mb-4 space-y-1;
-    }
+    & a { @apply underline underline-offset-4 text-primary hover:text-primary-light transition-colors; }
 
-    & li {
-        @apply text-base leading-[1.75] text-foreground;
-    }
+    & mark { @apply rounded-sm px-0.5; }
 
-    & strong {
-        @apply font-semibold;
-    }
+    & blockquote { @apply border-l border-border pl-6 italic text-muted my-4; }
 
-    & em {
-        @apply italic;
-    }
+    & code { @apply bg-surface border border-border px-1 py-0.5 rounded-sm text-xs font-mono; }
+    & pre { @apply bg-surface border border-border p-4 overflow-x-auto my-4 text-sm font-mono; }
+    & pre code { @apply bg-transparent border-0 p-0; }
 
-    & a {
-        @apply underline underline-offset-4 hover:text-primary transition-colors;
-    }
+    & hr { @apply border-border my-8; }
 
-    & blockquote {
-        @apply border-l border-border pl-6 italic text-muted my-4;
-    }
+    & details { @apply border border-border my-4 overflow-hidden; }
+    & summary { @apply p-3 cursor-pointer font-medium select-none bg-surface; }
+    & details > div { @apply p-3; }
 
-    & p:last-child {
-        @apply mb-0;
+    & p:last-child { @apply mb-0; }
+}
+
+.admin-rte {
+    & .ProseMirror {
+        @apply outline-none min-h-[280px];
+
+        & h1 { @apply font-serif text-2xl font-bold text-foreground mt-8 mb-4; }
+        & h2 { @apply font-serif text-xl font-bold text-foreground mt-6 mb-3; }
+        & h3 { @apply font-serif text-lg font-bold text-foreground mt-5 mb-2; }
+        & h4 { @apply font-serif text-base font-bold text-foreground mt-4 mb-2; }
+        & h5 { @apply text-sm font-bold text-foreground mt-3 mb-1 uppercase tracking-wide; }
+        & h6 { @apply text-xs font-bold text-muted mt-2 mb-1 uppercase tracking-wider; }
+
+        & p { @apply mb-3 leading-relaxed; }
+
+        & a { @apply text-primary underline underline-offset-2 hover:text-primary-light transition-colors; }
+        & mark { @apply bg-yellow-200/70 rounded-sm px-0.5; }
+
+        & ul { @apply list-disc pl-5 mb-3; }
+        & ol { @apply list-decimal pl-5 mb-3; }
+        & li { @apply mb-1; }
+
+        & blockquote { @apply border-l-2 border-border pl-4 italic text-muted my-4; }
+
+        & code { @apply bg-surface border border-border px-1 py-0.5 rounded-sm text-xs font-mono; }
+        & pre { @apply bg-surface border border-border p-4 overflow-x-auto my-4; }
+        & pre code { @apply bg-transparent border-0 p-0; }
+
+        & hr { @apply border-border my-6; }
+
+        & table { @apply border-collapse w-full my-4 text-sm; }
+        & td, & th { @apply border border-border p-2 align-top; }
+        & th { @apply bg-surface font-bold text-left; }
+
+        & details { @apply border border-border my-4 overflow-hidden; }
+        & summary { @apply p-3 cursor-pointer font-medium select-none bg-surface; }
+        & details > div { @apply p-3; }
     }
 }

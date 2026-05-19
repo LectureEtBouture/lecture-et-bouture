@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import { siteConfig } from '@/lib/metadata';
 import { getLivresPubliques } from '@/lib/queries/livres';
+import { getEvenementMisEnAvant } from '@/lib/queries/evenements';
 import { HeroSection } from './_components/HeroSection';
 import { LivresSection } from './_components/LivresSection';
 import { SurprendreSection } from './_components/SurprendreSection';
+import { EvenementEnAvant } from './_components/EvenementEnAvant';
 
 export const metadata: Metadata = {
     title: siteConfig.name,
@@ -42,14 +44,19 @@ const SECTIONS = [
     },
 ] as const;
 
+export const dynamic = 'force-dynamic';
+
 export default async function HomePage() {
-    const livresParSection = await Promise.all(
-        SECTIONS.map((section) =>
-            getLivresPubliques(section.filters).then((livres) =>
-                livres.slice(0, LIMIT),
+    const [livresParSection, evenementMisEnAvant] = await Promise.all([
+        Promise.all(
+            SECTIONS.map((section) =>
+                getLivresPubliques(section.filters).then((livres) =>
+                    livres.slice(0, LIMIT),
+                ),
             ),
         ),
-    );
+        getEvenementMisEnAvant(),
+    ]);
 
     return (
         <>
@@ -63,6 +70,12 @@ export default async function HomePage() {
                     href={section.href}
                 />
             ))}
+            {evenementMisEnAvant && (
+                <EvenementEnAvant
+                    evenement={evenementMisEnAvant.evenement}
+                    status={evenementMisEnAvant.status}
+                />
+            )}
             <SurprendreSection />
         </>
     );

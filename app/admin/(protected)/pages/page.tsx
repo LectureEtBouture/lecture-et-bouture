@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getPagesList } from '@/lib/actions/pages';
+import { getPagesList, togglePagePubliee } from '@/lib/actions/pages';
 
 const ROUTE_LABELS: Record<string, string> = {
     concept: 'Notre concept',
@@ -29,20 +29,38 @@ export default async function AdminPagesPage() {
                         key={page.slug}
                         className="flex items-center justify-between py-4"
                     >
-                        <div>
-                            <p className="text-sm font-medium text-foreground">
+                        <div className="min-w-0 flex-1">
+                            <Link
+                                href={`/${page.slug}`}
+                                target="_blank"
+                                className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+                            >
                                 {ROUTE_LABELS[page.slug] ?? page.titre}
-                            </p>
+                            </Link>
                             <p className="text-xs text-muted font-mono mt-0.5">
                                 /{page.slug}
                             </p>
                         </div>
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-4 shrink-0">
                             <span
                                 className={`text-[10px] uppercase tracking-widest ${page.contenu ? 'text-primary' : 'text-muted'}`}
                             >
                                 {page.contenu ? 'Rédigée' : 'Vide'}
                             </span>
+                            <form
+                                action={async () => {
+                                    'use server';
+                                    await togglePagePubliee(page.slug);
+                                }}
+                                className="contents"
+                            >
+                                <button
+                                    type="submit"
+                                    className={`text-[10px] uppercase tracking-[0.08em] px-1.5 py-0.5 border transition-colors leading-none ${page.publiee ? 'border-primary text-primary hover:bg-primary hover:text-background' : 'border-border text-muted hover:border-primary hover:text-primary'}`}
+                                >
+                                    {page.publiee ? 'Publiée' : 'Privée'}
+                                </button>
+                            </form>
                             <Link
                                 href={`/admin/pages/${page.slug}/modifier`}
                                 className="text-xs text-muted hover:text-primary transition-colors"

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Noto_Serif, Manrope } from 'next/font/google';
+import { Noto_Serif, Raleway, Dancing_Script } from 'next/font/google';
 import Script from 'next/script';
 import { baseMetadata } from '@/lib/metadata';
 import './globals.css';
@@ -11,9 +11,15 @@ const notoSerif = Noto_Serif({
     display: 'swap',
 });
 
-const manrope = Manrope({
+const raleway = Raleway({
     subsets: ['latin'],
-    variable: '--font-manrope',
+    variable: '--font-raleway',
+    display: 'swap',
+});
+
+const dancingScript = Dancing_Script({
+    subsets: ['latin'],
+    variable: '--font-dancing-script',
     display: 'swap',
 });
 
@@ -23,7 +29,7 @@ export default function RootLayout({
     children,
 }: Readonly<{ children: React.ReactNode }>) {
     return (
-        <html lang="fr" className={`${notoSerif.variable} ${manrope.variable}`}>
+        <html lang="fr" className={`${notoSerif.variable} ${raleway.variable} ${dancingScript.variable}`}>
             <body className="min-h-screen bg-background text-foreground">
                 {children}
             </body>

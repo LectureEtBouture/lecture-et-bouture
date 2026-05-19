@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
-import { getEvenements } from '@/lib/actions/evenements';
+import { getEvenementsPublics } from '@/lib/queries/evenements';
 import { EvenementItem } from './_components/EvenementItem';
+import type { EvenementStatus } from './_components/EvenementItem';
 
 export const metadata: Metadata = {
     title: 'Événements',
@@ -10,14 +11,35 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
+function getStatus(
+    dateDebut: Date,
+    dateFin: Date | null,
+    now: Date,
+): EvenementStatus {
+    const debut = new Date(dateDebut);
+    const fin = dateFin ? new Date(dateFin) : null;
+    if (debut <= now && fin !== null && fin > now) return 'en_cours';
+    if (debut > now) return 'upcoming';
+    return 'past';
+}
+
 export default async function EvenementsPage() {
-    const all = await getEvenements();
+    const all = await getEvenementsPublics();
     const now = new Date();
-    const upcoming = all.filter((e) => new Date(e.dateDebut) >= now);
-    const past = all
-        .filter((e) => new Date(e.dateDebut) < now)
+
+    const withStatus = all.map((e) => ({
+        ...e,
+        status: getStatus(e.dateDebut, e.dateFin, now),
+    }));
+
+    const enCours = withStatus.filter((e) => e.status === 'en_cours');
+    const upcoming = withStatus.filter((e) => e.status === 'upcoming');
+    const past = withStatus
+        .filter((e) => e.status === 'past')
         .slice(-5)
         .reverse();
+
+    const hasActive = enCours.length > 0 || upcoming.length > 0;
 
     return (
         <div className="max-w-3xl mx-auto px-6 py-section">
@@ -30,7 +52,7 @@ export default async function EvenementsPage() {
                 </h1>
             </header>
 
-            {upcoming.length === 0 ? (
+            {!hasActive ? (
                 <div className="py-16 text-center">
                     <p className="text-sm text-muted italic">
                         Aucun événement prévu pour le moment.
@@ -41,10 +63,18 @@ export default async function EvenementsPage() {
                 </div>
             ) : (
                 <div className="divide-y divide-border">
+                    {enCours.map((evenement) => (
+                        <EvenementItem
+                            key={evenement.id}
+                            evenement={evenement}
+                            status="en_cours"
+                        />
+                    ))}
                     {upcoming.map((evenement) => (
                         <EvenementItem
                             key={evenement.id}
                             evenement={evenement}
+                            status="upcoming"
                         />
                     ))}
                 </div>
@@ -60,7 +90,7 @@ export default async function EvenementsPage() {
                             <EvenementItem
                                 key={evenement.id}
                                 evenement={evenement}
-                                past
+                                status="past"
                             />
                         ))}
                     </div>

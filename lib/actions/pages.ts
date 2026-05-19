@@ -39,3 +39,20 @@ export async function updatePage(slug: string, formData: FormData) {
     revalidatePath(`/admin/pages/${slug}/modifier`);
     redirect('/admin/pages');
 }
+
+export async function togglePagePubliee(slug: string) {
+    await requireAdmin();
+    const row = await db
+        .select({ publiee: pagesEditoriales.publiee })
+        .from(pagesEditoriales)
+        .where(eq(pagesEditoriales.slug, slug))
+        .limit(1)
+        .then((r) => r[0]);
+    if (!row) return;
+    await db
+        .update(pagesEditoriales)
+        .set({ publiee: !row.publiee, updatedAt: new Date() })
+        .where(eq(pagesEditoriales.slug, slug));
+    revalidatePath('/admin/pages');
+    revalidatePath(`/${slug}`);
+}
