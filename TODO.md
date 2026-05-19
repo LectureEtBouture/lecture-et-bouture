@@ -54,8 +54,9 @@
 
 ## Back-office — à faire
 
-- [ ] Google Books API — auto-fill ISBN → titre/auteur/couverture (création livre)
-- [ ] RTE (Tiptap) — éditeur descriptions
+- [ ] RTE (Tiptap) — éditeur rich text pour descriptions livres et boutures
+- [ ] Google Books API — recherche par titre : autocomplete (titre + auteur + éditeur + année + édition) → sélection → préremplissage complet du formulaire livre
+- [ ] Google Books API — saisie ISBN → préremplissage complet du formulaire livre (titre, auteur, éditeur, année, édition, image, description)
 
 ## Infra — fait
 

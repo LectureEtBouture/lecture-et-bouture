@@ -58,6 +58,8 @@ Concept hybride : livres académiques + boutures végétales. Expérience d'acha
 - **Choix de la librairie** : badge "Choix de la librairie" sur les livres sélectionnés, administrable en BO, filtrable dans le catalogue
 - **Événements** : agenda d'événements (rencontres, lectures, ateliers) administrable en BO, affiché sur la home et sur une page dédiée
 - **Achat** : redirection leslibraires.fr (v1) → API stocks/panier (v2+)
+- **Saisie livre assistée (back-office)** : deux modes d'aide à la saisie via Google Books API — (1) recherche par titre avec autocomplete (suggestions : titre + auteur + éditeur + année + édition) puis préremplissage complet du formulaire au choix ; (2) saisie ISBN seul → préremplissage complet (titre, auteur, éditeur, année, édition, image de couverture, description). Les champs restent éditables après import.
+- **RTE descriptions** : éditeur rich text (Tiptap) pour les champs `description` des livres et boutures. Rendu en HTML côté front.
 - **Contact** : formulaire → Resend
 - **Newsletter** : Loops
 - **Analytics** : Umami (privacy-first)
