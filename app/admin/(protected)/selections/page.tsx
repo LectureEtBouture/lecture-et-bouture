@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { getSelections, deleteSelection } from '@/lib/actions/selections';
+import { getSelections } from '@/lib/actions/selections';
+import { SelectionsSortable } from './_components/SelectionsSortable';
 
 export default async function AdminSelectionsPage() {
     const data = await getSelections();
@@ -7,68 +8,43 @@ export default async function AdminSelectionsPage() {
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <h1 className="font-serif text-2xl font-bold text-foreground">
-                    Sélections
-                </h1>
+                <div>
+                    <h1 className="font-serif text-2xl font-bold text-foreground">
+                        Sélections
+                    </h1>
+                    <p className="text-[11px] text-muted mt-0.5">
+                        Mises en avant sur le site, affichées dans l&apos;ordre
+                        ci-dessous.
+                    </p>
+                </div>
                 <Link
                     href="/admin/selections/nouvelle"
-                    className="px-4 py-2 bg-[#2D4B3E] text-background text-xs uppercase tracking-widest hover:bg-primary-light transition-colors"
+                    className="px-4 py-2 bg-primary text-background text-[11px] uppercase tracking-[0.1em] hover:bg-primary-light transition-colors"
                 >
                     Créer
                 </Link>
             </div>
 
             {data.length === 0 ? (
-                <p className="text-sm text-muted">
+                <p className="text-sm text-muted py-4">
                     Aucune sélection pour l&apos;instant.
                 </p>
             ) : (
-                <div className="space-y-3">
-                    {data.map((s) => (
-                        <div
-                            key={s.id}
-                            className="bg-white border border-border px-5 py-4 flex items-center justify-between"
-                        >
-                            <div className="space-y-0.5">
-                                <p className="text-sm font-medium text-foreground">
-                                    {s.titre}
-                                </p>
-                                <p className="text-xs text-muted">
-                                    Ordre {s.ordre} ·{' '}
-                                    {s.active ? 'Active' : 'Inactive'}
-                                </p>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <Link
-                                    href={`/admin/selections/${s.id}`}
-                                    className="text-xs text-muted hover:text-[#2D4B3E] transition-colors"
-                                >
-                                    Gérer les items
-                                </Link>
-                                <Link
-                                    href={`/admin/selections/${s.id}/modifier`}
-                                    className="text-xs text-muted hover:text-[#2D4B3E] transition-colors"
-                                >
-                                    Modifier
-                                </Link>
-                                <form
-                                    action={async () => {
-                                        'use server';
-                                        await deleteSelection(s.id);
-                                    }}
-                                    className="inline"
-                                >
-                                    <button
-                                        type="submit"
-                                        className="text-xs text-muted hover:text-red-600 transition-colors"
-                                    >
-                                        Supprimer
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                <>
+                    <p className="text-[11px] text-muted flex items-center gap-2">
+                        <span>↕</span>
+                        Glissez pour modifier l&apos;ordre d&apos;affichage sur
+                        le site.
+                    </p>
+                    <SelectionsSortable
+                        initial={data.map((s) => ({
+                            id: s.id,
+                            titre: s.titre,
+                            active: s.active,
+                            itemCount: s.itemCount,
+                        }))}
+                    />
+                </>
             )}
         </div>
     );

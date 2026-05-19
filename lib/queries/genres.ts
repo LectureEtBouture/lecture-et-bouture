@@ -5,8 +5,12 @@ import { eq } from 'drizzle-orm';
 
 export const getGenreById = unstable_cache(
     async (id: number) =>
-        db.select().from(genres).where(eq(genres.id, id))
-            .limit(1).then(rows => rows[0] ?? null),
+        db
+            .select()
+            .from(genres)
+            .where(eq(genres.id, id))
+            .limit(1)
+            .then((rows) => rows[0] ?? null),
     ['genre-by-id'],
     { tags: ['genres'] },
 );

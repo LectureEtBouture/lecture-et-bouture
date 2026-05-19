@@ -1,0 +1,27 @@
+[
+    {
+        "id": 1,
+        "titre": "La Sélection du Conservateur",
+        "description": "Des choix faits pour durer. Livres et boutures réunis par une même exigence.",
+        "ordre": 0,
+        "active": true,
+        "items": [
+            { "type": "livre", "id": 1 },
+            { "type": "bouture", "id": 3 },
+            { "type": "livre", "id": 4 },
+            { "type": "bouture", "id": 1 }
+        ]
+    },
+    {
+        "id": 2,
+        "titre": "Débuter avec sérénité",
+        "description": "Pour ceux qui commencent — livres accessibles et boutures robustes.",
+        "ordre": 1,
+        "active": true,
+        "items": [
+            { "type": "livre", "id": 2 },
+            { "type": "bouture", "id": 2 },
+            { "type": "bouture", "id": 5 }
+        ]
+    }
+]

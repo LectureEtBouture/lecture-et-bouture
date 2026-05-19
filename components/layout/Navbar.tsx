@@ -4,6 +4,8 @@ import { siteConfig } from '@/lib/metadata';
 const navLinks = [
     { href: '/livres', label: 'Livres' },
     { href: '/boutures', label: 'Boutures' },
+    { href: '/selections', label: 'Sélections' },
+    { href: '/evenements', label: 'Événements' },
     { href: '/concept', label: 'Concept' },
     { href: '/contact', label: 'Contact' },
 ];

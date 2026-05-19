@@ -1,0 +1,10 @@
+[
+    { "id": 1, "slug": "philosophie", "nom": "Philosophie" },
+    { "id": 2, "slug": "botanique", "nom": "Botanique" },
+    { "id": 3, "slug": "essai", "nom": "Essai" },
+    { "id": 4, "slug": "litterature", "nom": "Littérature" },
+    { "id": 5, "slug": "sciences", "nom": "Sciences naturelles" },
+    { "id": 6, "slug": "histoire", "nom": "Histoire" },
+    { "id": 7, "slug": "litrpg", "nom": "LitRPG" },
+    { "id": 8, "slug": "fantasy", "nom": "Fantasy" }
+]

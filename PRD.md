@@ -98,8 +98,10 @@ Concept hybride : livres académiques + boutures végétales. Expérience d'acha
 
 ---
 
-## Hors scope v1
+## TO REFINE
 
-- Collections / bibliothèque virtuelle
-- Intégration API leslibraires.fr (stocks / panier)
+- Intégration API leslibraires.fr (stocks / panier) / Google books ? A voir si une alternative est possible (et prix des API / disponibilités)
 - Infinite scroll sur /livres et /boutures (avec cache + optimisations perf — à faire après migration vers PostgreSQL)
+- Utilisation de font Dancing Script pour les avis de la libraire
+- Utilisation de font Raleway pour tout le reste (par défaut)
+- Formbricks ? Surveys

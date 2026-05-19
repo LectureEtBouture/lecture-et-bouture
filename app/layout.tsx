@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import { Noto_Serif, Manrope } from 'next/font/google';
 import Script from 'next/script';
-import { Navbar } from '@/components/layout/Navbar';
-import { Footer } from '@/components/layout/Footer';
 import { baseMetadata } from '@/lib/metadata';
 import './globals.css';
 
@@ -26,10 +24,8 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
     return (
         <html lang="fr" className={`${notoSerif.variable} ${manrope.variable}`}>
-            <body className="min-h-screen flex flex-col">
-                <Navbar />
-                <main className="flex-1">{children}</main>
-                <Footer />
+            <body className="min-h-screen bg-background text-foreground">
+                {children}
             </body>
             {process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (
                 <Script

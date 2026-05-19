@@ -1,91 +1,78 @@
 import Link from 'next/link';
-import { getPlantes, deletePlante } from '@/lib/actions/plantes';
+import { getPlantes, type PlantesSort } from '@/lib/actions/plantes';
+import { BoutureSortFilter } from './_components/BoutureSortFilter';
+import { BouturesTable } from './_components/BouturesTable';
 
-export default async function AdminBouturesPage() {
-    const data = await getPlantes();
+function buildHref(params: Record<string, string | undefined>) {
+    const q = new URLSearchParams();
+    for (const [k, v] of Object.entries(params)) {
+        if (v) q.set(k, v);
+    }
+    const qs = q.toString();
+    return qs ? `/admin/boutures?${qs}` : '/admin/boutures';
+}
+
+const VALID_SORTS: PlantesSort[] = [
+    'recent',
+    'nom',
+    'prix',
+    'stock',
+    'difficulte',
+];
+const VALID_DIFFICULTES = ['facile', 'moyen', 'difficile'];
+
+export default async function AdminBouturesPage({
+    searchParams,
+}: {
+    searchParams: Promise<{
+        sort?: string;
+        choix?: string;
+        difficulte?: string;
+    }>;
+}) {
+    const {
+        sort: sortParam,
+        choix: choixParam,
+        difficulte: difficulteParam,
+    } = await searchParams;
+    const sort = (VALID_SORTS as string[]).includes(sortParam ?? '')
+        ? (sortParam as PlantesSort)
+        : 'recent';
+    const choix = choixParam === '1';
+    const difficulte = VALID_DIFFICULTES.includes(difficulteParam ?? '')
+        ? (difficulteParam as 'facile' | 'moyen' | 'difficile')
+        : undefined;
+
+    const data = await getPlantes(sort, {
+        choix: choix || undefined,
+        difficulte,
+    });
 
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <h1 className="font-serif text-2xl font-bold text-foreground">
-                    Boutures
-                </h1>
+                <div>
+                    <h1 className="font-serif text-2xl font-bold text-foreground">
+                        Boutures
+                    </h1>
+                    <p className="text-[11px] text-muted mt-0.5">
+                        {data.length} entrée{data.length > 1 ? 's' : ''}
+                    </p>
+                </div>
                 <Link
-                    href="/admin/(protected)/boutures/nouveau"
-                    className="px-4 py-2 bg-[#2D4B3E] text-background text-xs uppercase tracking-widest hover:bg-primary-light transition-colors"
+                    href="/admin/boutures/nouveau"
+                    className="px-4 py-2 bg-primary text-background text-[11px] uppercase tracking-[0.1em] hover:bg-primary-light transition-colors"
                 >
                     Ajouter
                 </Link>
             </div>
-
-            {data.length === 0 ? (
-                <p className="text-sm text-muted">
-                    Aucune plante pour l&apos;instant.
-                </p>
-            ) : (
-                <table className="w-full text-sm">
-                    <thead>
-                        <tr className="border-b border-border">
-                            <th className="text-left py-2 text-xs uppercase tracking-widest text-muted font-normal">
-                                Nom
-                            </th>
-                            <th className="text-left py-2 text-xs uppercase tracking-widest text-muted font-normal">
-                                Espèce
-                            </th>
-                            <th className="text-left py-2 text-xs uppercase tracking-widest text-muted font-normal">
-                                Prix
-                            </th>
-                            <th className="text-left py-2 text-xs uppercase tracking-widest text-muted font-normal">
-                                Difficulté
-                            </th>
-                            <th />
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {data.map((plante) => (
-                            <tr
-                                key={plante.id}
-                                className="border-b border-border/50 hover:bg-white transition-colors"
-                            >
-                                <td className="py-3 pr-4 font-medium text-foreground">
-                                    {plante.nom}
-                                </td>
-                                <td className="py-3 pr-4 text-muted italic">
-                                    {plante.espece ?? '—'}
-                                </td>
-                                <td className="py-3 pr-4 text-[#2D4B3E]">
-                                    {plante.prix} €
-                                </td>
-                                <td className="py-3 pr-4 text-muted">
-                                    {plante.difficulte ?? '—'}
-                                </td>
-                                <td className="py-3 text-right space-x-4">
-                                    <Link
-                                        href={`/admin/boutures/${plante.id}/modifier`}
-                                        className="text-xs text-muted hover:text-[#2D4B3E] transition-colors"
-                                    >
-                                        Modifier
-                                    </Link>
-                                    <form
-                                        action={async () => {
-                                            'use server';
-                                            await deletePlante(plante.id);
-                                        }}
-                                        className="inline"
-                                    >
-                                        <button
-                                            type="submit"
-                                            className="text-xs text-muted hover:text-red-600 transition-colors"
-                                        >
-                                            Supprimer
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            )}
+            <BoutureSortFilter
+                sort={sort}
+                choix={choix}
+                difficulte={difficulte}
+                buildHref={buildHref}
+            />
+            <BouturesTable data={data} />
         </div>
     );
 }

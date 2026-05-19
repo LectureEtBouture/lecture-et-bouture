@@ -10,7 +10,9 @@ export function BoutureCard({
     featured?: boolean;
 }) {
     const coverColor = getBoutureCoverColor(bouture.lumiere ?? '');
-    const difficulteLabel = bouture.difficulte ? DIFFICULTE_LABELS[bouture.difficulte] : undefined;
+    const difficulteLabel = bouture.difficulte
+        ? DIFFICULTE_LABELS[bouture.difficulte]
+        : undefined;
 
     return (
         <Link href={`/boutures/${bouture.slug}`} className="group block">

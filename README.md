@@ -38,16 +38,7 @@ npm install
 docker compose up -d
 ```
 
-### 2. (Première fois) Trusting le certificat Caddy
-
-```bash
-docker exec leb-caddy cat /data/caddy/pki/authorities/local/root.crt > /tmp/caddy-root.crt
-sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain /tmp/caddy-root.crt
-```
-
-Redémarre le navigateur après.
-
-### 3. Lancer Next.js
+### 2. Lancer Next.js
 
 ```bash
 npm run dev
@@ -57,11 +48,11 @@ npm run dev
 
 ## URLs
 
-| Service   | URL                         |
-| --------- | --------------------------- |
-| App       | https://app.localhost       |
-| Adminer   | https://adminer.localhost   |
-| Portainer | https://portainer.localhost |
+| Service   | URL                   |
+| --------- | --------------------- |
+| App       | http://localhost:3000 |
+| Adminer   | http://localhost:8080 |
+| Portainer | http://localhost:9000 |
 
 **Adminer** : serveur `leb-db` · user `leb` · password `leb` · db `leb`
 
@@ -115,34 +106,49 @@ docker compose down
 
 ---
 
+## État du projet
+
+### Back-office — fait
+
+- Dashboard : stats, alertes ruptures/avis, agenda événements
+- Livres : CRUD complet, filtres rayon/choix librairie, tri, responsive mobile
+- Boutures : CRUD complet, filtres difficulté/choix librairie, tri, responsive mobile
+- Avis : modération (approuver, masquer), tri par date/note/type
+- Événements : CRUD complet, distinction passé/à venir, responsive mobile
+- Sélections : CRUD, drag-and-drop pour l'ordre (sélections et items), visibilité publique/privée
+- Navigation admin : burger menu mobile, sidebar desktop
+
+### Front public — fait (v1)
+
+- Page d'accueil
+- Catalogue livres avec filtres (genre, rayon) et tri
+- Fiche livre avec avis
+- Catalogue boutures avec filtres (difficulté) et tri
+- Fiche bouture avec avis
+- Page "Surprendre" (sélection aléatoire)
+- Page événements (`/evenements`) — à venir + passés récents
+- Page sélections (`/selections`) — sélections actives du conservateur, items livres + boutures cliquables
+- Avis : formulaire de dépôt sur les fiches produit (livres + boutures)
+- Navigation publique (Livres, Boutures, Sélections, Événements, Concept, Contact)
+
+---
+
 ## Backlog
 
-### Pages manquantes
+### Back-office — à faire
 
-- Home (`/`) — sélection conservateur + CTA "Me faire surprendre"
-- Page "Me faire surprendre" — livre aléatoire parmi `choixLibrairie`, avec édito du libraire
-- Contact, concept, mentions légales
-
-### Front — planifié
-
-- **"L'avis de la librairie"** — champ texte séparé en BDD (≠ avis utilisateurs), affiché en évidence sur la fiche. "Pourquoi on aime ce livre."
-- **Open Graph / Satori** — `@vercel/og`, image OG par fiche livre/bouture
-- **LocalStorage historique** — tracker livres/boutures visités → alimenter les recommandations
-- **SEO** — metadata API Next.js, sitemap.xml, robots.txt, sémantique HTML, audit a11y
-
-### Back-office — planifié
-
-- **Google Books API** — back-office uniquement : ISBN → auto-fill titre / auteur / couverture à la création d'un livre (`https://developers.google.com/books/docs/v1/using`)
-- **RTE** — éditeur rich text pour descriptions (`https://tiptap.dev/`)
-- **Avis** — formulaire de soumission front → modération back-office
+- **Google Books API** — ISBN → auto-fill titre / auteur / couverture ([doc](https://developers.google.com/books/docs/v1/using))
+- **Upload images boutures** — MinIO ou stockage local
+- **RTE** — éditeur rich text pour descriptions ([Tiptap](https://tiptap.dev/))
 
 ### Infra — quand nécessaire
 
-- **MinIO** — stockage images boutures (upload admin). Priorité : tester l'API leslibraires.fr pour les couvertures livres d'abord. MinIO = S3-compatible, déployable via Docker.
-- **Meilisearch** — moteur de recherche (analytics, open source, privacy). À envisager quand le catalogue dépasse ~500 entrées ou quand les filtres JSON ne suffisent plus.
+- **MinIO** — stockage images boutures (upload admin). Tester l'API leslibraires.fr pour les couvertures livres d'abord.
+- **Meilisearch** — quand le catalogue dépasse ~500 entrées ou quand les filtres ne suffisent plus.
 
 ### À définir
 
-- Rebrand "newsletter" → terme cohérent avec l'univers librairie (TBD)
-- Choix de la font body (TBD)
-- Validation éco-conception : `https://www.thegreenwebfoundation.org/`
+- Rebrand "newsletter" → terme cohérent avec l'univers librairie
+- Choix de la font body
+- Contenu pages légales (mentions légales, CGV, CGU, cookies, politique de confidentialité)
+- Validation éco-conception : [thegreenwebfoundation.org](https://www.thegreenwebfoundation.org/)

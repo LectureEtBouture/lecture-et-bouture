@@ -15,6 +15,8 @@ services:
         image: adminer:latest
         container_name: leb-adminer
         restart: unless-stopped
+        ports:
+            - '8080:8080'
         depends_on:
             - postgres
 
@@ -22,27 +24,12 @@ services:
         image: portainer/portainer-ce:latest
         container_name: leb-portainer
         restart: unless-stopped
+        ports:
+            - '9000:9000'
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
             - portainer_data:/data
 
-    caddy:
-        image: caddy:2-alpine
-        container_name: leb-caddy
-        restart: unless-stopped
-        ports:
-            - '80:80'
-            - '443:443'
-        volumes:
-            - ./Caddyfile:/etc/caddy/Caddyfile:ro
-            - caddy_data:/data
-            - caddy_config:/config
-        depends_on:
-            - adminer
-            - portainer
-
 volumes:
     postgres_data:
     portainer_data:
-    caddy_data:
-    caddy_config:

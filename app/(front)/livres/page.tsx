@@ -56,7 +56,16 @@ export default async function LivresPage({ searchParams }: Props) {
         editeurs,
         formats,
     ] = await Promise.all([
-        getLivresPubliques({ rayon: rayonId, genre: genreId, serie, editeur, format, sort, q, choixLibrairie }),
+        getLivresPubliques({
+            rayon: rayonId,
+            genre: genreId,
+            serie,
+            editeur,
+            format,
+            sort,
+            q,
+            choixLibrairie,
+        }),
         isFiltered ? Promise.resolve([]) : getLivresMisEnAvant(),
         getLivresRayons(),
         getGenresActifs(rayonId),
@@ -93,7 +102,8 @@ export default async function LivresPage({ searchParams }: Props) {
             {isFiltered ? (
                 <div className="space-y-6 pt-4 border-t border-border">
                     <p className="text-sm text-muted">
-                        {livresList.length} titre{livresList.length !== 1 ? 's' : ''}
+                        {livresList.length} titre
+                        {livresList.length !== 1 ? 's' : ''}
                         {q && (
                             <>
                                 {' '}
@@ -112,7 +122,12 @@ export default async function LivresPage({ searchParams }: Props) {
                                 <LivreCard
                                     key={livre.id}
                                     livre={livre}
-                                    genreNom={genresList.find((genre) => genre.id === livre.genreId)?.nom}
+                                    genreNom={
+                                        genresList.find(
+                                            (genre) =>
+                                                genre.id === livre.genreId,
+                                        )?.nom
+                                    }
                                 />
                             ))}
                         </div>
@@ -134,7 +149,12 @@ export default async function LivresPage({ searchParams }: Props) {
                                         key={livre.id}
                                         livre={livre}
                                         featured
-                                        genreNom={genresList.find((genre) => genre.id === livre.genreId)?.nom}
+                                        genreNom={
+                                            genresList.find(
+                                                (genre) =>
+                                                    genre.id === livre.genreId,
+                                            )?.nom
+                                        }
                                     />
                                 ))}
                             </div>
@@ -157,7 +177,12 @@ export default async function LivresPage({ searchParams }: Props) {
                                 <LivreCard
                                     key={livre.id}
                                     livre={livre}
-                                    genreNom={genresList.find((genre) => genre.id === livre.genreId)?.nom}
+                                    genreNom={
+                                        genresList.find(
+                                            (genre) =>
+                                                genre.id === livre.genreId,
+                                        )?.nom
+                                    }
                                 />
                             ))}
                         </div>

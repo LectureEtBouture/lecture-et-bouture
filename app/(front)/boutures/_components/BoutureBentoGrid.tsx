@@ -1,6 +1,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { getBoutureCoverColor, DIFFICULTE_LABELS, LUMIERE_LABELS } from '@/lib/data';
+import {
+    getBoutureCoverColor,
+    DIFFICULTE_LABELS,
+    LUMIERE_LABELS,
+} from '@/lib/data';
 import type { BouturePublique } from '@/lib/queries/boutures';
 
 // Pattern bento pour 5 items, répété par blocs de 5 au-delà
@@ -14,11 +18,21 @@ const BENTO_PATTERN: { span: 1 | 2; colStartClass?: string }[] = [
     { span: 2, colStartClass: 'lg:col-start-2' },
 ];
 
-function BentoCard({ bouture, large }: { bouture: BouturePublique; large: boolean }) {
+function BentoCard({
+    bouture,
+    large,
+}: {
+    bouture: BouturePublique;
+    large: boolean;
+}) {
     const coverColor = getBoutureCoverColor(bouture.lumiere ?? '');
     const coverImage = bouture.image ?? null;
-    const difficulte = bouture.difficulte ? DIFFICULTE_LABELS[bouture.difficulte] : undefined;
-    const lumiere = bouture.lumiere ? LUMIERE_LABELS[bouture.lumiere] : undefined;
+    const difficulte = bouture.difficulte
+        ? DIFFICULTE_LABELS[bouture.difficulte]
+        : undefined;
+    const lumiere = bouture.lumiere
+        ? LUMIERE_LABELS[bouture.lumiere]
+        : undefined;
 
     if (large) {
         return (
@@ -112,7 +126,11 @@ function BentoCard({ bouture, large }: { bouture: BouturePublique; large: boolea
     );
 }
 
-export function BoutureBentoGrid({ boutures }: { boutures: BouturePublique[] }) {
+export function BoutureBentoGrid({
+    boutures,
+}: {
+    boutures: BouturePublique[];
+}) {
     if (boutures.length === 0) {
         return (
             <p className="text-sm text-muted py-16 text-center">

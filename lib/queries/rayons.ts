@@ -5,8 +5,12 @@ import { eq } from 'drizzle-orm';
 
 export const getRayonById = unstable_cache(
     async (id: number) =>
-        db.select().from(rayons).where(eq(rayons.id, id))
-            .limit(1).then(rows => rows[0] ?? null),
+        db
+            .select()
+            .from(rayons)
+            .where(eq(rayons.id, id))
+            .limit(1)
+            .then((rows) => rows[0] ?? null),
     ['rayon-by-id'],
     { tags: ['rayons'] },
 );

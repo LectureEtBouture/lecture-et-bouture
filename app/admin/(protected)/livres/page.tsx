@@ -1,86 +1,67 @@
 import Link from 'next/link';
-import { getLivres } from '@/lib/actions/livres';
-import { deleteLivre } from '@/lib/actions/livres';
+import { getLivres, getRayons, type LivresSort } from '@/lib/actions/livres';
+import { LivresSortFilter } from './_components/LivresSortFilter';
+import { LivresTable } from './_components/LivresTable';
 
-export default async function AdminLivresPage() {
-    const data = await getLivres();
+function buildHref(params: Record<string, string | undefined>) {
+    const q = new URLSearchParams();
+    for (const [k, v] of Object.entries(params)) {
+        if (v) q.set(k, v);
+    }
+    const qs = q.toString();
+    return qs ? `/admin/livres?${qs}` : '/admin/livres';
+}
+
+const VALID_SORTS: LivresSort[] = [
+    'recent',
+    'titre',
+    'auteur',
+    'prix',
+    'stock',
+];
+
+export default async function AdminLivresPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ sort?: string; choix?: string; rayon?: string }>;
+}) {
+    const { sort: sortParam, choix: choixParam, rayon } = await searchParams;
+    const sort = (VALID_SORTS as string[]).includes(sortParam ?? '')
+        ? (sortParam as LivresSort)
+        : 'recent';
+    const choix = choixParam === '1';
+
+    const [data, rayonsList] = await Promise.all([
+        getLivres(sort, { choix: choix || undefined, rayon }),
+        getRayons(),
+    ]);
 
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <h1 className="font-serif text-2xl font-bold text-foreground">
-                    Livres
-                </h1>
+                <div>
+                    <h1 className="font-serif text-2xl font-bold text-foreground">
+                        Livres
+                    </h1>
+                    <p className="text-[11px] text-muted mt-0.5">
+                        {data.length} entrée{data.length > 1 ? 's' : ''}
+                    </p>
+                </div>
                 <Link
                     href="/admin/livres/nouveau"
-                    className="px-4 py-2 bg-[#2D4B3E] text-background text-xs uppercase tracking-widest hover:bg-primary-light transition-colors"
+                    className="px-4 py-2 bg-primary text-background text-[11px] uppercase tracking-[0.1em] hover:bg-primary-light transition-colors"
                 >
                     Ajouter
                 </Link>
             </div>
-
-            {data.length === 0 ? (
-                <p className="text-sm text-muted">
-                    Aucun livre pour l&apos;instant.
-                </p>
-            ) : (
-                <table className="w-full text-sm">
-                    <thead>
-                        <tr className="border-b border-border">
-                            <th className="text-left py-2 text-xs uppercase tracking-widest text-muted font-normal">
-                                Titre
-                            </th>
-                            <th className="text-left py-2 text-xs uppercase tracking-widest text-muted font-normal">
-                                Auteur
-                            </th>
-                            <th className="text-left py-2 text-xs uppercase tracking-widest text-muted font-normal">
-                                Prix
-                            </th>
-                            <th />
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {data.map((livre) => (
-                            <tr
-                                key={livre.id}
-                                className="border-b border-border/50 hover:bg-white transition-colors"
-                            >
-                                <td className="py-3 pr-4 font-medium text-foreground">
-                                    {livre.titre}
-                                </td>
-                                <td className="py-3 pr-4 text-muted">
-                                    {livre.auteur}
-                                </td>
-                                <td className="py-3 pr-4 text-[#2D4B3E]">
-                                    {livre.prix} €
-                                </td>
-                                <td className="py-3 text-right space-x-4">
-                                    <Link
-                                        href={`/admin/livres/${livre.id}/modifier`}
-                                        className="text-xs text-muted hover:text-[#2D4B3E] transition-colors"
-                                    >
-                                        Modifier
-                                    </Link>
-                                    <form
-                                        action={async () => {
-                                            'use server';
-                                            await deleteLivre(livre.id);
-                                        }}
-                                        className="inline"
-                                    >
-                                        <button
-                                            type="submit"
-                                            className="text-xs text-muted hover:text-red-600 transition-colors"
-                                        >
-                                            Supprimer
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            )}
+            <LivresSortFilter
+                sort={sort}
+                choix={choix}
+                rayon={rayon}
+                rayonsList={rayonsList}
+                buildHref={buildHref}
+            />
+            <LivresTable data={data} />
         </div>
     );
 }

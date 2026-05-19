@@ -43,3 +43,27 @@ Un fichier = une responsabilité. Cible : < 150 lignes.
 - JSON mock dans `data/` pour le développement front
 - `lib/data.ts` — toutes les fonctions d'accès aux données
 - Renommer cohérent : le concept s'appelle **boutures** (pas plantes) côté public
+
+## Server / Client components
+
+Tous les composants sont Server Components par défaut. Ne pas ajouter `'use client'` sauf si le composant a besoin de :
+
+- `useState`, `useEffect`, hooks React
+- event handlers (`onClick`, `onChange`, etc.)
+- APIs navigateur (`localStorage`, `window`, etc.)
+
+Quand un composant enfant doit être client, garder son parent server et lui passer les données en props.
+
+## Cache (Next.js 16 — modèle sans `cacheComponents`)
+
+`cacheComponents` n'est **pas** activé dans `next.config.ts`. Le modèle actif est l'ancien modèle :
+
+**Pages statiques (défaut)** — pas de config nécessaire. Les pages sans accès à des données dynamiques (cookies, headers, searchParams) sont prérendues statiquement au build.
+
+**Pages dynamiques par requête** — exporter `export const dynamic = 'force-dynamic'` depuis la page. Utiliser pour les pages qui ont besoin d'un résultat différent à chaque requête (ex : `/surprendre` avec `Math.random()`).
+
+**Données non-fetch mises en cache** — utiliser `unstable_cache` de `next/cache` pour wrapper des fonctions accédant à la BDD ou à des fichiers JSON lourds, avec tags de revalidation.
+
+**`Math.random()` et opérations non-déterministes** — fonctionnent dans ce modèle avec `force-dynamic`. Si `cacheComponents` est activé un jour, il faudra migrer vers `connection()` + `<Suspense>` (voir `app/surprendre/page.tsx`).
+
+**Revalidation** — `revalidateTag('tag')` depuis une Server Action pour invalider le cache après mutation en back-office.

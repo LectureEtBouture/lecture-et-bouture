@@ -1,6 +1,11 @@
 import { notFound } from 'next/navigation';
 import { LivreForm } from '@/components/admin/LivreForm';
-import { getLivre, getGenres, updateLivre } from '@/lib/actions/livres';
+import {
+    getLivre,
+    getGenres,
+    getRayons,
+    updateLivre,
+} from '@/lib/actions/livres';
 
 export default async function ModifierLivrePage({
     params,
@@ -8,9 +13,10 @@ export default async function ModifierLivrePage({
     params: Promise<{ id: string }>;
 }) {
     const { id } = await params;
-    const [livre, genresList] = await Promise.all([
+    const [livre, genresList, rayonsList] = await Promise.all([
         getLivre(Number(id)),
         getGenres(),
+        getRayons(),
     ]);
 
     if (!livre) notFound();
@@ -22,7 +28,12 @@ export default async function ModifierLivrePage({
             <h1 className="font-serif text-2xl font-bold text-foreground">
                 Modifier — {livre.titre}
             </h1>
-            <LivreForm action={action} livre={livre} genresList={genresList} />
+            <LivreForm
+                action={action}
+                livre={livre}
+                genresList={genresList}
+                rayonsList={rayonsList}
+            />
         </div>
     );
 }

@@ -1,0 +1,92 @@
+[
+    {
+        "id": 1,
+        "slug": "sciences-nature",
+        "nom": "Sciences & Nature",
+        "description": "Botanique, zoologie, écologie, sciences de la vie et de la Terre"
+    },
+    {
+        "id": 2,
+        "slug": "litterature",
+        "nom": "Littérature",
+        "description": "Romans, nouvelles, classiques, littérature contemporaine et étrangère"
+    },
+    {
+        "id": 3,
+        "slug": "philosophie-essai",
+        "nom": "Philosophie & Essai",
+        "description": "Philosophie, essais, pensée critique, sciences humaines"
+    },
+    {
+        "id": 4,
+        "slug": "histoire",
+        "nom": "Histoire",
+        "description": "Histoire mondiale, biographies historiques, mémoires, géopolitique"
+    },
+    {
+        "id": 5,
+        "slug": "imaginaire",
+        "nom": "Imaginaire",
+        "description": "Science-fiction, fantasy, LitRPG, horreur, anticipation, weird fiction"
+    },
+    {
+        "id": 6,
+        "slug": "bande-dessinee",
+        "nom": "Bande dessinée",
+        "description": "BD franco-belge, comics américains, romans graphiques"
+    },
+    {
+        "id": 7,
+        "slug": "manga",
+        "nom": "Manga",
+        "description": "Manga japonais, manhwa coréen, manhua chinois"
+    },
+    {
+        "id": 8,
+        "slug": "jeunesse",
+        "nom": "Jeunesse",
+        "description": "Albums illustrés, romans jeunesse, young adult, livres documentaires enfants"
+    },
+    {
+        "id": 9,
+        "slug": "policier-thriller",
+        "nom": "Policier & Thriller",
+        "description": "Romans policiers, thrillers, suspense, littérature noire"
+    },
+    {
+        "id": 10,
+        "slug": "biographie",
+        "nom": "Biographie & Mémoires",
+        "description": "Autobiographies, biographies, journaux intimes, récits de vie"
+    },
+    {
+        "id": 11,
+        "slug": "art-beaux-livres",
+        "nom": "Art & Beaux livres",
+        "description": "Beaux livres, art, photographie, architecture, design, mode"
+    },
+    {
+        "id": 12,
+        "slug": "cuisine-gastronomie",
+        "nom": "Cuisine & Gastronomie",
+        "description": "Recettes, gastronomie, vins et spiritueux, alimentation"
+    },
+    {
+        "id": 13,
+        "slug": "voyage",
+        "nom": "Voyage & Géographie",
+        "description": "Guides de voyage, récits d'exploration, géographie, cartographie"
+    },
+    {
+        "id": 14,
+        "slug": "developpement-personnel",
+        "nom": "Développement personnel",
+        "description": "Bien-être, psychologie pratique, mindfulness, santé mentale"
+    },
+    {
+        "id": 15,
+        "slug": "poesie-theatre",
+        "nom": "Poésie & Théâtre",
+        "description": "Poésie, pièces de théâtre, livrets, textes dramatiques"
+    }
+]

@@ -5,7 +5,7 @@ export default function NouvellePlantePage() {
     return (
         <div className="space-y-6">
             <h1 className="font-serif text-2xl font-bold text-foreground">
-                Nouvelle plante
+                Nouvelle bouture
             </h1>
             <PlanteForm action={createPlante} />
         </div>

@@ -38,7 +38,12 @@ export default async function LivrePage({ params }: Props) {
         livre.genreId ? getGenreById(livre.genreId) : Promise.resolve(null),
         livre.rayonId ? getRayonById(livre.rayonId) : Promise.resolve(null),
         getAvisForLivre(livre.id),
-        getRecommendations(livre.id, livre.serie ?? null, livre.genreId ?? null, livre.auteur),
+        getRecommendations(
+            livre.id,
+            livre.serie ?? null,
+            livre.genreId ?? null,
+            livre.auteur,
+        ),
     ]);
     const coverColor = getCoverColor(livre.genreId);
 

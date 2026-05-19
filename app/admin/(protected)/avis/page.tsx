@@ -1,119 +1,137 @@
+import Link from 'next/link';
 import {
     getAvis,
-    approveAvis,
-    rejectAvis,
+    validerAvis,
+    masquerAvis,
+    remettreEnLigneAvis,
     deleteAvis,
+    type AvisSort,
 } from '@/lib/actions/avis';
+import { AvisSection } from './_components/AvisSection';
+import { AvisRow } from './_components/AvisRow';
+import { ActionBtn } from './_components/ActionBtn';
 
-export default async function AdminAvisPage() {
-    const data = await getAvis();
-    const enAttente = data.filter((a) => !a.approuve);
-    const approuves = data.filter((a) => a.approuve);
+const SORT_OPTIONS: { value: AvisSort; label: string }[] = [
+    { value: 'date-desc', label: 'Plus récents' },
+    { value: 'date-asc', label: 'Plus anciens' },
+    { value: 'note-desc', label: 'Meilleure note' },
+    { value: 'note-asc', label: 'Note croissante' },
+    { value: 'type', label: 'Type' },
+];
 
-    return (
-        <div className="space-y-8">
-            <h1 className="font-serif text-2xl font-bold text-foreground">
-                Avis
-            </h1>
-
-            {enAttente.length > 0 && (
-                <section className="space-y-3">
-                    <h2 className="text-xs uppercase tracking-widest text-muted">
-                        En attente ({enAttente.length})
-                    </h2>
-                    {enAttente.map((a) => (
-                        <AvisRow key={a.id} avis={a} />
-                    ))}
-                </section>
-            )}
-
-            {approuves.length > 0 && (
-                <section className="space-y-3">
-                    <h2 className="text-xs uppercase tracking-widest text-muted">
-                        Approuvés ({approuves.length})
-                    </h2>
-                    {approuves.map((a) => (
-                        <AvisRow key={a.id} avis={a} />
-                    ))}
-                </section>
-            )}
-
-            {data.length === 0 && (
-                <p className="text-sm text-muted">
-                    Aucun avis pour l&apos;instant.
-                </p>
-            )}
-        </div>
-    );
-}
-
-function AvisRow({
-    avis: a,
+export default async function AdminAvisPage({
+    searchParams,
 }: {
-    avis: Awaited<ReturnType<typeof getAvis>>[number];
+    searchParams: Promise<{ sort?: string }>;
 }) {
-    const produit = a.type === 'livre' ? a.livreTitre : a.planteNom;
+    const { sort: sortParam } = await searchParams;
+    const sort = (
+        SORT_OPTIONS.map((option) => option.value) as string[]
+    ).includes(sortParam ?? '')
+        ? (sortParam as AvisSort)
+        : 'date-desc';
+
+    const data = await getAvis(sort);
+    const enAttente = data.filter((a) => !a.approuve && !a.masque);
+    const visibles = data.filter((a) => a.approuve && !a.masque);
+    const masques = data.filter((a) => a.masque);
 
     return (
-        <div className="bg-white border border-border px-5 py-4 space-y-2">
-            <div className="flex items-start justify-between gap-4">
-                <div className="space-y-0.5">
-                    <p className="text-sm font-medium text-foreground">
-                        {a.auteurNom}
-                    </p>
-                    <p className="text-xs text-muted">
-                        {a.type === 'livre' ? 'Livre' : 'Plante'} ·{' '}
-                        {produit ?? '—'} · {'★'.repeat(a.note)}
-                        {'☆'.repeat(5 - a.note)}
-                    </p>
-                </div>
-                <div className="flex items-center gap-3 shrink-0">
-                    {!a.approuve && (
-                        <form
-                            action={async () => {
-                                'use server';
-                                await approveAvis(a.id);
-                            }}
+        <div className="space-y-10">
+            <div className="space-y-4">
+                <h1 className="font-serif text-2xl font-bold text-foreground">
+                    Avis
+                </h1>
+                <div className="flex items-center gap-2 flex-wrap">
+                    {SORT_OPTIONS.map((option) => (
+                        <Link
+                            key={option.value}
+                            href={`/admin/avis?sort=${option.value}`}
+                            className={`px-3 py-1.5 text-[11px] uppercase tracking-[0.08em] border transition-colors ${sort === option.value ? 'bg-primary border-primary text-background' : 'border-border text-muted hover:border-primary hover:text-primary'}`}
                         >
-                            <button
-                                type="submit"
-                                className="text-xs text-[#2D4B3E] hover:underline"
-                            >
-                                Approuver
-                            </button>
-                        </form>
-                    )}
-                    {a.approuve && (
-                        <form
-                            action={async () => {
-                                'use server';
-                                await rejectAvis(a.id);
-                            }}
-                        >
-                            <button
-                                type="submit"
-                                className="text-xs text-muted hover:underline"
-                            >
-                                Retirer
-                            </button>
-                        </form>
-                    )}
-                    <form
-                        action={async () => {
-                            'use server';
-                            await deleteAvis(a.id);
-                        }}
-                    >
-                        <button
-                            type="submit"
-                            className="text-xs text-muted hover:text-red-600 transition-colors"
-                        >
-                            Supprimer
-                        </button>
-                    </form>
+                            {option.label}
+                        </Link>
+                    ))}
                 </div>
             </div>
-            {a.texte && <p className="text-sm text-foreground/80">{a.texte}</p>}
+
+            <AvisSection
+                titre={`En attente${enAttente.length > 0 ? ` (${enAttente.length})` : ''}`}
+                vide="Aucun avis en attente."
+            >
+                {enAttente.map((a) => (
+                    <AvisRow key={a.id} avis={a}>
+                        <ActionBtn
+                            action={async () => {
+                                'use server';
+                                await validerAvis(a.id);
+                            }}
+                            label="Valider"
+                            variant="primary"
+                        />
+                        <ActionBtn
+                            action={async () => {
+                                'use server';
+                                await deleteAvis(a.id);
+                            }}
+                            label="Supprimer"
+                            variant="danger"
+                        />
+                    </AvisRow>
+                ))}
+            </AvisSection>
+
+            <AvisSection
+                titre={`Visibles${visibles.length > 0 ? ` (${visibles.length})` : ''}`}
+                vide="Aucun avis publié."
+            >
+                {visibles.map((a) => (
+                    <AvisRow key={a.id} avis={a}>
+                        <ActionBtn
+                            action={async () => {
+                                'use server';
+                                await masquerAvis(a.id);
+                            }}
+                            label="Masquer"
+                            variant="secondary"
+                        />
+                        <ActionBtn
+                            action={async () => {
+                                'use server';
+                                await deleteAvis(a.id);
+                            }}
+                            label="Supprimer"
+                            variant="danger"
+                        />
+                    </AvisRow>
+                ))}
+            </AvisSection>
+
+            <AvisSection
+                titre={`Masqués${masques.length > 0 ? ` (${masques.length})` : ''}`}
+                vide="Aucun avis masqué."
+            >
+                {masques.map((a) => (
+                    <AvisRow key={a.id} avis={a}>
+                        <ActionBtn
+                            action={async () => {
+                                'use server';
+                                await remettreEnLigneAvis(a.id);
+                            }}
+                            label="Remettre en ligne"
+                            variant="secondary"
+                        />
+                        <ActionBtn
+                            action={async () => {
+                                'use server';
+                                await deleteAvis(a.id);
+                            }}
+                            label="Supprimer"
+                            variant="danger"
+                        />
+                    </AvisRow>
+                ))}
+            </AvisSection>
         </div>
     );
 }
