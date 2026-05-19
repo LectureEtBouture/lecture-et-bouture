@@ -47,7 +47,9 @@ export const livreSelect = {
     publishedAt: livres.publishedAt,
 } as const;
 
-export type LivrePublique = Awaited<ReturnType<typeof getLivresPubliques>>[number];
+export type LivrePublique = Awaited<
+    ReturnType<typeof getLivresPubliques>
+>[number];
 
 function buildOrderBy(sort?: SortLivres) {
     switch (sort) {
@@ -74,9 +76,11 @@ export const getLivresPubliques = unstable_cache(
         if (filters.rayon) conditions.push(eq(livres.rayonId, filters.rayon));
         if (filters.genre) conditions.push(eq(livres.genreId, filters.genre));
         if (filters.serie) conditions.push(eq(livres.serie, filters.serie));
-        if (filters.editeur) conditions.push(eq(livres.editeur, filters.editeur));
+        if (filters.editeur)
+            conditions.push(eq(livres.editeur, filters.editeur));
         if (filters.format) conditions.push(eq(livres.format, filters.format));
-        if (filters.choixLibrairie) conditions.push(eq(livres.choixLibrairie, true));
+        if (filters.choixLibrairie)
+            conditions.push(eq(livres.choixLibrairie, true));
         if (filters.q) {
             const pattern = `%${filters.q}%`;
             const searchCondition = or(
@@ -88,7 +92,10 @@ export const getLivresPubliques = unstable_cache(
             );
             if (searchCondition) conditions.push(searchCondition);
         }
-        const query = db.select(livreSelect).from(livres).orderBy(buildOrderBy(filters.sort));
+        const query = db
+            .select(livreSelect)
+            .from(livres)
+            .orderBy(buildOrderBy(filters.sort));
         return conditions.length > 0 ? query.where(and(...conditions)) : query;
     },
     ['livres-publiques'],
@@ -97,15 +104,21 @@ export const getLivresPubliques = unstable_cache(
 
 export const getLivreBySlug = unstable_cache(
     async (slug: string) =>
-        db.select(livreSelect).from(livres).where(eq(livres.slug, slug))
-            .limit(1).then(rows => rows[0] ?? null),
+        db
+            .select(livreSelect)
+            .from(livres)
+            .where(eq(livres.slug, slug))
+            .limit(1)
+            .then((rows) => rows[0] ?? null),
     ['livre-by-slug'],
     { tags: ['livres'] },
 );
 
 export const getLivresMisEnAvant = unstable_cache(
     async () =>
-        db.select(livreSelect).from(livres)
+        db
+            .select(livreSelect)
+            .from(livres)
             .where(eq(livres.choixLibrairie, true))
             .orderBy(asc(livres.titre)),
     ['livres-mis-en-avant'],

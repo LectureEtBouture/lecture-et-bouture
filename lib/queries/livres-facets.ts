@@ -5,7 +5,12 @@ import { eq, isNotNull } from 'drizzle-orm';
 
 export const getLivresRayons = unstable_cache(
     async () =>
-        db.selectDistinct({ id: rayons.id, nom: rayons.nom, slug: rayons.slug })
+        db
+            .selectDistinct({
+                id: rayons.id,
+                nom: rayons.nom,
+                slug: rayons.slug,
+            })
             .from(rayons)
             .innerJoin(livres, eq(livres.rayonId, rayons.id))
             .orderBy(rayons.nom),
@@ -16,7 +21,11 @@ export const getLivresRayons = unstable_cache(
 export const getGenresActifs = unstable_cache(
     async (rayonId?: number) => {
         const baseQuery = db
-            .selectDistinct({ id: genres.id, nom: genres.nom, slug: genres.slug })
+            .selectDistinct({
+                id: genres.id,
+                nom: genres.nom,
+                slug: genres.slug,
+            })
             .from(genres)
             .innerJoin(livres, eq(livres.genreId, genres.id));
         return rayonId
@@ -36,7 +45,7 @@ export const getLivresSeries = unstable_cache(
             .orderBy(livres.serie);
         return rows
             .filter((row): row is { serie: string } => row.serie !== null)
-            .map(row => row.serie);
+            .map((row) => row.serie);
     },
     ['livres-series'],
     { tags: ['livres'] },
@@ -51,7 +60,7 @@ export const getLivresEditeurs = unstable_cache(
             .orderBy(livres.editeur);
         return rows
             .filter((row): row is { editeur: string } => row.editeur !== null)
-            .map(row => row.editeur);
+            .map((row) => row.editeur);
     },
     ['livres-editeurs'],
     { tags: ['livres'] },
@@ -66,8 +75,11 @@ export const getLivresFormats = unstable_cache(
             .orderBy(livres.format);
         return rows
             .filter((row): row is { format: string } => row.format !== null)
-            .map(row => row.format);
+            .map((row) => row.format);
     },
     ['livres-formats'],
     { tags: ['livres'] },
 );
+
+export type GenreFacette = Awaited<ReturnType<typeof getGenresActifs>>[number];
+export type RayonFacette = Awaited<ReturnType<typeof getLivresRayons>>[number];
