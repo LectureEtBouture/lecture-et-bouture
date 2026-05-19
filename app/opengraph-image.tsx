@@ -48,7 +48,7 @@ export default async function Image() {
                     letterSpacing: '-0.02em',
                 }}
             >
-                Lecture &amp; Boutures
+                {siteConfig.name}
             </h1>
             <p
                 style={{

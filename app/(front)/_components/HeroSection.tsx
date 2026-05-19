@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { siteConfig } from '@/lib/metadata';
 
 export function HeroSection() {
     return (
@@ -19,9 +20,7 @@ export function HeroSection() {
                         Livres & Boutures
                     </p>
                     <h1 className="font-serif text-[clamp(2.5rem,3.5vw,4rem)] font-bold text-foreground leading-[1.05] tracking-[-0.02em] mb-6">
-                        Cultiver l&rsquo;esprit,
-                        <br />
-                        nourrir la terre.
+                        {siteConfig.tagline}
                     </h1>
                     <p className="text-base text-muted leading-[1.75] max-w-[42ch]">
                         Une librairie indépendante. Des boutures rares. Un

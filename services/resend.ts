@@ -1,3 +1,5 @@
+import { storeConfig } from '@/lib/config';
+
 type ContactEmailData = {
     name: string;
     email: string;
@@ -14,7 +16,7 @@ export async function sendContactEmail(data: ContactEmailData) {
         body: JSON.stringify({
             from: process.env.RESEND_FROM_EMAIL,
             to: process.env.RESEND_TO_EMAIL,
-            subject: `[Lecture & Boutures] Message de ${data.name}`,
+            subject: `[${storeConfig.name}] Message de ${data.name}`,
             text: `De : ${data.name} <${data.email}>\n\n${data.message}`,
         }),
     });

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { siteConfig } from '@/lib/metadata';
 
 const navItems = [
     { href: '/admin', label: 'Dashboard' },
@@ -14,6 +15,7 @@ const navItems = [
     { href: '/admin/evenements', label: 'Événements' },
     { href: '/admin/selections', label: 'Sélections' },
     { href: '/admin/pages', label: 'Pages' },
+    { href: '/admin/parametres', label: 'Paramètres' },
 ];
 
 function useIsActive(href: string) {
@@ -58,9 +60,19 @@ function MobileMenu({
             />
             <div className="absolute top-0 left-0 bottom-0 w-64 bg-white flex flex-col shadow-lg">
                 <div className="px-5 py-4 border-b border-border flex items-center justify-between">
-                    <p className="font-serif text-sm font-bold text-primary">
-                        Lecture &amp; Boutures
-                    </p>
+                    <div>
+                        <p className="font-serif text-sm font-bold text-primary">
+                            {siteConfig.name}
+                        </p>
+                        <a
+                            href="/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[11px] text-muted hover:text-primary transition-colors"
+                        >
+                            ↗ Voir le site
+                        </a>
+                    </div>
                     <button
                         onClick={onClose}
                         className="text-muted hover:text-foreground transition-colors p-1"
@@ -173,11 +185,22 @@ export function AdminShell({
                 <aside className="hidden md:flex w-56 shrink-0 bg-white border-r border-border flex-col min-h-screen">
                     <div className="px-5 py-5 border-b border-border">
                         <p className="font-serif text-sm font-bold text-primary tracking-tight">
-                            Lecture &amp; Boutures
+                            {siteConfig.name}
                         </p>
-                        <p className="text-[11px] text-muted uppercase tracking-widest mt-0.5">
-                            Back-office
-                        </p>
+                        <div className="flex items-center justify-between mt-0.5">
+                            <p className="text-[11px] text-muted uppercase tracking-widest">
+                                Back-office
+                            </p>
+                            <a
+                                href="/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[11px] text-muted hover:text-primary transition-colors"
+                                aria-label="Voir le site"
+                            >
+                                ↗ Site
+                            </a>
+                        </div>
                     </div>
                     <nav className="flex-1 px-3 py-4 space-y-0.5">
                         {navItems.map((item) => (

@@ -98,22 +98,25 @@ export async function getEvenements(
     sort: EvenementsSort = 'date-asc',
 ) {
     const now = new Date();
-    const order = sort === 'date-desc' ? desc(evenements.dateDebut) : asc(evenements.dateDebut);
+    const order =
+        sort === 'date-desc'
+            ? desc(evenements.dateDebut)
+            : asc(evenements.dateDebut);
 
     const where =
         filter === 'a-venir'
             ? gt(evenements.dateDebut, now)
             : filter === 'en-cours'
-              ? and(lte(evenements.dateDebut, now), isNotNull(evenements.dateFin), gt(evenements.dateFin, now))
+              ? and(
+                    lte(evenements.dateDebut, now),
+                    isNotNull(evenements.dateFin),
+                    gt(evenements.dateFin, now),
+                )
               : filter === 'passes'
                 ? lt(evenements.dateDebut, now)
                 : undefined;
 
-    return db
-        .select()
-        .from(evenements)
-        .where(where)
-        .orderBy(order);
+    return db.select().from(evenements).where(where).orderBy(order);
 }
 
 export async function getEvenement(id: number) {

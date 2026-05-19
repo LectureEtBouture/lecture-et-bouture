@@ -169,6 +169,14 @@ export const adminUsers = pgTable('admin_users', {
     createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// ─── Paramètres boutique ──────────────────────────────────────────────────────
+
+export const parametres = pgTable('parametres', {
+    cle: varchar('cle', { length: 100 }).primaryKey(),
+    valeur: text('valeur').notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
 // ─── Pages éditoriales ────────────────────────────────────────────────────────
 
 export const pagesEditoriales = pgTable('pages_editoriales', {

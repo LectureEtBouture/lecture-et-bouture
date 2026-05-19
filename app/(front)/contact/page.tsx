@@ -1,11 +1,14 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { sendContactEmail } from '@/services/resend';
+import { siteConfig } from '@/lib/metadata';
+import { getHoraires, getFermetures } from '@/lib/queries/parametres';
+import { HorairesDisplay } from '@/components/ui/HorairesDisplay';
 import { MapWrapper } from './_components/MapWrapper';
 
 export const metadata: Metadata = {
     title: 'Contact',
-    description: "Contactez l'équipe Lecture & Boutures.",
+    description: `Contactez l'équipe ${siteConfig.name}.`,
 };
 
 interface Props {
@@ -27,7 +30,11 @@ async function handleContact(formData: FormData) {
 }
 
 export default async function ContactPage({ searchParams }: Props) {
-    const params = await searchParams;
+    const [params, horaires, fermetures] = await Promise.all([
+        searchParams,
+        getHoraires(),
+        getFermetures(),
+    ]);
     const sent = params.sent === '1';
     const error = params.error === '1';
 
@@ -54,7 +61,7 @@ export default async function ContactPage({ searchParams }: Props) {
             )}
 
             {error && (
-                <div className="border border-[#b94a48] bg-surface px-6 py-4 mb-10">
+                <div className="border border-danger bg-surface px-6 py-4 mb-10">
                     <p className="text-sm text-foreground">
                         Une erreur est survenue. Réessayez ou contactez-nous
                         directement par email.
@@ -112,19 +119,15 @@ export default async function ContactPage({ searchParams }: Props) {
                 </p>
                 <div className="grid md:grid-cols-2 gap-10 items-start mb-8">
                     <div className="space-y-1">
-                        <p className="text-base font-medium text-foreground">Lecture &amp; Boutures</p>
+                        <p className="text-base font-medium text-foreground">
+                            {siteConfig.name}
+                        </p>
                         <p className="text-sm text-muted leading-relaxed">
-                            12 rue des Plantes<br />
-                            75014 Paris
+                            {siteConfig.address.street}
+                            <br />
+                            {siteConfig.address.city}
                         </p>
-                        <p className="text-sm text-muted mt-3">
-                            Mar&mdash;Sam : 10h&ndash;19h<br />
-                            Dim&mdash;Lun : fermé
-                        </p>
-                    </div>
-                    <div className="text-sm text-muted space-y-1">
-                        <p>Métro : <span className="text-foreground">Mouton-Duvernet</span> (ligne 13)</p>
-                        <p>Bus : <span className="text-foreground">58, 68</span></p>
+                        <HorairesDisplay horaires={horaires} fermetures={fermetures} className="mt-3" />
                     </div>
                 </div>
                 <MapWrapper />

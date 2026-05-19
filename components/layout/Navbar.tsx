@@ -25,17 +25,20 @@ export function Navbar() {
             >
                 <Link
                     href="/"
-                    className="flex items-center shrink-0 hover:opacity-80 transition-opacity"
+                    className="flex items-center gap-2.5 shrink-0 hover:opacity-80 transition-opacity"
                     onClick={() => setOpen(false)}
                 >
                     <Image
                         src="/leb-nobg.png"
-                        alt={siteConfig.name}
+                        alt=""
                         width={485}
                         height={325}
-                        className="h-10 w-auto"
+                        className="h-9 w-auto"
                         priority
                     />
+                    <span className="font-serif text-sm font-bold text-primary tracking-tight leading-tight">
+                        {siteConfig.name}
+                    </span>
                 </Link>
 
                 {/* Desktop links */}

@@ -44,6 +44,7 @@ Concept hybride : livres académiques + boutures végétales. Expérience d'acha
 | `/admin/selections`             | Gestion sélections du conservateur                                                                                        |
 | `/admin/evenements`             | CRUD événements                                                                                                           |
 | `/admin/pages`                  | Éditeur RTE pages éditoriales (concept, mentions légales, CGV, CGU, cookies, politique)                                   |
+| `/admin/parametres`             | Paramètres boutique : horaires, fermetures exceptionnelles, annonce globale, mode maintenance, réseaux sociaux             |
 
 ---
 
@@ -61,7 +62,7 @@ Concept hybride : livres académiques + boutures végétales. Expérience d'acha
 - **Achat** : redirection leslibraires.fr (v1) → API stocks/panier (v2+)
 - **Saisie livre assistée (back-office)** : deux modes d'aide à la saisie via Google Books API — (1) recherche par titre avec autocomplete (suggestions : titre + auteur + éditeur + année + édition) puis préremplissage complet du formulaire au choix ; (2) saisie ISBN seul → préremplissage complet (titre, auteur, éditeur, année, édition, image de couverture, description). Les champs restent éditables après import.
 - **RTE descriptions** : éditeur rich text (Tiptap) pour les champs `description` des livres et boutures. Rendu en HTML côté front.
-- **Pages éditoriales** : concept, mentions légales, CGV, CGU, cookies, politique de confidentialité — contenu rédigé via RTE en back-office, stocké en DB, sanitizé côté serveur avant rendu (`sanitize-html`). Éditeur complet : H1–H6, listes, couleurs texte/fond, alignement, surlignage, taille de police, liens (avec option nouvel onglet), accordéon, saut de ligne, bubble menu contextuel, drag handle.
+- **Pages éditoriales** : concept, mentions légales, CGV, CGU, cookies, politique de confidentialité — contenu rédigé via RTE en back-office, stocké en DB, sanitizé côté serveur avant rendu (`sanitize-html`). Éditeur complet : H1–H6, listes, couleurs texte/fond, alignement, surlignage, taille de police, liens (avec option nouvel onglet), accordéon, saut de ligne, bubble menu contextuel, drag handle. Composant partagé `PageEditoriale` (slug + title) pour les layouts standards ; nouvelles pages édito = 8 lignes. Prévisualisation sécurisée via Draft Mode (bouton BO → `/api/preview?secret=...` → front avec bannière "Mode prévisualisation").
 - **Événements** : agenda administrable, état calculé à la volée (passé / en cours / à venir), événement mis en avant sur la home (en cours prioritaire, sinon prochain).
 - **Erreurs custom** : 404 et 500 dans le thème.
 - **Contact** : formulaire → Resend
@@ -96,10 +97,8 @@ Concept hybride : livres académiques + boutures végétales. Expérience d'acha
 | `--color-background` | `#F5F4EF` — beige sable             |
 | `--color-foreground` | `#1A1A1A` — texte principal         |
 | `--font-serif`       | Noto Serif                          |
-| `--font-sans`        | Manrope                             |
+| `--font-sans`        | Raleway                             |
 | Icônes               | Lignes fines, inspiration botanique |
 | Animations           | Parallax, transitions fluides       |
 
 ---
-
-

@@ -1,13 +1,7 @@
 import type { Metadata } from 'next';
+import { storeConfig } from './config';
 
-export const siteConfig = {
-    name: 'Lecture & Boutures',
-    tagline: "Cultiver l'esprit, nourrir la terre.",
-    description:
-        'Livres soignés et boutures rares, curatés avec intention. Une librairie botanique.',
-    url: 'https://lectureetboutures.fr',
-    locale: 'fr_FR',
-};
+export const siteConfig = storeConfig;
 
 export const baseMetadata: Metadata = {
     title: {

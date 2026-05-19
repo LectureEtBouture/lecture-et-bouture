@@ -3,9 +3,18 @@
 import { useEditor, EditorContent } from '@tiptap/react';
 import { useMemo, useRef } from 'react';
 import StarterKit from '@tiptap/starter-kit';
-import { Details, DetailsContent, DetailsSummary } from '@tiptap/extension-details';
+import {
+    Details,
+    DetailsContent,
+    DetailsSummary,
+} from '@tiptap/extension-details';
 import Highlight from '@tiptap/extension-highlight';
-import { TextStyle, Color, BackgroundColor, FontSize } from '@tiptap/extension-text-style';
+import {
+    TextStyle,
+    Color,
+    BackgroundColor,
+    FontSize,
+} from '@tiptap/extension-text-style';
 import TextAlign from '@tiptap/extension-text-align';
 import Mention from '@tiptap/extension-mention';
 import DragHandle from '@tiptap/extension-drag-handle-react';
@@ -73,7 +82,12 @@ export function RteField({
     return (
         <div className="border border-border bg-surface">
             <RteToolbar editor={editor} />
-            <input ref={inputRef} type="hidden" name={name} defaultValue={defaultValue} />
+            <input
+                ref={inputRef}
+                type="hidden"
+                name={name}
+                defaultValue={defaultValue}
+            />
             {editor && (
                 <DragHandle editor={editor}>
                     <div className="flex items-center justify-center w-5 h-5 rounded-sm text-muted hover:text-foreground hover:bg-border transition-colors cursor-grab text-xs">
@@ -82,7 +96,10 @@ export function RteField({
                 </DragHandle>
             )}
             {editor && <RteBubbleMenu editor={editor} />}
-            <EditorContent editor={editor} className="admin-rte p-4 min-h-[300px] text-sm" />
+            <EditorContent
+                editor={editor}
+                className="admin-rte p-4 min-h-[300px] text-sm"
+            />
         </div>
     );
 }

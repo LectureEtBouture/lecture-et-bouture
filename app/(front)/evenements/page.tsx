@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 import { getEvenementsPublics } from '@/lib/queries/evenements';
+import { siteConfig } from '@/lib/metadata';
 import { EvenementItem } from './_components/EvenementItem';
 import type { EvenementStatus } from './_components/EvenementItem';
 
 export const metadata: Metadata = {
     title: 'Événements',
-    description:
-        'Rencontres, lectures, ateliers — agenda de la librairie Lecture & Boutures.',
+    description: `Rencontres, lectures, ateliers — agenda de la librairie ${siteConfig.name}.`,
 };
 
 export const dynamic = 'force-dynamic';

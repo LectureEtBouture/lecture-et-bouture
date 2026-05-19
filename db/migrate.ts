@@ -121,6 +121,11 @@ const statements = [
     )`,
     `ALTER TABLE evenements ADD COLUMN IF NOT EXISTS publie boolean NOT NULL DEFAULT true`,
     `ALTER TABLE pages_editoriales ADD COLUMN IF NOT EXISTS publiee boolean NOT NULL DEFAULT true`,
+    `CREATE TABLE IF NOT EXISTS parametres (
+        cle varchar(100) PRIMARY KEY,
+        valeur text NOT NULL,
+        updated_at timestamp NOT NULL DEFAULT now()
+    )`,
 ];
 
 async function main() {

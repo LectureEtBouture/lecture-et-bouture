@@ -3,6 +3,7 @@
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { siteConfig } from '@/lib/metadata';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -38,7 +39,7 @@ export default function LoginPage() {
                         Back-office
                     </h1>
                     <p className="text-sm text-neutral-500">
-                        Lecture &amp; Boutures
+                        {siteConfig.name}
                     </p>
                 </div>
 

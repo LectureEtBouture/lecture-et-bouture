@@ -1,16 +1,16 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getPageEditoriale } from '@/lib/queries/pages';
+import { fetchPageEditorialeWithDraft } from '@/lib/queries/pages';
 import { sanitizeRte } from '@/lib/sanitize';
+import { siteConfig } from '@/lib/metadata';
 
 export const metadata: Metadata = {
     title: 'Notre concept',
-    description:
-        "Lecture & Boutures — l'alliance du livre académique et de la bouture végétale. Cultiver l'esprit, nourrir la terre.",
+    description: `${siteConfig.name} — ${siteConfig.tagline}`,
 };
 
 export default async function ConceptPage() {
-    const page = await getPageEditoriale('concept');
+    const page = await fetchPageEditorialeWithDraft('concept');
     if (!page) notFound();
 
     const safeHtml = page.contenu ? sanitizeRte(page.contenu) : null;
@@ -22,9 +22,7 @@ export default async function ConceptPage() {
                     Notre philosophie
                 </p>
                 <h1 className="font-serif text-[clamp(2rem,4vw,3rem)] font-bold text-foreground leading-[1.05] tracking-[-0.02em]">
-                    Cultiver l&rsquo;esprit,
-                    <br />
-                    nourrir la terre.
+                    {siteConfig.tagline}
                 </h1>
             </header>
 

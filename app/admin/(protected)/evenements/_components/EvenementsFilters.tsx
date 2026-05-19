@@ -1,5 +1,8 @@
 import Link from 'next/link';
-import type { EvenementsFilter, EvenementsSort } from '@/lib/actions/evenements';
+import type {
+    EvenementsFilter,
+    EvenementsSort,
+} from '@/lib/actions/evenements';
 
 const FILTER_OPTIONS: { value: EvenementsFilter; label: string }[] = [
     { value: 'tous', label: 'Tous' },

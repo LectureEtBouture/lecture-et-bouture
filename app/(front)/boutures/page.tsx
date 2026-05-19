@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { getBouturesPubliques } from '@/lib/queries/boutures';
 import { BoutureIntro } from './_components/BoutureIntro';
-import { BoutureBentoGrid } from './_components/BoutureBentoGrid';
+import { BoutureBentoInfinite } from './_components/BoutureBentoInfinite';
 
 export const metadata: Metadata = {
     title: 'Boutures',
@@ -9,8 +9,10 @@ export const metadata: Metadata = {
         'Spécimens végétaux soignés — une sélection de boutures rares et de caractère.',
 };
 
+const PAGE_SIZE = 10;
+
 export default async function BouturesPage() {
-    const boutures = await getBouturesPubliques();
+    const boutures = await getBouturesPubliques({ limit: PAGE_SIZE, offset: 0 });
 
     return (
         <div className="max-w-6xl mx-auto px-6 py-section space-y-section">
@@ -29,7 +31,7 @@ export default async function BouturesPage() {
             </header>
 
             <BoutureIntro />
-            <BoutureBentoGrid boutures={boutures} />
+            <BoutureBentoInfinite initialItems={boutures} />
         </div>
     );
 }

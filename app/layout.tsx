@@ -29,7 +29,10 @@ export default function RootLayout({
     children,
 }: Readonly<{ children: React.ReactNode }>) {
     return (
-        <html lang="fr" className={`${notoSerif.variable} ${raleway.variable} ${dancingScript.variable}`}>
+        <html
+            lang="fr"
+            className={`${notoSerif.variable} ${raleway.variable} ${dancingScript.variable}`}
+        >
             <body className="min-h-screen bg-background text-foreground">
                 {children}
             </body>

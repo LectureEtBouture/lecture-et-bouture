@@ -13,7 +13,9 @@ export function LivreFormLibrairie({ livre }: { livre?: Livre }) {
             open={!!(livre?.choixLibrairie || livre?.noteDeLaLibrairie)}
         >
             <summary className="list-none cursor-pointer flex items-center gap-2 select-none text-xs font-medium text-foreground uppercase tracking-widest [&::-webkit-details-marker]:hidden">
-                <span className="text-[8px] text-muted [[open]_&]:rotate-90 transition-transform duration-150">▶</span>
+                <span className="text-[8px] text-muted [[open]_&]:rotate-90 transition-transform duration-150">
+                    ▶
+                </span>
                 Sélection librairie
                 <span className="text-[10px] text-muted font-normal normal-case tracking-normal">
                     (optionnel)

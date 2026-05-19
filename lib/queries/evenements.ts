@@ -49,7 +49,8 @@ export async function getEvenementMisEnAvant() {
         .orderBy(asc(evenements.dateDebut))
         .limit(1);
 
-    if (enCours.length) return { evenement: enCours[0], status: 'en_cours' as const };
+    if (enCours.length)
+        return { evenement: enCours[0], status: 'en_cours' as const };
 
     const prochain = await db
         .select()
@@ -58,7 +59,8 @@ export async function getEvenementMisEnAvant() {
         .orderBy(asc(evenements.dateDebut))
         .limit(1);
 
-    if (prochain.length) return { evenement: prochain[0], status: 'upcoming' as const };
+    if (prochain.length)
+        return { evenement: prochain[0], status: 'upcoming' as const };
 
     return null;
 }

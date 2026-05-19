@@ -22,13 +22,23 @@ export default async function ModifierPagePage({ params }: Props) {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="font-serif text-2xl font-bold text-foreground">
-                    {ROUTE_LABELS[page.slug] ?? page.titre}
-                </h1>
-                <p className="text-[11px] text-muted font-mono mt-1">
-                    /{page.slug}
-                </p>
+            <div className="flex items-start justify-between gap-4">
+                <div>
+                    <h1 className="font-serif text-2xl font-bold text-foreground">
+                        {ROUTE_LABELS[page.slug] ?? page.titre}
+                    </h1>
+                    <p className="text-[11px] text-muted font-mono mt-1">
+                        /{page.slug}
+                    </p>
+                </div>
+                <a
+                    href={`/api/preview?secret=${process.env.PREVIEW_SECRET}&slug=${page.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shrink-0 text-xs text-muted hover:text-primary transition-colors mt-1"
+                >
+                    Aperçu ↗
+                </a>
             </div>
             <RtePageForm
                 action={action}

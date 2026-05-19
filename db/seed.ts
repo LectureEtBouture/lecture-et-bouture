@@ -12,6 +12,7 @@ import {
     selections,
     selectionItems,
     pagesEditoriales,
+    parametres,
 } from './schema';
 import genresJson from '../data/genres.json';
 import rayonsJson from '../data/rayons.json';
@@ -30,6 +31,7 @@ async function main() {
         sql`TRUNCATE TABLE avis, selection_items, evenements, livres, plantes, selections, genres, rayons RESTART IDENTITY CASCADE`,
     );
     await db.execute(sql`TRUNCATE TABLE pages_editoriales`);
+    await db.execute(sql`TRUNCATE TABLE parametres`);
 
     // Genres
     const sortedGenres = [...genresJson].sort((a, b) => a.id - b.id);
@@ -311,6 +313,41 @@ async function main() {
         await db.insert(pagesEditoriales).values(pageData);
     }
     console.log(`Pages éditoriales : ${pagesInitiales.length}`);
+
+    const parametresInitiaux = [
+        {
+            cle: 'horaires',
+            valeur: JSON.stringify({
+                lun: null,
+                mar: { open: '10:00', close: '19:00' },
+                mer: { open: '10:00', close: '19:00' },
+                jeu: { open: '10:00', close: '19:00' },
+                ven: { open: '10:00', close: '19:00' },
+                sam: { open: '10:00', close: '19:00' },
+                dim: null,
+            }),
+        },
+        {
+            cle: 'fermetures',
+            valeur: JSON.stringify([]),
+        },
+        {
+            cle: 'annonce',
+            valeur: JSON.stringify({ active: false, type: 'info', message: '', expire_at: null }),
+        },
+        {
+            cle: 'maintenance',
+            valeur: JSON.stringify({ active: false, message: 'Site en maintenance. Revenez bientôt.' }),
+        },
+        {
+            cle: 'reseaux_sociaux',
+            valeur: JSON.stringify([]),
+        },
+    ];
+    for (const p of parametresInitiaux) {
+        await db.insert(parametres).values(p);
+    }
+    console.log(`Paramètres : ${parametresInitiaux.length}`);
 
     await client.end();
     console.log('Seed terminé.');

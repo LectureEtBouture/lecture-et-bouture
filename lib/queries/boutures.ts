@@ -17,6 +17,8 @@ export interface BouturesFilters {
     sort?: SortBoutures;
     q?: string;
     choixLibrairie?: boolean;
+    limit?: number;
+    offset?: number;
 }
 
 const boutureSelect = {
@@ -102,11 +104,15 @@ export const getBouturesPubliques = unstable_cache(
             );
             if (searchCondition) conditions.push(searchCondition);
         }
-        const query = db
+        const base = db
             .select(boutureSelect)
             .from(plantes)
+            .where(conditions.length > 0 ? and(...conditions) : undefined)
             .orderBy(buildBoutureOrderBy(filters.sort));
-        return conditions.length > 0 ? query.where(and(...conditions)) : query;
+        if (filters.limit !== undefined) {
+            return base.limit(filters.limit).offset(filters.offset ?? 0);
+        }
+        return base;
     },
     ['boutures-publiques'],
     { tags: ['boutures'] },

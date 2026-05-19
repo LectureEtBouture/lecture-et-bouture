@@ -1,5 +1,8 @@
 import Link from 'next/link';
-import { deleteEvenement, toggleEvenementPublie } from '@/lib/actions/evenements';
+import {
+    deleteEvenement,
+    toggleEvenementPublie,
+} from '@/lib/actions/evenements';
 
 type Evenement = {
     id: number;
@@ -68,7 +71,9 @@ export function EvenementRowMobile({
     return (
         <div className="py-3 space-y-2">
             <div>
-                <p className={`text-sm font-medium leading-snug ${etat === 'passe' ? 'text-muted' : 'text-foreground'}`}>
+                <p
+                    className={`text-sm font-medium leading-snug ${etat === 'passe' ? 'text-muted' : 'text-foreground'}`}
+                >
                     {evenement.titre}
                 </p>
                 <p className="text-xs text-muted mt-0.5">
@@ -81,7 +86,10 @@ export function EvenementRowMobile({
             <div className="flex items-center justify-between">
                 <PublieToggle id={evenement.id} publie={evenement.publie} />
                 <div className="flex items-center gap-4">
-                    <Link href={`/admin/evenements/${evenement.id}/modifier`} className="text-xs text-muted hover:text-primary transition-colors">
+                    <Link
+                        href={`/admin/evenements/${evenement.id}/modifier`}
+                        className="text-xs text-muted hover:text-primary transition-colors"
+                    >
                         Modifier
                     </Link>
                     <form
@@ -91,7 +99,10 @@ export function EvenementRowMobile({
                         }}
                         className="contents"
                     >
-                        <button type="submit" className="text-xs text-muted hover:text-red-600 transition-colors">
+                        <button
+                            type="submit"
+                            className="text-xs text-muted hover:text-red-600 transition-colors"
+                        >
                             Supprimer
                         </button>
                     </form>
@@ -113,14 +124,20 @@ export function EvenementRowDesktop({
     return (
         <tr className="border-b border-border/50 hover:bg-white transition-colors">
             <td className="py-3 pr-4">
-                <p className={`font-medium leading-snug ${etat === 'passe' ? 'text-muted' : 'text-foreground'}`}>
+                <p
+                    className={`font-medium leading-snug ${etat === 'passe' ? 'text-muted' : 'text-foreground'}`}
+                >
                     {evenement.titre}
                 </p>
                 {etat === 'passe' && (
-                    <span className="text-[10px] uppercase tracking-[0.08em] text-muted">Passé</span>
+                    <span className="text-[10px] uppercase tracking-[0.08em] text-muted">
+                        Passé
+                    </span>
                 )}
                 {etat === 'en-cours' && (
-                    <span className="text-[10px] uppercase tracking-[0.08em] text-primary">En cours</span>
+                    <span className="text-[10px] uppercase tracking-[0.08em] text-primary">
+                        En cours
+                    </span>
                 )}
             </td>
             <td className="py-3 pr-4 text-muted text-xs">
@@ -134,7 +151,10 @@ export function EvenementRowDesktop({
             </td>
             <td className="py-3 pl-4 text-right whitespace-nowrap">
                 <div className="flex items-center justify-end gap-4">
-                    <Link href={`/admin/evenements/${evenement.id}/modifier`} className="text-xs text-muted hover:text-primary transition-colors">
+                    <Link
+                        href={`/admin/evenements/${evenement.id}/modifier`}
+                        className="text-xs text-muted hover:text-primary transition-colors"
+                    >
                         Modifier
                     </Link>
                     <form
@@ -144,7 +164,10 @@ export function EvenementRowDesktop({
                         }}
                         className="contents"
                     >
-                        <button type="submit" className="text-xs text-muted hover:text-red-600 transition-colors">
+                        <button
+                            type="submit"
+                            className="text-xs text-muted hover:text-red-600 transition-colors"
+                        >
                             Supprimer
                         </button>
                     </form>

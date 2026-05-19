@@ -61,6 +61,14 @@ export default async function AdminPagesPage() {
                                     {page.publiee ? 'Publiée' : 'Privée'}
                                 </button>
                             </form>
+                            <a
+                                href={`/api/preview?secret=${process.env.PREVIEW_SECRET}&slug=${page.slug}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs text-muted hover:text-primary transition-colors"
+                            >
+                                Aperçu
+                            </a>
                             <Link
                                 href={`/admin/pages/${page.slug}/modifier`}
                                 className="text-xs text-muted hover:text-primary transition-colors"

@@ -20,7 +20,9 @@ function Btn({
             type="button"
             onClick={onClick}
             className={`px-2 py-1.5 text-xs leading-none transition-colors select-none ${
-                active ? 'bg-primary text-background' : 'text-foreground hover:bg-border'
+                active
+                    ? 'bg-primary text-background'
+                    : 'text-foreground hover:bg-border'
             } ${extraClass}`}
         >
             {label}
@@ -45,10 +47,15 @@ export function RteBubbleMenu({ editor }: { editor: Editor }) {
     const applyLink = () => {
         const url = linkUrl.trim();
         if (url) {
-            editor.chain().focus().extendMarkRange('link').setLink({
-                href: url,
-                target: linkBlank ? '_blank' : null,
-            }).run();
+            editor
+                .chain()
+                .focus()
+                .extendMarkRange('link')
+                .setLink({
+                    href: url,
+                    target: linkBlank ? '_blank' : null,
+                })
+                .run();
         } else {
             editor.chain().focus().extendMarkRange('link').unsetLink().run();
         }
@@ -69,7 +76,10 @@ export function RteBubbleMenu({ editor }: { editor: Editor }) {
                         onChange={(e) => setLinkUrl(e.target.value)}
                         placeholder="https://..."
                         onKeyDown={(e) => {
-                            if (e.key === 'Enter') { e.preventDefault(); applyLink(); }
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                applyLink();
+                            }
                             if (e.key === 'Escape') setLinkOpen(false);
                         }}
                         className="w-48 text-xs border border-border px-2 py-1 bg-background focus:outline-none focus:border-primary"
@@ -83,18 +93,66 @@ export function RteBubbleMenu({ editor }: { editor: Editor }) {
                         />
                         ↗
                     </label>
-                    <button type="button" onClick={applyLink} className="px-2 py-1 bg-primary text-background text-xs hover:bg-primary-light transition-colors">✓</button>
-                    <button type="button" onClick={() => setLinkOpen(false)} className="px-1.5 py-1 text-muted hover:text-foreground text-xs transition-colors">✕</button>
+                    <button
+                        type="button"
+                        onClick={applyLink}
+                        className="px-2 py-1 bg-primary text-background text-xs hover:bg-primary-light transition-colors"
+                    >
+                        ✓
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setLinkOpen(false)}
+                        className="px-1.5 py-1 text-muted hover:text-foreground text-xs transition-colors"
+                    >
+                        ✕
+                    </button>
                 </div>
             ) : (
                 <>
-                    <Btn onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive('bold')} label="G" extraClass="font-bold" />
-                    <Btn onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive('italic')} label="I" extraClass="italic" />
-                    <Btn onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive('underline')} label="S̲" />
-                    <Btn onClick={() => editor.chain().focus().toggleStrike().run()} active={editor.isActive('strike')} label="S̶" />
+                    <Btn
+                        onClick={() =>
+                            editor.chain().focus().toggleBold().run()
+                        }
+                        active={editor.isActive('bold')}
+                        label="G"
+                        extraClass="font-bold"
+                    />
+                    <Btn
+                        onClick={() =>
+                            editor.chain().focus().toggleItalic().run()
+                        }
+                        active={editor.isActive('italic')}
+                        label="I"
+                        extraClass="italic"
+                    />
+                    <Btn
+                        onClick={() =>
+                            editor.chain().focus().toggleUnderline().run()
+                        }
+                        active={editor.isActive('underline')}
+                        label="S̲"
+                    />
+                    <Btn
+                        onClick={() =>
+                            editor.chain().focus().toggleStrike().run()
+                        }
+                        active={editor.isActive('strike')}
+                        label="S̶"
+                    />
                     <div className="w-px h-4 bg-border mx-0.5 self-center" />
-                    <Btn onClick={openLink} active={editor.isActive('link')} label="🔗" />
-                    <Btn onClick={() => editor.chain().focus().toggleHighlight().run()} active={editor.isActive('highlight')} label="✦" />
+                    <Btn
+                        onClick={openLink}
+                        active={editor.isActive('link')}
+                        label="🔗"
+                    />
+                    <Btn
+                        onClick={() =>
+                            editor.chain().focus().toggleHighlight().run()
+                        }
+                        active={editor.isActive('highlight')}
+                        label="✦"
+                    />
                 </>
             )}
         </BubbleMenu>

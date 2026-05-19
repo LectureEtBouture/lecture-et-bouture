@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import {
     getLivresPubliques,
+    getLivresCount,
     getLivresMisEnAvant,
     type SortLivres,
 } from '@/lib/queries/livres';
@@ -14,12 +15,15 @@ import {
 import { FilterBar } from './_components/FilterBar';
 import { SearchBar } from './_components/SearchBar';
 import { LivreCard } from '@/components/ui/LivreCard';
+import { LivresGrid } from './_components/LivresGrid';
 import { VusRecemment } from '@/components/ui/VusRecemment';
 
 export const metadata: Metadata = {
     title: 'Livres',
     description: 'Parcourez notre sélection de livres soignés.',
 };
+
+const PAGE_SIZE = 24;
 
 interface Props {
     searchParams: Promise<Record<string, string | undefined>>;
@@ -47,8 +51,11 @@ export default async function LivresPage({ searchParams }: Props) {
         choixLibrairie
     );
 
+    const activeFilters = { rayon: rayonId, genre: genreId, serie, editeur, format, sort, q, choixLibrairie };
+
     const [
         livresList,
+        livresTotal,
         misEnAvant,
         rayons,
         genresList,
@@ -56,16 +63,8 @@ export default async function LivresPage({ searchParams }: Props) {
         editeurs,
         formats,
     ] = await Promise.all([
-        getLivresPubliques({
-            rayon: rayonId,
-            genre: genreId,
-            serie,
-            editeur,
-            format,
-            sort,
-            q,
-            choixLibrairie,
-        }),
+        getLivresPubliques({ ...activeFilters, limit: PAGE_SIZE, offset: 0 }),
+        getLivresCount({ rayon: rayonId, genre: genreId, serie, editeur, format, q, choixLibrairie }),
         isFiltered ? Promise.resolve([]) : getLivresMisEnAvant(),
         getLivresRayons(),
         getGenresActifs(rayonId),
@@ -73,6 +72,8 @@ export default async function LivresPage({ searchParams }: Props) {
         getLivresEditeurs(),
         getLivresFormats(),
     ]);
+
+    const gridKey = `${rayonId}-${genreId}-${serie}-${editeur}-${format}-${sort}-${q}-${choixLibrairie}`;
 
     return (
         <div className="max-w-6xl mx-auto px-6 py-16 space-y-10">
@@ -102,8 +103,8 @@ export default async function LivresPage({ searchParams }: Props) {
             {isFiltered ? (
                 <div className="space-y-6 pt-4 border-t border-border">
                     <p className="text-sm text-muted">
-                        {livresList.length} titre
-                        {livresList.length !== 1 ? 's' : ''}
+                        {livresTotal} titre
+                        {livresTotal !== 1 ? 's' : ''}
                         {q && (
                             <>
                                 {' '}
@@ -117,20 +118,12 @@ export default async function LivresPage({ searchParams }: Props) {
                     {livresList.length === 0 ? (
                         <p className="text-sm text-muted">Aucun résultat.</p>
                     ) : (
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            {livresList.map((livre) => (
-                                <LivreCard
-                                    key={livre.id}
-                                    livre={livre}
-                                    genreNom={
-                                        genresList.find(
-                                            (genre) =>
-                                                genre.id === livre.genreId,
-                                        )?.nom
-                                    }
-                                />
-                            ))}
-                        </div>
+                        <LivresGrid
+                            key={gridKey}
+                            initialItems={livresList}
+                            filters={activeFilters}
+                            genresList={genresList}
+                        />
                     )}
                 </div>
             ) : (
@@ -167,25 +160,17 @@ export default async function LivresPage({ searchParams }: Props) {
                                 Tout le catalogue
                             </h2>
                             <span className="text-xs uppercase tracking-widest text-muted">
-                                {livresList.length} titre
-                                {livresList.length !== 1 ? 's' : ''}
+                                {livresTotal} titre
+                                {livresTotal !== 1 ? 's' : ''}
                             </span>
                             <div className="flex-1 h-px bg-border" />
                         </div>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            {livresList.map((livre) => (
-                                <LivreCard
-                                    key={livre.id}
-                                    livre={livre}
-                                    genreNom={
-                                        genresList.find(
-                                            (genre) =>
-                                                genre.id === livre.genreId,
-                                        )?.nom
-                                    }
-                                />
-                            ))}
-                        </div>
+                        <LivresGrid
+                            key={gridKey}
+                            initialItems={livresList}
+                            filters={activeFilters}
+                            genresList={genresList}
+                        />
                     </section>
                 </div>
             )}

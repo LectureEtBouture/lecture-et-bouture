@@ -73,16 +73,16 @@
 - [x] `POST /api/avis` — validation + écriture en DB (status `pending`)
 - [x] Seed avis.json → DB (5 avis approved)
 
-## Templatisation — à faire
+## Templatisation — fait
 
-- [ ] `lib/config.ts` — `storeConfig` centralisé, lit depuis `NEXT_PUBLIC_STORE_*` avec fallbacks
-- [ ] `lib/metadata.ts` — `siteConfig` devient alias de `storeConfig`
-- [ ] Tagline footer + hero + concept — remplacer les literals par `siteConfig.tagline`
-- [ ] Adresse + coordonnées carte + horaires contact — lire depuis `storeConfig`
-- [ ] Email subject Resend — lire depuis `storeConfig.name`
-- [ ] AdminShell + login admin — `Lecture & Boutures` → `siteConfig.name`
-- [ ] OG images (root, livres/slug, boutures/slug) — nom codé en dur → `siteConfig.name`
-- [ ] `.env.local` + README — documenter les vars `NEXT_PUBLIC_STORE_*`
+- [x] `lib/config.ts` — `storeConfig` centralisé, lit depuis `NEXT_PUBLIC_STORE_*` avec fallbacks
+- [x] `lib/metadata.ts` — `siteConfig` devient alias de `storeConfig`
+- [x] Tagline footer + hero + concept — remplacer les literals par `siteConfig.tagline`
+- [x] Adresse + coordonnées carte + horaires contact — lire depuis `storeConfig`
+- [x] Email subject Resend — lire depuis `storeConfig.name`
+- [x] AdminShell + login admin — `Lecture & Boutures` → `siteConfig.name`
+- [x] OG images (root, livres/slug, boutures/slug) — nom codé en dur → `siteConfig.name`
+- [x] `.env.local` — vars `NEXT_PUBLIC_STORE_*` documentées avec valeurs Lille
 
 ## Infra — plus tard
 
@@ -94,9 +94,15 @@
 - [ ] Rebrand "newsletter"
 - [ ] Éco-conception (thegreenwebfoundation.org)
 - [ ] Intégration API leslibraires.fr (stocks / panier) / Google books — voir alternatives et prix
-- [ ] Infinite scroll sur /livres et /boutures
-- [ ] Formbricks — surveys
+- [x] Infinite scroll sur /livres et /boutures
+- [~] Formbricks — widget feedback flottant intégré (cloud), SDK singleton avec await setup, bouton fixed bas-droite. À vérifier : trigger action "test" → enquête s'ouvre correctement.
 - [ ] Recherche par titre : autocomplete (titre + auteur + éditeur + année) → préremplissage formulaire livre
 - [ ] Saisie ISBN → préremplissage complet formulaire livre
-- [ ] Prévisualisation pages éditoriales (sécurisation via token)
-- [ ] Pouvoir modifier les horaires / jours d'ouvertures de la boutique via le back office, et potentiellement des jours fermés exceptionnelement.
+- [x] Prévisualisation pages éditoriales (sécurisation via token)
+- [x] Paramètres BO — table `parametres` (clé/valeur JSON) : horaires, fermetures exceptionnelles, annonce (avec expiration + localStorage dismiss), mode maintenance, réseaux sociaux. Page `/admin/parametres`. HorairesDisplay partagé footer + contact.
+- [x] Paramètres BO — formulaires UX : delete inline confirm (card tintée rouge + "Oui, supprimer / Annuler"), dirty state `· non enregistré`, auto-dismiss "Enregistré ✓" (2,5 s)
+- [x] Paramètres BO — `ParametresNav` : barre ancre sticky, scroll horizontal + fade droit mobile, underline actif via IntersectionObserver, pills desktop
+- [x] Fermetures exceptionnelles — affichées front (contact + footer) quand date courante dans la plage, via `HorairesDisplay` prop `fermetures`
+- [x] Templatisation — `storeConfig` (`lib/config.ts`) centralise `NEXT_PUBLIC_STORE_*` ; `siteConfig` alias rétrocompat ; tokens `danger` + `note` dans globals.css
+- [x] Prévisualisation pages éditoriales — Draft Mode Next.js (`PREVIEW_SECRET` env), `app/api/preview` + `exit`, `PreviewBanner` dans layout front, `fetchPageEditorialeWithDraft` + `PageEditoriale` composant partagé, bouton "Aperçu ↗" liste + éditeur BO
+- [x] AdminShell — lien "↗ Site" dans la sidebar desktop + menu mobile (ouvre le front dans un nouvel onglet)

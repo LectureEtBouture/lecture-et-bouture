@@ -52,7 +52,7 @@ npm run dev
 ## URLs
 
 | Service   | URL                    |
-| --------- |------------------------|
+| --------- | ---------------------- |
 | App       | https://localhost:3000 |
 | Adminer   | http://localhost:8080  |
 | Portainer | http://localhost:9000  |

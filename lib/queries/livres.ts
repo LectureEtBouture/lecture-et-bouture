@@ -1,7 +1,7 @@
 import { unstable_cache } from 'next/cache';
 import { db } from '@/db';
 import { livres } from '@/db/schema';
-import { eq, and, asc, desc, ilike, or, type SQL } from 'drizzle-orm';
+import { eq, and, asc, desc, ilike, or, sql, type SQL } from 'drizzle-orm';
 
 export type SortLivres =
     | 'alpha'
@@ -20,6 +20,8 @@ export interface LivresFilters {
     sort?: SortLivres;
     q?: string;
     choixLibrairie?: boolean;
+    limit?: number;
+    offset?: number;
 }
 
 export const livreSelect = {
@@ -70,35 +72,55 @@ function buildOrderBy(sort?: SortLivres) {
     }
 }
 
+function buildConditions(filters: Omit<LivresFilters, 'sort' | 'limit' | 'offset'>) {
+    const conditions: SQL[] = [];
+    if (filters.rayon) conditions.push(eq(livres.rayonId, filters.rayon));
+    if (filters.genre) conditions.push(eq(livres.genreId, filters.genre));
+    if (filters.serie) conditions.push(eq(livres.serie, filters.serie));
+    if (filters.editeur) conditions.push(eq(livres.editeur, filters.editeur));
+    if (filters.format) conditions.push(eq(livres.format, filters.format));
+    if (filters.choixLibrairie) conditions.push(eq(livres.choixLibrairie, true));
+    if (filters.q) {
+        const pattern = `%${filters.q}%`;
+        const searchCondition = or(
+            ilike(livres.titre, pattern),
+            ilike(livres.auteur, pattern),
+            ilike(livres.collection, pattern),
+            ilike(livres.editeur, pattern),
+            ilike(livres.serie, pattern),
+        );
+        if (searchCondition) conditions.push(searchCondition);
+    }
+    return conditions;
+}
+
 export const getLivresPubliques = unstable_cache(
     async (filters: LivresFilters = {}) => {
-        const conditions: SQL[] = [];
-        if (filters.rayon) conditions.push(eq(livres.rayonId, filters.rayon));
-        if (filters.genre) conditions.push(eq(livres.genreId, filters.genre));
-        if (filters.serie) conditions.push(eq(livres.serie, filters.serie));
-        if (filters.editeur)
-            conditions.push(eq(livres.editeur, filters.editeur));
-        if (filters.format) conditions.push(eq(livres.format, filters.format));
-        if (filters.choixLibrairie)
-            conditions.push(eq(livres.choixLibrairie, true));
-        if (filters.q) {
-            const pattern = `%${filters.q}%`;
-            const searchCondition = or(
-                ilike(livres.titre, pattern),
-                ilike(livres.auteur, pattern),
-                ilike(livres.collection, pattern),
-                ilike(livres.editeur, pattern),
-                ilike(livres.serie, pattern),
-            );
-            if (searchCondition) conditions.push(searchCondition);
-        }
-        const query = db
+        const conditions = buildConditions(filters);
+        const base = db
             .select(livreSelect)
             .from(livres)
+            .where(conditions.length > 0 ? and(...conditions) : undefined)
             .orderBy(buildOrderBy(filters.sort));
-        return conditions.length > 0 ? query.where(and(...conditions)) : query;
+        if (filters.limit !== undefined) {
+            return base.limit(filters.limit).offset(filters.offset ?? 0);
+        }
+        return base;
     },
     ['livres-publiques'],
+    { tags: ['livres'] },
+);
+
+export const getLivresCount = unstable_cache(
+    async (filters: Omit<LivresFilters, 'sort' | 'limit' | 'offset'> = {}) => {
+        const conditions = buildConditions(filters);
+        const [row] = await db
+            .select({ total: sql<number>`count(*)` })
+            .from(livres)
+            .where(conditions.length > 0 ? and(...conditions) : undefined);
+        return Number(row.total);
+    },
+    ['livres-count'],
     { tags: ['livres'] },
 );
 

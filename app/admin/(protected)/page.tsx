@@ -2,6 +2,7 @@ import { db } from '@/db';
 import { livres, plantes, avis } from '@/db/schema';
 import { eq, and, count, desc } from 'drizzle-orm';
 import { getProchainEvenements } from '@/lib/actions/evenements';
+import { siteConfig } from '@/lib/metadata';
 import { StatsLedger } from './_components/dashboard/StatsLedger';
 import { AlerteBar } from './_components/dashboard/AlerteBar';
 import { RupturesList } from './_components/dashboard/RupturesList';
@@ -109,7 +110,7 @@ export default async function AdminPage() {
                     {formatDate()}
                 </p>
                 <h1 className="font-serif text-3xl font-bold text-foreground leading-tight">
-                    Lecture &amp; Boutures
+                    {siteConfig.name}
                 </h1>
             </div>
 
