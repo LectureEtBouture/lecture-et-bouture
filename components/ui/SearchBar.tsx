@@ -69,7 +69,7 @@ export function SearchBar({
                 </svg>
             </div>
             <input
-                type="search"
+                type="text"
                 value={displayValue}
                 onChange={(e) => handleChange(e.target.value)}
                 onFocus={() => {

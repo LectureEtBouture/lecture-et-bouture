@@ -5,7 +5,7 @@ type Tome = {
     id: number;
     slug: string;
     titre: string;
-    genreId?: number | null;
+    genreIds?: number[];
     numeroSerie?: number | null;
 };
 
@@ -39,7 +39,7 @@ export function AutresTomes({
                         <div
                             className="aspect-2/3 w-full relative overflow-hidden"
                             style={{
-                                backgroundColor: getCoverColor(tome.genreId),
+                                backgroundColor: getCoverColor(tome.genreIds?.[0]),
                             }}
                         >
                             <span className="absolute bottom-2 left-2 text-[10px] uppercase tracking-widest text-foreground/50">

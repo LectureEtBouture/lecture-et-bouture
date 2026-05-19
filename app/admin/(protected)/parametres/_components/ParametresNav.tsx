@@ -30,7 +30,9 @@ export function ParametresNav() {
     }, []);
 
     function scrollTo(id: string) {
-        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document
+            .getElementById(id)
+            ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     const pillCls = (id: string) =>

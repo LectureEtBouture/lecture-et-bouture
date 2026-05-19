@@ -1,6 +1,6 @@
 import { unstable_cache } from 'next/cache';
 import { db } from '@/db';
-import { livres } from '@/db/schema';
+import { livres, livresGenres } from '@/db/schema';
 import { eq, and, asc, desc, ilike, or, sql, type SQL } from 'drizzle-orm';
 
 export type SortLivres =
@@ -30,7 +30,7 @@ export const livreSelect = {
     titre: livres.titre,
     auteur: livres.auteur,
     isbn: livres.isbn,
-    genreId: livres.genreId,
+    genreIds: sql<number[]>`COALESCE(ARRAY(SELECT lg.genre_id FROM livres_genres lg WHERE lg.livre_id = ${livres.id} ORDER BY lg.genre_id), ARRAY[]::integer[])`,
     rayonId: livres.rayonId,
     editeur: livres.editeur,
     collection: livres.collection,
@@ -42,6 +42,7 @@ export const livreSelect = {
     prix: livres.prix,
     description: livres.description,
     image: livres.image,
+    imageAlt: livres.imageAlt,
     noteMoyenne: livres.noteMoyenne,
     choixLibrairie: livres.choixLibrairie,
     stock: livres.stock,
@@ -72,14 +73,20 @@ function buildOrderBy(sort?: SortLivres) {
     }
 }
 
-function buildConditions(filters: Omit<LivresFilters, 'sort' | 'limit' | 'offset'>) {
+function buildConditions(
+    filters: Omit<LivresFilters, 'sort' | 'limit' | 'offset'>,
+) {
     const conditions: SQL[] = [];
     if (filters.rayon) conditions.push(eq(livres.rayonId, filters.rayon));
-    if (filters.genre) conditions.push(eq(livres.genreId, filters.genre));
+    if (filters.genre)
+        conditions.push(
+            sql`EXISTS (SELECT 1 FROM livres_genres WHERE livre_id = ${livres.id} AND genre_id = ${filters.genre})`,
+        );
     if (filters.serie) conditions.push(eq(livres.serie, filters.serie));
     if (filters.editeur) conditions.push(eq(livres.editeur, filters.editeur));
     if (filters.format) conditions.push(eq(livres.format, filters.format));
-    if (filters.choixLibrairie) conditions.push(eq(livres.choixLibrairie, true));
+    if (filters.choixLibrairie)
+        conditions.push(eq(livres.choixLibrairie, true));
     if (filters.q) {
         const pattern = `%${filters.q}%`;
         const searchCondition = or(

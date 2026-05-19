@@ -21,12 +21,14 @@ export function LivresSortFilter({
     sort,
     choix,
     rayon,
+    q,
     rayonsList,
     buildHref,
 }: {
     sort: LivresSort;
     choix: boolean;
     rayon?: string;
+    q?: string;
     rayonsList: Rayon[];
     buildHref: (params: Record<string, string | undefined>) => string;
 }) {
@@ -34,6 +36,7 @@ export function LivresSortFilter({
         sort: sort !== 'recent' ? sort : undefined,
         choix: choix ? '1' : undefined,
         rayon,
+        q,
     };
 
     return (

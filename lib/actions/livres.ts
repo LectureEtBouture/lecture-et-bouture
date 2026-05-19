@@ -3,8 +3,8 @@
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { db } from '@/db';
-import { livres, genres, rayons } from '@/db/schema';
-import { eq, asc, desc, ilike, and, SQL } from 'drizzle-orm';
+import { livres, genres, rayons, livresGenres } from '@/db/schema';
+import { eq, asc, desc, ilike, or, and, sql, SQL } from 'drizzle-orm';
 import { auth } from '@/auth';
 import { z } from 'zod';
 
@@ -26,7 +26,6 @@ const livreSchema = z.object({
     titre: z.string().min(1),
     auteur: z.string().min(1),
     isbn: z.string().optional(),
-    genreId: z.coerce.number().optional(),
     rayonId: z.coerce.number().optional(),
     editeur: z.string().optional(),
     collection: z.string().optional(),
@@ -38,17 +37,17 @@ const livreSchema = z.object({
     prix: z.coerce.number().positive(),
     description: z.string().optional(),
     image: z.string().optional(),
+    imageAlt: z.string().optional(),
     stock: z.coerce.number().int().min(0).default(0),
     choixLibrairie: z.boolean().default(false),
     noteDeLaLibrairie: z.string().optional(),
 });
 
 function parseFormData(formData: FormData) {
-    return livreSchema.parse({
+    const parsed = livreSchema.parse({
         titre: formData.get('titre'),
         auteur: formData.get('auteur'),
         isbn: formData.get('isbn') || undefined,
-        genreId: formData.get('genreId') || undefined,
         rayonId: formData.get('rayonId') || undefined,
         editeur: formData.get('editeur') || undefined,
         collection: formData.get('collection') || undefined,
@@ -60,10 +59,15 @@ function parseFormData(formData: FormData) {
         prix: formData.get('prix'),
         description: formData.get('description') || undefined,
         image: formData.get('image') || undefined,
+        imageAlt: formData.get('imageAlt') || undefined,
         stock: formData.get('stock') ?? 0,
         choixLibrairie: formData.get('choixLibrairie') === 'on',
         noteDeLaLibrairie: formData.get('noteDeLaLibrairie') || undefined,
     });
+    const genreIds = (formData.getAll('genreIds') as string[])
+        .map(Number)
+        .filter((id) => !isNaN(id) && id > 0);
+    return { ...parsed, genreIds };
 }
 
 export async function createLivre(formData: FormData) {
@@ -71,23 +75,36 @@ export async function createLivre(formData: FormData) {
     const parsed = parseFormData(formData);
     const slug = makeSlug(parsed.titre);
 
-    await db.insert(livres).values({
-        ...parsed,
-        slug,
-        prix: String(parsed.prix),
-        genreId: parsed.genreId ?? null,
-        rayonId: parsed.rayonId ?? null,
-        editeur: parsed.editeur ?? null,
-        collection: parsed.collection ?? null,
-        format: parsed.format ?? null,
-        edition: parsed.edition ?? null,
-        anneePublication: parsed.anneePublication ?? null,
-        serie: parsed.serie ?? null,
-        numeroSerie: parsed.numeroSerie ?? null,
-        description: parsed.description ?? null,
-        image: parsed.image ?? null,
-        noteDeLaLibrairie: parsed.noteDeLaLibrairie ?? null,
-    });
+    const [{ id }] = await db
+        .insert(livres)
+        .values({
+            slug,
+            titre: parsed.titre,
+            auteur: parsed.auteur,
+            isbn: parsed.isbn ?? null,
+            rayonId: parsed.rayonId ?? null,
+            editeur: parsed.editeur ?? null,
+            collection: parsed.collection ?? null,
+            format: parsed.format ?? null,
+            edition: parsed.edition ?? null,
+            anneePublication: parsed.anneePublication ?? null,
+            serie: parsed.serie ?? null,
+            numeroSerie: parsed.numeroSerie ?? null,
+            prix: String(parsed.prix),
+            description: parsed.description ?? null,
+            image: parsed.image ?? null,
+            imageAlt: parsed.imageAlt ?? null,
+            stock: parsed.stock,
+            choixLibrairie: parsed.choixLibrairie,
+            noteDeLaLibrairie: parsed.noteDeLaLibrairie ?? null,
+        })
+        .returning({ id: livres.id });
+
+    if (parsed.genreIds.length > 0) {
+        await db
+            .insert(livresGenres)
+            .values(parsed.genreIds.map((genreId) => ({ livreId: id, genreId })));
+    }
 
     revalidatePath('/admin/livres');
     revalidateTag('livres', { expire: 0 });
@@ -101,9 +118,9 @@ export async function updateLivre(id: number, formData: FormData) {
     await db
         .update(livres)
         .set({
-            ...parsed,
-            prix: String(parsed.prix),
-            genreId: parsed.genreId ?? null,
+            titre: parsed.titre,
+            auteur: parsed.auteur,
+            isbn: parsed.isbn ?? null,
             rayonId: parsed.rayonId ?? null,
             editeur: parsed.editeur ?? null,
             collection: parsed.collection ?? null,
@@ -112,12 +129,23 @@ export async function updateLivre(id: number, formData: FormData) {
             anneePublication: parsed.anneePublication ?? null,
             serie: parsed.serie ?? null,
             numeroSerie: parsed.numeroSerie ?? null,
+            prix: String(parsed.prix),
             description: parsed.description ?? null,
             image: parsed.image ?? null,
+            imageAlt: parsed.imageAlt ?? null,
+            stock: parsed.stock,
+            choixLibrairie: parsed.choixLibrairie,
             noteDeLaLibrairie: parsed.noteDeLaLibrairie ?? null,
             updatedAt: new Date(),
         })
         .where(eq(livres.id, id));
+
+    await db.delete(livresGenres).where(eq(livresGenres.livreId, id));
+    if (parsed.genreIds.length > 0) {
+        await db
+            .insert(livresGenres)
+            .values(parsed.genreIds.map((genreId) => ({ livreId: id, genreId })));
+    }
 
     revalidatePath('/admin/livres');
     revalidateTag('livres', { expire: 0 });
@@ -161,8 +189,18 @@ export async function getLivres(
 
     const conditions: SQL[] = [];
     if (filter.choix) conditions.push(eq(livres.choixLibrairie, true));
-    if (filter.search)
-        conditions.push(ilike(livres.titre, `%${filter.search}%`));
+    if (filter.search) {
+        const pattern = `%${filter.search}%`;
+        const searchCondition = or(
+            ilike(livres.titre, pattern),
+            ilike(livres.auteur, pattern),
+            ilike(livres.collection, pattern),
+            ilike(livres.editeur, pattern),
+            ilike(livres.isbn, pattern),
+            ilike(livres.serie, pattern),
+        );
+        if (searchCondition) conditions.push(searchCondition);
+    }
     if (filter.rayon) conditions.push(eq(rayons.nom, filter.rayon));
 
     const query = db
@@ -177,12 +215,11 @@ export async function getLivres(
             format: livres.format,
             choixLibrairie: livres.choixLibrairie,
             stock: livres.stock,
-            genreNom: genres.nom,
+            genreNom: sql<string | null>`(SELECT g.nom FROM livres_genres lg JOIN genres g ON g.id = lg.genre_id WHERE lg.livre_id = ${livres.id} ORDER BY lg.genre_id LIMIT 1)`,
             rayonNom: rayons.nom,
             createdAt: livres.createdAt,
         })
         .from(livres)
-        .leftJoin(genres, eq(livres.genreId, genres.id))
         .leftJoin(rayons, eq(livres.rayonId, rayons.id))
         .orderBy(order);
 
@@ -207,4 +244,12 @@ export async function getGenres() {
 
 export async function getRayons() {
     return db.select().from(rayons).orderBy(rayons.nom);
+}
+
+export async function getLivreGenreIds(livreId: number): Promise<number[]> {
+    const rows = await db
+        .select({ genreId: livresGenres.genreId })
+        .from(livresGenres)
+        .where(eq(livresGenres.livreId, livreId));
+    return rows.map((row) => row.genreId);
 }

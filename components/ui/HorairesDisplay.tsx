@@ -1,4 +1,9 @@
-import type { Horaires, JourSemaine, PlageHoraire, FermetureExceptionnelle } from '@/lib/types/parametres';
+import type {
+    Horaires,
+    JourSemaine,
+    PlageHoraire,
+    FermetureExceptionnelle,
+} from '@/lib/types/parametres';
 
 const JOURS: { key: JourSemaine; label: string }[] = [
     { key: 'lun', label: 'Lun' },
@@ -14,7 +19,9 @@ type Groupe = { debut: string; fin: string; plage: PlageHoraire | null };
 
 function formaterHeure(h: string): string {
     const [heures, minutes] = h.split(':');
-    return minutes === '00' ? `${parseInt(heures)}h` : `${parseInt(heures)}h${minutes}`;
+    return minutes === '00'
+        ? `${parseInt(heures)}h`
+        : `${parseInt(heures)}h${minutes}`;
 }
 
 function grouper(horaires: Horaires): Groupe[] {
@@ -23,7 +30,10 @@ function grouper(horaires: Horaires): Groupe[] {
 
     for (const { key, label } of JOURS) {
         const plage = horaires[key];
-        if (courant && JSON.stringify(plage) === JSON.stringify(courant.plage)) {
+        if (
+            courant &&
+            JSON.stringify(plage) === JSON.stringify(courant.plage)
+        ) {
             courant.fin = label;
         } else {
             if (courant) groupes.push(courant);
@@ -34,7 +44,9 @@ function grouper(horaires: Horaires): Groupe[] {
     return groupes;
 }
 
-function fermetureActive(fermetures: FermetureExceptionnelle[]): FermetureExceptionnelle | null {
+function fermetureActive(
+    fermetures: FermetureExceptionnelle[],
+): FermetureExceptionnelle | null {
     const today = new Date().toISOString().slice(0, 10);
     return fermetures.find((f) => today >= f.debut && today <= f.fin) ?? null;
 }
@@ -74,7 +86,11 @@ export function HorairesDisplay({
                     return (
                         <li key={i} className="flex gap-3 text-sm text-muted">
                             <span className="w-20 shrink-0">{label}</span>
-                            <span className={groupe.plage ? 'text-foreground' : ''}>
+                            <span
+                                className={
+                                    groupe.plage ? 'text-foreground' : ''
+                                }
+                            >
                                 {valeur}
                             </span>
                         </li>

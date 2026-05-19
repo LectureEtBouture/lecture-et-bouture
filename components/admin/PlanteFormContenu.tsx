@@ -6,6 +6,7 @@ import {
     fieldsetClass,
     legendClass,
 } from './formStyles';
+import { ImageUpload } from './ImageUpload';
 
 type Plante = InferSelectModel<typeof plantes>;
 
@@ -32,15 +33,7 @@ export function PlanteFormContenu({ plante }: { plante?: Plante }) {
                     placeholder="Pourquoi on aime cette bouture…"
                 />
             </div>
-            <div>
-                <label className={labelClass}>Image (URL)</label>
-                <input
-                    name="image"
-                    defaultValue={plante?.image ?? ''}
-                    className={inputClass}
-                    placeholder="/covers/nom-de-la-bouture.jpg"
-                />
-            </div>
+            <ImageUpload defaultValue={plante?.image} defaultAltValue={plante?.imageAlt} folder="boutures" />
         </fieldset>
     );
 }

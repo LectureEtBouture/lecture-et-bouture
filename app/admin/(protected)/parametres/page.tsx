@@ -12,8 +12,10 @@ import { MaintenanceForm } from './_components/MaintenanceForm';
 import { ReseauxForm } from './_components/ReseauxForm';
 import { ParametresNav } from './_components/ParametresNav';
 
-const sectionCls = 'border border-border p-6 space-y-6 scroll-mt-24 md:scroll-mt-14';
-const titleCls = 'text-[11px] uppercase tracking-[0.12em] font-medium text-muted';
+const sectionCls =
+    'border border-border p-6 space-y-6 scroll-mt-24 md:scroll-mt-14';
+const titleCls =
+    'text-[11px] uppercase tracking-[0.12em] font-medium text-muted';
 const headingCls = 'font-serif text-lg font-bold text-foreground';
 
 export default async function ParametresPage() {
@@ -50,7 +52,8 @@ export default async function ParametresPage() {
             <section id="annonce" className={sectionCls}>
                 <h2 className={headingCls}>Annonce globale</h2>
                 <p className="text-sm text-muted">
-                    Bandeau affiché en haut du site. Dismissible par le visiteur.
+                    Bandeau affiché en haut du site. Dismissible par le
+                    visiteur.
                 </p>
                 <AnnonceForm initial={annonce} />
             </section>
@@ -58,8 +61,8 @@ export default async function ParametresPage() {
             <section id="maintenance" className={sectionCls}>
                 <h2 className={headingCls}>Mode maintenance</h2>
                 <p className="text-sm text-muted">
-                    Remplace le site public par un écran d&apos;attente.
-                    Le back-office reste accessible.
+                    Remplace le site public par un écran d&apos;attente. Le
+                    back-office reste accessible.
                 </p>
                 <MaintenanceForm initial={maintenance} />
             </section>

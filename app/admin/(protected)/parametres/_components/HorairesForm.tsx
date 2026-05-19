@@ -1,7 +1,11 @@
 'use client';
 
 import { useState, useTransition, useRef } from 'react';
-import type { Horaires, JourSemaine, PlageHoraire } from '@/lib/types/parametres';
+import type {
+    Horaires,
+    JourSemaine,
+    PlageHoraire,
+} from '@/lib/types/parametres';
 import { sauvegarderHoraires } from '@/lib/actions/parametres';
 
 const JOURS: { key: JourSemaine; label: string }[] = [
@@ -46,7 +50,10 @@ export function HorairesForm({ initial }: { initial: Horaires }) {
                 const ouvert = horaires[key] !== null;
                 const plage = horaires[key];
                 return (
-                    <div key={key} className="flex items-center gap-3 flex-wrap">
+                    <div
+                        key={key}
+                        className="flex items-center gap-3 flex-wrap"
+                    >
                         <span className="w-24 text-sm text-foreground shrink-0">
                             {label}
                         </span>
@@ -80,7 +87,12 @@ export function HorairesForm({ initial }: { initial: Horaires }) {
                                     }
                                     className={inputCls}
                                 />
-                                <span className="text-muted text-sm" aria-hidden="true">–</span>
+                                <span
+                                    className="text-muted text-sm"
+                                    aria-hidden="true"
+                                >
+                                    –
+                                </span>
                                 <input
                                     type="time"
                                     value={plage.close}

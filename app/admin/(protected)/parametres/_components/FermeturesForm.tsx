@@ -7,8 +7,13 @@ import { sauvegarderFermetures } from '@/lib/actions/parametres';
 const inputCls =
     'border border-border bg-surface text-foreground px-[14px] py-[10px] text-sm focus:outline-none focus:border-primary';
 
-export function FermeturesForm({ initial }: { initial: FermetureExceptionnelle[] }) {
-    const [fermetures, setFermetures] = useState<FermetureExceptionnelle[]>(initial);
+export function FermeturesForm({
+    initial,
+}: {
+    initial: FermetureExceptionnelle[];
+}) {
+    const [fermetures, setFermetures] =
+        useState<FermetureExceptionnelle[]>(initial);
     const [pending, startTransition] = useTransition();
     const [saved, setSaved] = useState(false);
     const [dirty, setDirty] = useState(false);
@@ -93,7 +98,9 @@ export function FermeturesForm({ initial }: { initial: FermetureExceptionnelle[]
                         <button
                             type="button"
                             onClick={() =>
-                                setPendingDelete(pendingDelete === index ? null : index)
+                                setPendingDelete(
+                                    pendingDelete === index ? null : index,
+                                )
                             }
                             className="text-muted hover:text-danger transition-colors text-xs mt-4 shrink-0 ml-auto"
                         >

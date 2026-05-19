@@ -1,4 +1,4 @@
-# PRD — Lecture & Boutures
+# PRD — Lecture & Bouture
 
 ## Vision
 
@@ -44,7 +44,7 @@ Concept hybride : livres académiques + boutures végétales. Expérience d'acha
 | `/admin/selections`             | Gestion sélections du conservateur                                                                                        |
 | `/admin/evenements`             | CRUD événements                                                                                                           |
 | `/admin/pages`                  | Éditeur RTE pages éditoriales (concept, mentions légales, CGV, CGU, cookies, politique)                                   |
-| `/admin/parametres`             | Paramètres boutique : horaires, fermetures exceptionnelles, annonce globale, mode maintenance, réseaux sociaux             |
+| `/admin/parametres`             | Paramètres boutique : horaires, fermetures exceptionnelles, annonce globale, mode maintenance, réseaux sociaux            |
 
 ---
 

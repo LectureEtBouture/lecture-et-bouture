@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import { selections, selectionItems, livres, plantes } from '@/db/schema';
-import { eq, asc } from 'drizzle-orm';
+import { eq, asc, sql } from 'drizzle-orm';
 
 export type SelectionItemPublique =
     | {
@@ -11,7 +11,7 @@ export type SelectionItemPublique =
           auteur: string;
           slug: string;
           prix: string;
-          genreId: number | null;
+          primaryGenreId: number | null;
       }
     | {
           id: number;
@@ -50,7 +50,7 @@ export async function getPublicSelections(): Promise<SelectionPublique[]> {
             livreAuteur: livres.auteur,
             livreSlug: livres.slug,
             livrePrix: livres.prix,
-            livreGenreId: livres.genreId,
+            livreGenreId: sql<number | null>`(SELECT genre_id FROM livres_genres WHERE livre_id = ${livres.id} ORDER BY genre_id LIMIT 1)`,
             planteId: selectionItems.planteId,
             planteNom: plantes.nom,
             planteEspece: plantes.espece,
@@ -101,7 +101,7 @@ export async function getPublicSelections(): Promise<SelectionPublique[]> {
                 auteur: row.livreAuteur,
                 slug: row.livreSlug,
                 prix: row.livrePrix,
-                genreId: row.livreGenreId ?? null,
+                primaryGenreId: row.livreGenreId ?? null,
             });
         } else if (
             row.itemType === 'plante' &&

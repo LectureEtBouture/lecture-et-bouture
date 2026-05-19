@@ -6,6 +6,7 @@ import {
     genres,
     rayons,
     livres,
+    livresGenres,
     plantes,
     avis,
     evenements,
@@ -55,12 +56,11 @@ async function main() {
     // Livres
     const sortedLivres = [...livresJson].sort((a, b) => a.id - b.id);
     for (const livre of sortedLivres) {
-        await db.insert(livres).values({
+        const [inserted] = await db.insert(livres).values({
             slug: livre.slug,
             titre: livre.titre,
             auteur: livre.auteur,
             isbn: livre.isbn ?? null,
-            genreId: livre.genreId ?? null,
             rayonId: livre.rayonId ?? null,
             editeur: livre.editeur ?? null,
             collection: livre.collection ?? null,
@@ -78,7 +78,10 @@ async function main() {
             stock: livre.stock ?? 0,
             noteDeLaLibrairie: livre.noteDeLaLibrairie ?? null,
             publishedAt: livre.publishedAt ? new Date(livre.publishedAt) : null,
-        });
+        }).returning({ id: livres.id });
+        if (livre.genreId && inserted) {
+            await db.insert(livresGenres).values({ livreId: inserted.id, genreId: livre.genreId });
+        }
     }
     console.log(`Livres : ${sortedLivres.length}`);
 
@@ -159,7 +162,7 @@ async function main() {
             titre: 'Rencontre avec Baptiste Morizot',
             description:
                 "L'auteur de « Manières d'être vivant » dialogue avec notre équipe autour de la question du vivant et de notre rapport aux autres espèces. Entrée libre, places limitées.",
-            lieu: 'Lecture & Boutures — espace principal',
+            lieu: 'Lecture & Bouture — espace principal',
             dateDebut: new Date(
                 now.getFullYear(),
                 now.getMonth() + 1,
@@ -227,7 +230,7 @@ async function main() {
             titre: 'Dédicace — Francis Hallé',
             description:
                 "Séance de dédicace exceptionnelle autour de l'Herbier du Monde. File d'attente dès 14h.",
-            lieu: 'Lecture & Boutures',
+            lieu: 'Lecture & Bouture',
             dateDebut: new Date(
                 now.getFullYear(),
                 now.getMonth() - 2,
@@ -333,11 +336,19 @@ async function main() {
         },
         {
             cle: 'annonce',
-            valeur: JSON.stringify({ active: false, type: 'info', message: '', expire_at: null }),
+            valeur: JSON.stringify({
+                active: false,
+                type: 'info',
+                message: '',
+                expire_at: null,
+            }),
         },
         {
             cle: 'maintenance',
-            valeur: JSON.stringify({ active: false, message: 'Site en maintenance. Revenez bientôt.' }),
+            valeur: JSON.stringify({
+                active: false,
+                message: 'Site en maintenance. Revenez bientôt.',
+            }),
         },
         {
             cle: 'reseaux_sociaux',

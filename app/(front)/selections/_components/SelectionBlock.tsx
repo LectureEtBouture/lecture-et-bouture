@@ -16,7 +16,7 @@ function ItemRow({ item }: { item: SelectionItemPublique }) {
     return (
         <Link
             href={href}
-            className="flex items-baseline justify-between py-3 border-b border-border group last:border-b-0"
+            className="flex items-baseline justify-between py-3 border-b border-border group last:border-b-0 items-center"
         >
             <span className="min-w-0 pr-6 flex items-baseline gap-2.5">
                 <span className="font-serif text-[15px] font-medium text-foreground group-hover:text-primary transition-colors leading-snug">

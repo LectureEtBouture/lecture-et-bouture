@@ -1,5 +1,5 @@
 import type { InferSelectModel } from 'drizzle-orm';
-import type { livres, genres, rayons } from '@/db/schema';
+import type { genres, rayons } from '@/db/schema';
 import {
     inputClass,
     labelClass,
@@ -7,52 +7,60 @@ import {
     legendClass,
 } from './formStyles';
 
-type Livre = InferSelectModel<typeof livres>;
 type Genre = InferSelectModel<typeof genres>;
 type Rayon = InferSelectModel<typeof rayons>;
 
 export function LivreFormClassification({
-    livre,
+    selectedGenreIds,
     genresList,
+    rayonId,
     rayonsList,
 }: {
-    livre?: Livre;
+    selectedGenreIds: number[];
     genresList: Genre[];
+    rayonId?: number | null;
     rayonsList: Rayon[];
 }) {
     return (
         <fieldset className={fieldsetClass}>
             <legend className={legendClass}>Classification</legend>
-            <div className="grid grid-cols-2 gap-4">
-                <div>
-                    <label className={labelClass}>Rayon</label>
-                    <select
-                        name="rayonId"
-                        defaultValue={livre?.rayonId ?? ''}
-                        className={inputClass}
-                    >
-                        <option value="">— Aucun —</option>
-                        {rayonsList.map((rayon) => (
-                            <option key={rayon.id} value={rayon.id}>
-                                {rayon.nom}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <div>
-                    <label className={labelClass}>Genre</label>
-                    <select
-                        name="genreId"
-                        defaultValue={livre?.genreId ?? ''}
-                        className={inputClass}
-                    >
-                        <option value="">— Aucun —</option>
-                        {genresList.map((genre) => (
-                            <option key={genre.id} value={genre.id}>
+            <div>
+                <label className={labelClass}>Rayon</label>
+                <select
+                    name="rayonId"
+                    defaultValue={rayonId ?? ''}
+                    className={inputClass}
+                >
+                    <option value="">— Aucun —</option>
+                    {rayonsList.map((rayon) => (
+                        <option key={rayon.id} value={rayon.id}>
+                            {rayon.nom}
+                        </option>
+                    ))}
+                </select>
+            </div>
+            <div>
+                <p className={labelClass}>Genres</p>
+                <div className="flex flex-wrap gap-x-6 gap-y-2 mt-1">
+                    {genresList.map((genre) => (
+                        <label
+                            key={genre.id}
+                            className="flex items-center gap-2 cursor-pointer"
+                        >
+                            <input
+                                type="checkbox"
+                                name="genreIds"
+                                value={genre.id}
+                                defaultChecked={selectedGenreIds.includes(
+                                    genre.id,
+                                )}
+                                className="accent-primary"
+                            />
+                            <span className="text-[12px] text-foreground">
                                 {genre.nom}
-                            </option>
-                        ))}
-                    </select>
+                            </span>
+                        </label>
+                    ))}
                 </div>
             </div>
         </fieldset>

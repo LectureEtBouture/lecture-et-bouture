@@ -32,9 +32,18 @@ export async function getPageEditorialeDraft(slug: string) {
 
 export async function fetchPageEditorialeWithDraft(slug: string) {
     const { isEnabled } = await draftMode();
-    return isEnabled
-        ? getPageEditorialeDraft(slug)
-        : getPageEditoriale(slug);
+    return isEnabled ? getPageEditorialeDraft(slug) : getPageEditoriale(slug);
 }
 
 export type PageEditoriale = Awaited<ReturnType<typeof getPageEditoriale>>;
+
+export const getPublishedEditorialSlugs = unstable_cache(
+    async () =>
+        db
+            .select({ slug: pagesEditoriales.slug })
+            .from(pagesEditoriales)
+            .where(eq(pagesEditoriales.publiee, true))
+            .then((rows) => rows.map((row) => row.slug)),
+    ['published-editorial-slugs'],
+    { tags: ['pages'] },
+);

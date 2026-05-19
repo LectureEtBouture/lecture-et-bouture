@@ -3,6 +3,7 @@ import { getEvenementsPublics } from '@/lib/queries/evenements';
 import { siteConfig } from '@/lib/metadata';
 import { EvenementItem } from './_components/EvenementItem';
 import type { EvenementStatus } from './_components/EvenementItem';
+import { EvenementEnAvant } from '../_components/EvenementEnAvant';
 
 export const metadata: Metadata = {
     title: 'Événements',
@@ -62,21 +63,26 @@ export default async function EvenementsPage() {
                     </p>
                 </div>
             ) : (
-                <div className="divide-y divide-border">
+                <div>
                     {enCours.map((evenement) => (
-                        <EvenementItem
+                        <EvenementEnAvant
                             key={evenement.id}
                             evenement={evenement}
                             status="en_cours"
+                            hideAgendaLink
                         />
                     ))}
-                    {upcoming.map((evenement) => (
-                        <EvenementItem
-                            key={evenement.id}
-                            evenement={evenement}
-                            status="upcoming"
-                        />
-                    ))}
+                    {upcoming.length > 0 && (
+                        <div className="divide-y divide-border mt-2">
+                            {upcoming.map((evenement) => (
+                                <EvenementItem
+                                    key={evenement.id}
+                                    evenement={evenement}
+                                    status="upcoming"
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
             )}
 

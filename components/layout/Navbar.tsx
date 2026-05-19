@@ -5,17 +5,24 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { siteConfig } from '@/lib/metadata';
 
-const navLinks = [
-    { href: '/livres', label: 'Livres' },
-    { href: '/boutures', label: 'Boutures' },
-    { href: '/selections', label: 'Sélections' },
-    { href: '/evenements', label: 'Événements' },
-    { href: '/concept', label: 'Concept' },
-    { href: '/contact', label: 'Contact' },
+const ALL_NAV_LINKS = [
+    { href: '/livres', label: 'Livres', editorialSlug: null },
+    { href: '/boutures', label: 'Boutures', editorialSlug: null },
+    { href: '/selections', label: 'Sélections', editorialSlug: null },
+    { href: '/evenements', label: 'Événements', editorialSlug: null },
+    { href: '/concept', label: 'Concept', editorialSlug: 'concept' },
+    { href: '/contact', label: 'Contact', editorialSlug: null },
 ];
 
-export function Navbar() {
+export function Navbar({ publishedSlugs }: { publishedSlugs?: string[] }) {
     const [open, setOpen] = useState(false);
+
+    const navLinks = publishedSlugs
+        ? ALL_NAV_LINKS.filter(
+              ({ editorialSlug }) =>
+                  !editorialSlug || publishedSlugs.includes(editorialSlug),
+          )
+        : ALL_NAV_LINKS;
 
     return (
         <header className="sticky top-0 z-50 bg-background border-b border-border relative">

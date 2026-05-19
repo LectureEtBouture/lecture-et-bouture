@@ -47,7 +47,7 @@ export default async function AdminGenresPage() {
                             {data.map((genre) => (
                                 <tr
                                     key={genre.id}
-                                    className="border-b border-border/50 hover:bg-white transition-colors"
+                                    className="border-b border-border/50 hover:bg-white transition-colors px-4"
                                 >
                                     <td className="py-3 pr-4 font-medium text-foreground">
                                         {genre.nom}

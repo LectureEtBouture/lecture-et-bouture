@@ -1,6 +1,6 @@
 import { unstable_cache } from 'next/cache';
 import { db } from '@/db';
-import { livres, genres, rayons } from '@/db/schema';
+import { livres, genres, rayons, livresGenres } from '@/db/schema';
 import { eq, isNotNull } from 'drizzle-orm';
 
 export const getLivresRayons = unstable_cache(
@@ -27,7 +27,8 @@ export const getGenresActifs = unstable_cache(
                 slug: genres.slug,
             })
             .from(genres)
-            .innerJoin(livres, eq(livres.genreId, genres.id));
+            .innerJoin(livresGenres, eq(livresGenres.genreId, genres.id))
+            .innerJoin(livres, eq(livres.id, livresGenres.livreId));
         return rayonId
             ? baseQuery.where(eq(livres.rayonId, rayonId)).orderBy(genres.nom)
             : baseQuery.orderBy(genres.nom);

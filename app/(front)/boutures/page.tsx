@@ -12,7 +12,10 @@ export const metadata: Metadata = {
 const PAGE_SIZE = 10;
 
 export default async function BouturesPage() {
-    const boutures = await getBouturesPubliques({ limit: PAGE_SIZE, offset: 0 });
+    const boutures = await getBouturesPubliques({
+        limit: PAGE_SIZE,
+        offset: 0,
+    });
 
     return (
         <div className="max-w-6xl mx-auto px-6 py-section space-y-section">

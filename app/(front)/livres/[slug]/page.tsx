@@ -34,18 +34,19 @@ export default async function LivrePage({ params }: Props) {
     const livre = await getLivreBySlug(slug);
     if (!livre) notFound();
 
+    const primaryGenreId = livre.genreIds?.[0];
     const [genre, rayon, avis, reco] = await Promise.all([
-        livre.genreId ? getGenreById(livre.genreId) : Promise.resolve(null),
+        primaryGenreId ? getGenreById(primaryGenreId) : Promise.resolve(null),
         livre.rayonId ? getRayonById(livre.rayonId) : Promise.resolve(null),
         getAvisForLivre(livre.id),
         getRecommendations(
             livre.id,
             livre.serie ?? null,
-            livre.genreId ?? null,
+            primaryGenreId ?? null,
             livre.auteur,
         ),
     ]);
-    const coverColor = getCoverColor(livre.genreId);
+    const coverColor = getCoverColor(primaryGenreId);
 
     return (
         <div className="max-w-6xl mx-auto px-6 py-16">
@@ -98,7 +99,7 @@ export default async function LivrePage({ params }: Props) {
                         <RecoSection
                             prefix="Dans le même genre"
                             label={genre.nom}
-                            href={`/livres?genre=${livre.genreId}`}
+                            href={`/livres?genre=${primaryGenreId}`}
                             livres={reco.memeGenre}
                         />
                     )}

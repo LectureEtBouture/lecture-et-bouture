@@ -7,10 +7,12 @@ type Props = {
         titre: string;
         description: string | null;
         lieu: string | null;
+        image: string | null;
         dateDebut: Date;
         dateFin: Date | null;
     };
     status: EvenementStatus;
+    hideAgendaLink?: boolean;
 };
 
 function formatDate(date: Date) {
@@ -28,54 +30,90 @@ function formatHeure(date: Date) {
     });
 }
 
-export function EvenementEnAvant({ evenement, status }: Props) {
+function isSameDay(a: Date, b: Date) {
+    const da = new Date(a);
+    const db = new Date(b);
     return (
-        <section className="border-t border-border">
-            <div className="max-w-7xl mx-auto px-6 sm:px-8 py-14 sm:py-20">
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-8">
-                    <div className="space-y-1">
-                        <p className="text-[11px] uppercase tracking-[0.14em] text-muted">
-                            {status === 'en_cours'
-                                ? 'En ce moment'
-                                : 'Prochain événement'}
+        da.getFullYear() === db.getFullYear() &&
+        da.getMonth() === db.getMonth() &&
+        da.getDate() === db.getDate()
+    );
+}
+
+export function EvenementEnAvant({
+    evenement,
+    status,
+    hideAgendaLink = false,
+}: Props) {
+    const enCours = status === 'en_cours';
+    const singleDayEndTime =
+        evenement.dateFin &&
+        isSameDay(evenement.dateDebut, evenement.dateFin);
+
+    return (
+        <section className="border-t-2 border-primary">
+            <div className="max-w-7xl mx-auto px-6 sm:px-8 py-16 sm:py-24">
+                <div className="flex items-start justify-between gap-8">
+                    <div className="flex items-center gap-3">
+                        <p className="text-xs uppercase tracking-[0.16em] font-medium text-muted">
+                            {enCours ? 'En ce moment' : 'Prochain événement'}
                         </p>
-                        {status === 'en_cours' && (
-                            <span className="inline-block text-[9px] uppercase tracking-[0.12em] font-medium text-primary border border-primary/40 px-2 py-0.5 leading-none mt-2">
+                        {enCours && (
+                            <span className="text-[9px] uppercase tracking-[0.12em] font-medium text-primary bg-primary/10 border border-primary/30 px-2 py-1 leading-none">
                                 En cours
                             </span>
                         )}
                     </div>
-                    <Link
-                        href="/evenements"
-                        className="text-[11px] uppercase tracking-[0.1em] text-muted hover:text-primary transition-colors shrink-0"
-                    >
-                        Tout l&apos;agenda
-                    </Link>
+                    {!hideAgendaLink && (
+                        <Link
+                            href="/evenements"
+                            className="text-[11px] uppercase tracking-[0.1em] text-muted hover:text-primary transition-colors shrink-0"
+                        >
+                            Tout l&apos;agenda
+                        </Link>
+                    )}
                 </div>
 
-                <div className="mt-6 max-w-2xl">
-                    <h2 className="font-serif text-[clamp(1.5rem,3vw,2.25rem)] font-bold text-foreground leading-[1.1] tracking-[-0.01em]">
-                        {evenement.titre}
-                    </h2>
-                    <div className="flex flex-wrap items-center gap-x-6 gap-y-1 mt-3">
-                        <span className="text-[11px] uppercase tracking-[0.1em] text-muted">
-                            {formatDate(evenement.dateDebut)}
-                        </span>
-                        <span className="text-[11px] uppercase tracking-[0.1em] text-muted">
-                            {formatHeure(evenement.dateDebut)}
-                            {evenement.dateFin &&
-                                ` — ${formatHeure(evenement.dateFin)}`}
-                        </span>
-                        {evenement.lieu && (
+                <div className={`mt-8 ${evenement.image ? 'grid lg:grid-cols-[1fr_380px] items-stretch gap-12' : ''}`}>
+                    <div className="max-w-3xl">
+                        <h2 className="font-serif text-[clamp(2rem,4vw,3.25rem)] font-bold text-foreground leading-[1.05] tracking-[-0.02em]">
+                            {evenement.titre}
+                        </h2>
+                        <div className="flex flex-wrap items-center gap-x-5 gap-y-1 mt-5">
                             <span className="text-[11px] uppercase tracking-[0.1em] text-muted">
-                                {evenement.lieu}
+                                {formatDate(evenement.dateDebut)}
                             </span>
+                            <span className="text-muted/40 text-[10px]">·</span>
+                            <span className="text-[11px] uppercase tracking-[0.1em] text-muted">
+                                {formatHeure(evenement.dateDebut)}
+                                {singleDayEndTime &&
+                                    ` — ${formatHeure(evenement.dateFin!)}`}
+                            </span>
+                            {evenement.lieu && (
+                                <>
+                                    <span className="text-muted/40 text-[10px]">
+                                        ·
+                                    </span>
+                                    <span className="text-[11px] uppercase tracking-[0.1em] text-muted">
+                                        {evenement.lieu}
+                                    </span>
+                                </>
+                            )}
+                        </div>
+                        {evenement.description && (
+                            <p className="text-base text-foreground/65 leading-[1.8] max-w-[58ch] mt-6">
+                                {evenement.description}
+                            </p>
                         )}
                     </div>
-                    {evenement.description && (
-                        <p className="text-base text-foreground/70 leading-[1.75] max-w-[60ch] mt-4">
-                            {evenement.description}
-                        </p>
+                    {evenement.image && (
+                        <div className="relative h-52 lg:h-auto lg:min-h-[280px]">
+                            <img
+                                src={evenement.image}
+                                alt={evenement.titre}
+                                className="absolute inset-0 w-full h-full object-cover"
+                            />
+                        </div>
                     )}
                 </div>
             </div>

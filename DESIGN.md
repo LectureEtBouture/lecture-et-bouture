@@ -1,5 +1,5 @@
 ---
-name: Lecture & Boutures
+name: Lecture & Bouture
 description: Boutique hybride livres académiques et boutures végétales — "Cultiver l'esprit, nourrir la terre."
 colors:
     primary: '#2d4b3e'
@@ -84,7 +84,7 @@ components:
         padding: '10px 14px'
 ---
 
-# Design System: Lecture & Boutures
+# Design System: Lecture & Bouture
 
 ## 1. Overview
 

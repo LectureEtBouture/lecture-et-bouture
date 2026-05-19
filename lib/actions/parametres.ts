@@ -26,7 +26,9 @@ export async function sauvegarderHoraires(horaires: Horaires) {
     await upsert('horaires', horaires);
 }
 
-export async function sauvegarderFermetures(fermetures: FermetureExceptionnelle[]) {
+export async function sauvegarderFermetures(
+    fermetures: FermetureExceptionnelle[],
+) {
     await upsert('fermetures', fermetures);
 }
 

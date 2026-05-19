@@ -12,7 +12,7 @@ export function LivreCard({
     featured?: boolean;
     genreNom?: string;
 }) {
-    const coverColor = getCoverColor(livre.genreId);
+    const coverColor = getCoverColor(livre.genreIds?.[0]);
     const coverImage = livre.image ?? null;
 
     return (

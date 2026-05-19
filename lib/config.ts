@@ -1,5 +1,5 @@
 export const storeConfig = {
-    name: process.env.NEXT_PUBLIC_STORE_NAME ?? 'Lecture & Boutures',
+    name: process.env.NEXT_PUBLIC_STORE_NAME ?? 'Lecture & Bouture',
     tagline:
         process.env.NEXT_PUBLIC_STORE_TAGLINE ??
         "Cultiver l'esprit, nourrir la terre.",

@@ -1,30 +1,53 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { siteConfig } from '@/lib/metadata';
-import { getHoraires, getReseauxSociaux, getFermetures } from '@/lib/queries/parametres';
+import {
+    getHoraires,
+    getReseauxSociaux,
+    getFermetures,
+} from '@/lib/queries/parametres';
+import { getPublishedEditorialSlugs } from '@/lib/queries/pages';
 import { HorairesDisplay } from '@/components/ui/HorairesDisplay';
 import { NewsletterSection } from '@/components/ui/NewsletterSection';
 
 const navExplorer = [
-    { href: '/livres', label: 'Livres' },
-    { href: '/boutures', label: 'Boutures' },
-    { href: '/selections', label: 'Sélections' },
-    { href: '/evenements', label: 'Événements' },
-    { href: '/surprendre', label: 'Me faire surprendre' },
+    { href: '/livres', label: 'Livres', editorialSlug: null },
+    { href: '/boutures', label: 'Boutures', editorialSlug: null },
+    { href: '/selections', label: 'Sélections', editorialSlug: null },
+    { href: '/evenements', label: 'Événements', editorialSlug: null },
+    { href: '/surprendre', label: 'Me faire surprendre', editorialSlug: null },
 ];
 
 const navBoutique = [
-    { href: '/concept', label: 'Notre concept' },
-    { href: '/contact', label: 'Contact' },
+    { href: '/concept', label: 'Notre concept', editorialSlug: 'concept' },
+    { href: '/contact', label: 'Contact', editorialSlug: null },
 ];
 
 const navLegal = [
-    { href: '/mentions-legales', label: 'Mentions légales' },
-    { href: '/politique-de-confidentialite', label: 'Confidentialité' },
-    { href: '/cgv', label: 'CGV' },
-    { href: '/cgu', label: 'CGU' },
-    { href: '/cookies', label: 'Cookies' },
+    {
+        href: '/mentions-legales',
+        label: 'Mentions légales',
+        editorialSlug: 'mentions-legales',
+    },
+    {
+        href: '/politique-de-confidentialite',
+        label: 'Confidentialité',
+        editorialSlug: 'politique-de-confidentialite',
+    },
+    { href: '/cgv', label: 'CGV', editorialSlug: 'cgv' },
+    { href: '/cgu', label: 'CGU', editorialSlug: 'cgu' },
+    { href: '/cookies', label: 'Cookies', editorialSlug: 'cookies' },
 ];
+
+function filterLinks(
+    links: { href: string; label: string; editorialSlug: string | null }[],
+    publishedSlugs: string[],
+) {
+    return links.filter(
+        ({ editorialSlug }) =>
+            !editorialSlug || publishedSlugs.includes(editorialSlug),
+    );
+}
 
 function NavCol({
     label,
@@ -57,10 +80,11 @@ function NavCol({
 }
 
 export async function Footer() {
-    const [horaires, fermetures, reseaux] = await Promise.all([
+    const [horaires, fermetures, reseaux, publishedSlugs] = await Promise.all([
         getHoraires(),
         getFermetures(),
         getReseauxSociaux(),
+        getPublishedEditorialSlugs(),
     ]);
 
     return (
@@ -94,7 +118,11 @@ export async function Footer() {
                         <p className="text-sm text-muted leading-relaxed max-w-[22ch]">
                             {siteConfig.description}
                         </p>
-                        <HorairesDisplay horaires={horaires} fermetures={fermetures} className="pt-1" />
+                        <HorairesDisplay
+                            horaires={horaires}
+                            fermetures={fermetures}
+                            className="pt-1"
+                        />
                         {reseaux.length > 0 && (
                             <div className="flex flex-wrap gap-3 pt-1">
                                 {reseaux.map((r) => (
@@ -114,17 +142,17 @@ export async function Footer() {
 
                     <NavCol
                         label="Explorer"
-                        links={navExplorer}
+                        links={filterLinks(navExplorer, publishedSlugs)}
                         ariaLabel="Explorer le catalogue"
                     />
                     <NavCol
                         label="La boutique"
-                        links={navBoutique}
+                        links={filterLinks(navBoutique, publishedSlugs)}
                         ariaLabel="À propos de la boutique"
                     />
                     <NavCol
                         label="Légal"
-                        links={navLegal}
+                        links={filterLinks(navLegal, publishedSlugs)}
                         ariaLabel="Liens légaux"
                     />
                 </div>

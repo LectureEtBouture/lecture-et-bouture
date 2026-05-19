@@ -125,7 +125,7 @@ export function BouturesTable({ data }: { data: BoutureRow[] }) {
                         {data.map((bouture) => (
                             <tr
                                 key={bouture.id}
-                                className="border-b border-border/50 hover:bg-white transition-colors"
+                                className="border-b border-border/50 hover:bg-white transition-colors px-4"
                             >
                                 <td className="py-3 pr-4">
                                     <p className="font-medium text-foreground">

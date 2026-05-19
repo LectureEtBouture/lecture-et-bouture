@@ -59,7 +59,7 @@ export function LivresGrid({
                         livre={livre}
                         genreNom={
                             genresList.find(
-                                (genre) => genre.id === livre.genreId,
+                                (genre) => genre.id === livre.genreIds?.[0],
                             )?.nom
                         }
                     />

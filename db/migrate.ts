@@ -120,7 +120,20 @@ const statements = [
         updated_at timestamp NOT NULL DEFAULT now()
     )`,
     `ALTER TABLE evenements ADD COLUMN IF NOT EXISTS publie boolean NOT NULL DEFAULT true`,
+    `ALTER TABLE evenements ADD COLUMN IF NOT EXISTS image text`,
     `ALTER TABLE pages_editoriales ADD COLUMN IF NOT EXISTS publiee boolean NOT NULL DEFAULT true`,
+    `CREATE TABLE IF NOT EXISTS livres_genres (
+        livre_id integer NOT NULL REFERENCES livres(id) ON DELETE CASCADE,
+        genre_id integer NOT NULL REFERENCES genres(id) ON DELETE CASCADE,
+        PRIMARY KEY (livre_id, genre_id)
+    )`,
+    `INSERT INTO livres_genres (livre_id, genre_id)
+        SELECT id, genre_id FROM livres WHERE genre_id IS NOT NULL
+        ON CONFLICT DO NOTHING`,
+    `ALTER TABLE livres DROP COLUMN IF EXISTS genre_id`,
+    `ALTER TABLE livres ADD COLUMN IF NOT EXISTS image_alt text`,
+    `ALTER TABLE plantes ADD COLUMN IF NOT EXISTS image_alt text`,
+    `ALTER TABLE evenements ADD COLUMN IF NOT EXISTS image_alt text`,
     `CREATE TABLE IF NOT EXISTS parametres (
         cle varchar(100) PRIMARY KEY,
         valeur text NOT NULL,

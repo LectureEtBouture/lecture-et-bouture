@@ -51,7 +51,16 @@ export default async function LivresPage({ searchParams }: Props) {
         choixLibrairie
     );
 
-    const activeFilters = { rayon: rayonId, genre: genreId, serie, editeur, format, sort, q, choixLibrairie };
+    const activeFilters = {
+        rayon: rayonId,
+        genre: genreId,
+        serie,
+        editeur,
+        format,
+        sort,
+        q,
+        choixLibrairie,
+    };
 
     const [
         livresList,
@@ -64,7 +73,15 @@ export default async function LivresPage({ searchParams }: Props) {
         formats,
     ] = await Promise.all([
         getLivresPubliques({ ...activeFilters, limit: PAGE_SIZE, offset: 0 }),
-        getLivresCount({ rayon: rayonId, genre: genreId, serie, editeur, format, q, choixLibrairie }),
+        getLivresCount({
+            rayon: rayonId,
+            genre: genreId,
+            serie,
+            editeur,
+            format,
+            q,
+            choixLibrairie,
+        }),
         isFiltered ? Promise.resolve([]) : getLivresMisEnAvant(),
         getLivresRayons(),
         getGenresActifs(rayonId),
@@ -145,7 +162,7 @@ export default async function LivresPage({ searchParams }: Props) {
                                         genreNom={
                                             genresList.find(
                                                 (genre) =>
-                                                    genre.id === livre.genreId,
+                                                    genre.id === livre.genreIds?.[0],
                                             )?.nom
                                         }
                                     />

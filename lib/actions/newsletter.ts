@@ -8,10 +8,12 @@ export async function subscribeToNewsletter(
     email: string,
 ): Promise<{ ok: boolean; error?: string }> {
     const parsed = emailSchema.safeParse(email);
-    if (!parsed.success) return { ok: false, error: 'Adresse e-mail invalide.' };
+    if (!parsed.success)
+        return { ok: false, error: 'Adresse e-mail invalide.' };
 
     const apiKey = process.env.LOOPS_API_KEY;
-    if (!apiKey) return { ok: false, error: 'Service temporairement indisponible.' };
+    if (!apiKey)
+        return { ok: false, error: 'Service temporairement indisponible.' };
 
     try {
         const res = await fetch('https://app.loops.so/api/v1/contacts/create', {
@@ -30,7 +32,10 @@ export async function subscribeToNewsletter(
         if (res.ok || res.status === 409) return { ok: true };
 
         const data = await res.json().catch(() => ({}));
-        return { ok: false, error: data?.message ?? 'Une erreur est survenue.' };
+        return {
+            ok: false,
+            error: data?.message ?? 'Une erreur est survenue.',
+        };
     } catch {
         return { ok: false, error: 'Une erreur est survenue.' };
     }

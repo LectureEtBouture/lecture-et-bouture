@@ -127,7 +127,11 @@ export default async function ContactPage({ searchParams }: Props) {
                             <br />
                             {siteConfig.address.city}
                         </p>
-                        <HorairesDisplay horaires={horaires} fermetures={fermetures} className="mt-3" />
+                        <HorairesDisplay
+                            horaires={horaires}
+                            fermetures={fermetures}
+                            className="mt-3"
+                        />
                     </div>
                 </div>
                 <MapWrapper />

@@ -1,5 +1,6 @@
 import {
     pgTable,
+    primaryKey,
     serial,
     text,
     varchar,
@@ -59,7 +60,6 @@ export const livres = pgTable('livres', {
     titre: varchar('titre', { length: 300 }).notNull(),
     auteur: varchar('auteur', { length: 200 }).notNull(),
     isbn: varchar('isbn', { length: 20 }),
-    genreId: integer('genre_id').references(() => genres.id),
     rayonId: integer('rayon_id').references(() => rayons.id),
     editeur: varchar('editeur', { length: 200 }),
     collection: varchar('collection', { length: 200 }),
@@ -71,6 +71,7 @@ export const livres = pgTable('livres', {
     prix: decimal('prix', { precision: 8, scale: 2 }).notNull(),
     description: text('description'),
     image: text('image'),
+    imageAlt: text('image_alt'),
     noteMoyenne: decimal('note_moyenne', { precision: 3, scale: 2 }),
     choixLibrairie: boolean('choix_librairie').notNull().default(false),
     stock: integer('stock').notNull().default(0),
@@ -79,6 +80,19 @@ export const livres = pgTable('livres', {
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+
+export const livresGenres = pgTable(
+    'livres_genres',
+    {
+        livreId: integer('livre_id')
+            .notNull()
+            .references(() => livres.id, { onDelete: 'cascade' }),
+        genreId: integer('genre_id')
+            .notNull()
+            .references(() => genres.id, { onDelete: 'cascade' }),
+    },
+    (t) => [primaryKey({ columns: [t.livreId, t.genreId] })],
+);
 
 // ─── Plantes ──────────────────────────────────────────────────────────────────
 
@@ -95,6 +109,7 @@ export const plantes = pgTable('plantes', {
     lumiere: lumierePlante('lumiere'),
     arrosage: arrosagePlante('arrosage'),
     image: text('image'),
+    imageAlt: text('image_alt'),
     noteMoyenne: decimal('note_moyenne', { precision: 3, scale: 2 }),
     choixLibrairie: boolean('choix_librairie').notNull().default(false),
     stock: integer('stock').notNull().default(0),
@@ -155,6 +170,8 @@ export const evenements = pgTable('evenements', {
     lieu: varchar('lieu', { length: 300 }),
     dateDebut: timestamp('date_debut').notNull(),
     dateFin: timestamp('date_fin'),
+    image: text('image'),
+    imageAlt: text('image_alt'),
     publie: boolean('publie').notNull().default(true),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),

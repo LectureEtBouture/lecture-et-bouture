@@ -122,7 +122,7 @@ export function EvenementRowDesktop({
     const etat = getEtat(evenement.dateDebut, evenement.dateFin, now);
 
     return (
-        <tr className="border-b border-border/50 hover:bg-white transition-colors">
+        <tr className="border-b border-border/50 hover:bg-white transition-colors px-4">
             <td className="py-3 pr-4">
                 <p
                     className={`font-medium leading-snug ${etat === 'passe' ? 'text-muted' : 'text-foreground'}`}

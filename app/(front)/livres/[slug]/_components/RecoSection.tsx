@@ -6,7 +6,7 @@ type RecoLivre = {
     slug: string;
     titre: string;
     auteur: string;
-    genreId: number | null;
+    genreIds: number[];
     noteMoyenne: string | null;
 };
 
@@ -42,7 +42,7 @@ export function RecoSection({
                         <div
                             className="aspect-2/3 w-full relative overflow-hidden"
                             style={{
-                                backgroundColor: getCoverColor(livre.genreId),
+                                backgroundColor: getCoverColor(livre.genreIds?.[0]),
                             }}
                         />
                         <div>

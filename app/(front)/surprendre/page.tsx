@@ -36,8 +36,9 @@ export default async function SurprendrePage() {
         );
     }
 
-    const coverColor = getCoverColor(livre.genreId);
-    const genre = livre.genreId ? await getGenreById(livre.genreId) : null;
+    const primaryGenreId = livre.genreIds?.[0];
+    const coverColor = getCoverColor(primaryGenreId);
+    const genre = primaryGenreId ? await getGenreById(primaryGenreId) : null;
     const coverImage = livre.image ?? null;
     const achatUrl = `https://www.leslibraires.fr/recherche/?q=${encodeURIComponent(livre.titre + ' ' + livre.auteur)}`;
 

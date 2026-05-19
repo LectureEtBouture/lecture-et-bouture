@@ -24,7 +24,9 @@
 
 - [x] Modération avis — 3 états (en attente / visible / masqué), valider/masquer/supprimer
 - [x] Dashboard — stats livres, boutures, avis en attente (accent rouge si > 0)
+- [x] Dashboard — cards "À traiter" redesign : 2 colonnes, grand chiffre serif, border-t-2 primary quand actif
 - [x] Livres — liste avec tri (récents / titre / auteur / prix)
+- [x] Livres — searchbar (titre, auteur, collection, éditeur, ISBN, série)
 - [x] Boutures — liste avec tri (récentes / nom / prix / difficulté)
 - [x] Sélections — liste avec ordre affiché
 - [x] "L'avis de la librairie" — `noteDeLaLibrairie` dans JSON + composant `NoteLibrairie` sur fiche livre
@@ -63,6 +65,10 @@
 - [x] Logo `leb-nobg.png` — intégré nav + footer (next/image, h-10 nav / h-12 footer)
 - [x] Navbar — burger menu responsive mobile (animation 3 barres → X, menu overlay absolu)
 - [x] `/evenements` front — agenda public (en cours / à venir / passés), filtre publie=true
+- [x] `/evenements` — événements multi-jours : affichage plage dates (même mois → "14–16 mai", mois différents → colonne)
+- [x] `/evenements` — event en_cours mis en avant via `EvenementEnAvant` (border-t-2 primary, titre display, badge teinté)
+- [x] Home — `EvenementEnAvant` redesign éditorial (border-t-2 primary, titre clamp(2rem→3.25rem))
+- [x] Nav + Footer — liens pages éditoriales masqués si `publiee = false` en BO (`getPublishedEditorialSlugs`)
 - [x] `/selections` front — sélections actives du conservateur
 - [x] Contact — section "Nous trouver" : adresse + carte Leaflet (react-leaflet v5, tuiles CartoDB light, import dynamique SSR:false)
 
@@ -80,7 +86,7 @@
 - [x] Tagline footer + hero + concept — remplacer les literals par `siteConfig.tagline`
 - [x] Adresse + coordonnées carte + horaires contact — lire depuis `storeConfig`
 - [x] Email subject Resend — lire depuis `storeConfig.name`
-- [x] AdminShell + login admin — `Lecture & Boutures` → `siteConfig.name`
+- [x] AdminShell + login admin — `Lecture & Bouture` → `siteConfig.name`
 - [x] OG images (root, livres/slug, boutures/slug) — nom codé en dur → `siteConfig.name`
 - [x] `.env.local` — vars `NEXT_PUBLIC_STORE_*` documentées avec valeurs Lille
 

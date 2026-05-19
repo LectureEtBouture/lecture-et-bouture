@@ -881,7 +881,7 @@ import { sanitizeRte } from '@/lib/sanitize';
 export const metadata: Metadata = {
     title: 'Notre concept',
     description:
-        "Lecture & Boutures — l'alliance du livre académique et de la bouture végétale. Cultiver l'esprit, nourrir la terre.",
+        "Lecture & Bouture — l'alliance du livre académique et de la bouture végétale. Cultiver l'esprit, nourrir la terre.",
 };
 
 export default async function ConceptPage() {

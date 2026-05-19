@@ -1,7 +1,9 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { getLivres, getRayons, type LivresSort } from '@/lib/actions/livres';
 import { LivresSortFilter } from './_components/LivresSortFilter';
 import { LivresTable } from './_components/LivresTable';
+import { AdminSearchBar } from './_components/AdminSearchBar';
 
 function buildHref(params: Record<string, string | undefined>) {
     const q = new URLSearchParams();
@@ -23,16 +25,26 @@ const VALID_SORTS: LivresSort[] = [
 export default async function AdminLivresPage({
     searchParams,
 }: {
-    searchParams: Promise<{ sort?: string; choix?: string; rayon?: string }>;
+    searchParams: Promise<{
+        sort?: string;
+        choix?: string;
+        rayon?: string;
+        q?: string;
+    }>;
 }) {
-    const { sort: sortParam, choix: choixParam, rayon } = await searchParams;
+    const {
+        sort: sortParam,
+        choix: choixParam,
+        rayon,
+        q,
+    } = await searchParams;
     const sort = (VALID_SORTS as string[]).includes(sortParam ?? '')
         ? (sortParam as LivresSort)
         : 'recent';
     const choix = choixParam === '1';
 
     const [data, rayonsList] = await Promise.all([
-        getLivres(sort, { choix: choix || undefined, rayon }),
+        getLivres(sort, { choix: choix || undefined, rayon, search: q }),
         getRayons(),
     ]);
 
@@ -54,10 +66,14 @@ export default async function AdminLivresPage({
                     Ajouter
                 </Link>
             </div>
+            <Suspense fallback={null}>
+                <AdminSearchBar value={q ?? ''} />
+            </Suspense>
             <LivresSortFilter
                 sort={sort}
                 choix={choix}
                 rayon={rayon}
+                q={q}
                 rayonsList={rayonsList}
                 buildHref={buildHref}
             />

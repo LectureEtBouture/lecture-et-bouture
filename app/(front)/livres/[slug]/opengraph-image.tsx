@@ -48,8 +48,9 @@ export default async function Image({
         );
     }
 
-    const genre = livre.genreId ? await getGenreById(livre.genreId) : null;
-    const coverColor = getCoverColor(livre.genreId);
+    const primaryGenreId = livre.genreIds?.[0];
+    const genre = primaryGenreId ? await getGenreById(primaryGenreId) : null;
+    const coverColor = getCoverColor(primaryGenreId);
 
     return new ImageResponse(
         <div style={{ display: 'flex', width: '100%', height: '100%' }}>

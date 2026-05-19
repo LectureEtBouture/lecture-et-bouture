@@ -79,7 +79,9 @@ export function AnnonceForm({ initial }: { initial: Annonce }) {
                 </label>
                 <input
                     type="datetime-local"
-                    value={annonce.expire_at ? annonce.expire_at.slice(0, 16) : ''}
+                    value={
+                        annonce.expire_at ? annonce.expire_at.slice(0, 16) : ''
+                    }
                     onChange={(evt) =>
                         update({
                             expire_at: evt.target.value

@@ -8,9 +8,6 @@ export const metadata: Metadata = {
 
 export default function CGUPage() {
     return (
-        <PageEditoriale
-            slug="cgu"
-            title="Conditions Générales d'Utilisation"
-        />
+        <PageEditoriale slug="cgu" title="Conditions Générales d'Utilisation" />
     );
 }

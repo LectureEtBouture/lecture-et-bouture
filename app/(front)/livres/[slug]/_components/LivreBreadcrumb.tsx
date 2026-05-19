@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 type LivreRef = {
     rayonId?: number | null;
-    genreId?: number | null;
+    genreIds?: number[];
     serie?: string | null;
     numeroSerie?: number | null;
 };
@@ -39,7 +39,7 @@ export function LivreBreadcrumb({
                 <>
                     <span>·</span>
                     <Link
-                        href={`/livres?genre=${livre.genreId}`}
+                        href={`/livres?genre=${livre.genreIds?.[0]}`}
                         className="hover:text-primary transition-colors"
                     >
                         {genre.nom}

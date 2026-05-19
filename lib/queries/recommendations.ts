@@ -1,7 +1,7 @@
 import { unstable_cache } from 'next/cache';
 import { db } from '@/db';
 import { livres } from '@/db/schema';
-import { eq, and, asc, desc, notInArray, ne, type SQL } from 'drizzle-orm';
+import { and, asc, desc, eq, notInArray, ne, sql, type SQL } from 'drizzle-orm';
 import { livreSelect, type LivrePublique } from './livres';
 
 export type Recommendations = {
@@ -28,7 +28,10 @@ export const getRecommendations = unstable_cache(
 
         const excludeForGenre = memeSerie.map((livre) => livre.id);
         const genreConditions: SQL[] = [ne(livres.id, livreId)];
-        if (genreId) genreConditions.push(eq(livres.genreId, genreId));
+        if (genreId)
+            genreConditions.push(
+                sql`EXISTS (SELECT 1 FROM livres_genres WHERE livre_id = ${livres.id} AND genre_id = ${genreId})`,
+            );
         if (excludeForGenre.length > 0)
             genreConditions.push(notInArray(livres.id, excludeForGenre));
 

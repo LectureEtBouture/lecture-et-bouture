@@ -1,7 +1,11 @@
 'use client';
 
 import { useState, useTransition, useRef } from 'react';
-import type { ReseauxSociaux, ReseauSocial, PlatformSocial } from '@/lib/types/parametres';
+import type {
+    ReseauxSociaux,
+    ReseauSocial,
+    PlatformSocial,
+} from '@/lib/types/parametres';
 import { sauvegarderReseaux } from '@/lib/actions/parametres';
 
 const PLATFORMS: PlatformSocial[] = [
@@ -94,7 +98,8 @@ export function ReseauxForm({ initial }: { initial: ReseauxSociaux }) {
                             value={reseau.platform}
                             onChange={(evt) =>
                                 update(index, {
-                                    platform: evt.target.value as PlatformSocial,
+                                    platform: evt.target
+                                        .value as PlatformSocial,
                                 })
                             }
                             className={`${inputCls} w-36 shrink-0`}

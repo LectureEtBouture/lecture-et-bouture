@@ -6,6 +6,7 @@ import {
     fieldsetClass,
     legendClass,
 } from './formStyles';
+import { ImageUpload } from './ImageUpload';
 
 type Livre = InferSelectModel<typeof livres>;
 
@@ -22,15 +23,11 @@ export function LivreFormContenu({ livre }: { livre?: Livre }) {
                     className={`${inputClass} resize-none`}
                 />
             </div>
-            <div>
-                <label className={labelClass}>Image (URL)</label>
-                <input
-                    name="image"
-                    defaultValue={livre?.image ?? ''}
-                    className={inputClass}
-                    placeholder="/covers/nom-du-livre.jpg"
-                />
-            </div>
+            <ImageUpload
+                defaultValue={livre?.image}
+                defaultAltValue={livre?.imageAlt}
+                folder="boutures"
+            />
         </fieldset>
     );
 }

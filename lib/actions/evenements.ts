@@ -29,8 +29,12 @@ function parseFormData(formData: FormData) {
         dateDebut: formData.get('dateDebut'),
         dateFin: formData.get('dateFin') || undefined,
     });
+    const image = (formData.get('image') as string) || null;
+    const imageAlt = (formData.get('imageAlt') as string) || null;
     return {
         ...raw,
+        image,
+        imageAlt,
         dateDebut: new Date(raw.dateDebut),
         dateFin: raw.dateFin ? new Date(raw.dateFin) : null,
     };
@@ -43,6 +47,8 @@ export async function createEvenement(formData: FormData) {
         titre: parsed.titre,
         description: parsed.description ?? null,
         lieu: parsed.lieu ?? null,
+        image: parsed.image,
+        imageAlt: parsed.imageAlt,
         dateDebut: parsed.dateDebut,
         dateFin: parsed.dateFin ?? null,
     });
@@ -59,6 +65,8 @@ export async function updateEvenement(id: number, formData: FormData) {
             titre: parsed.titre,
             description: parsed.description ?? null,
             lieu: parsed.lieu ?? null,
+            image: parsed.image,
+            imageAlt: parsed.imageAlt,
             dateDebut: parsed.dateDebut,
             dateFin: parsed.dateFin ?? null,
             updatedAt: new Date(),

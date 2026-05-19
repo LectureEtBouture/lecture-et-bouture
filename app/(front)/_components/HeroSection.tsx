@@ -7,7 +7,7 @@ export function HeroSection() {
             <div className="relative lg:w-[62%] h-72 sm:h-96 lg:h-auto">
                 <Image
                     src="/hero.jpg"
-                    alt="L'espace Lecture & Boutures — livres et plantes sous le même toit"
+                    alt="L'espace Lecture & Bouture — livres et plantes sous le même toit"
                     fill
                     className="object-cover object-center"
                     priority

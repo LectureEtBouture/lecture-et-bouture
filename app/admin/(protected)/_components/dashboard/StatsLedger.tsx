@@ -13,7 +13,7 @@ export function StatsLedger({ lines }: { lines: StatLine[] }) {
                 <Link
                     key={line.href}
                     href={line.href}
-                    className="flex items-baseline justify-between py-3 px-1 hover:bg-white transition-colors group"
+                    className="items-center flex items-baseline justify-between py-3 hover:bg-white transition-colors group px-4"
                 >
                     <span className="text-muted text-[13px] tracking-wide group-hover:text-primary transition-colors">
                         {line.label}

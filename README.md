@@ -1,4 +1,4 @@
-# Lecture & Boutures
+# Lecture & Bouture
 
 Boutique hybride livres académiques + boutures végétales.
 

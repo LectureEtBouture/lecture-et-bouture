@@ -6,6 +6,7 @@ import {
     fieldsetClass,
     legendClass,
 } from './formStyles';
+import { ImageUpload } from './ImageUpload';
 
 type Evenement = InferSelectModel<typeof evenements>;
 
@@ -75,6 +76,11 @@ export function EvenementForm({
                         className={`${inputClass} resize-none`}
                     />
                 </div>
+                <ImageUpload
+                    defaultValue={evenement?.image}
+                    defaultAltValue={evenement?.imageAlt}
+                    folder="evenements"
+                />
             </fieldset>
             <div className="flex items-center gap-4 pt-2">
                 <button
