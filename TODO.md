@@ -54,7 +54,7 @@
 
 ## Back-office — à faire
 
-- [ ] RTE (Tiptap) — éditeur rich text pour descriptions livres et boutures
+- [x] RTE (Tiptap) — pages éditoriales (concept, mentions légales, CGV, CGU, cookies, politique) gérables depuis `/admin/pages`
 - [ ] Google Books API — recherche par titre : autocomplete (titre + auteur + éditeur + année + édition) → sélection → préremplissage complet du formulaire livre
 - [ ] Google Books API — saisie ISBN → préremplissage complet du formulaire livre (titre, auteur, éditeur, année, édition, image, description)
 
