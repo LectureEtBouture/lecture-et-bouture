@@ -1,10 +1,10 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { db } from '@/db';
 import { plantes } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, asc, desc, and, SQL } from 'drizzle-orm';
 import { auth } from '@/auth';
 import { z } from 'zod';
 
@@ -20,11 +20,15 @@ const planteSchema = z.object({
     prix: z.coerce.number().positive(),
     description: z.string().optional(),
     conseilsEntretien: z.string().optional(),
+    noteDeLaLibrairie: z.string().optional(),
+    image: z.string().optional(),
     difficulte: z.enum(['facile', 'moyen', 'difficile']).optional(),
     lumiere: z
         .enum(['ombre', 'mi-ombre', 'lumiere-vive', 'plein-soleil'])
         .optional(),
     arrosage: z.enum(['rare', 'modere', 'regulier', 'abondant']).optional(),
+    stock: z.coerce.number().int().min(0).default(0),
+    choixLibrairie: z.boolean().default(false),
 });
 
 export async function createPlante(formData: FormData) {
@@ -37,9 +41,13 @@ export async function createPlante(formData: FormData) {
         prix: formData.get('prix'),
         description: formData.get('description') || undefined,
         conseilsEntretien: formData.get('conseilsEntretien') || undefined,
+        noteDeLaLibrairie: formData.get('noteDeLaLibrairie') || undefined,
+        image: formData.get('image') || undefined,
         difficulte: formData.get('difficulte') || undefined,
         lumiere: formData.get('lumiere') || undefined,
         arrosage: formData.get('arrosage') || undefined,
+        stock: formData.get('stock') ?? 0,
+        choixLibrairie: formData.get('choixLibrairie') === 'on',
     });
 
     const slug = parsed.nom
@@ -53,10 +61,20 @@ export async function createPlante(formData: FormData) {
         ...parsed,
         slug,
         prix: String(parsed.prix),
+        espece: parsed.espece ?? null,
+        famille: parsed.famille ?? null,
+        description: parsed.description ?? null,
+        conseilsEntretien: parsed.conseilsEntretien ?? null,
+        noteDeLaLibrairie: parsed.noteDeLaLibrairie ?? null,
+        image: parsed.image ?? null,
+        difficulte: parsed.difficulte ?? null,
+        lumiere: parsed.lumiere ?? null,
+        arrosage: parsed.arrosage ?? null,
     });
 
-    revalidatePath('/admin/plantes');
-    redirect('/admin/plantes');
+    revalidatePath('/admin/boutures');
+    revalidateTag('boutures', { expire: 0 });
+    redirect('/admin/boutures');
 }
 
 export async function updatePlante(id: number, formData: FormData) {
@@ -69,39 +87,104 @@ export async function updatePlante(id: number, formData: FormData) {
         prix: formData.get('prix'),
         description: formData.get('description') || undefined,
         conseilsEntretien: formData.get('conseilsEntretien') || undefined,
+        noteDeLaLibrairie: formData.get('noteDeLaLibrairie') || undefined,
+        image: formData.get('image') || undefined,
         difficulte: formData.get('difficulte') || undefined,
         lumiere: formData.get('lumiere') || undefined,
         arrosage: formData.get('arrosage') || undefined,
+        stock: formData.get('stock') ?? 0,
+        choixLibrairie: formData.get('choixLibrairie') === 'on',
     });
 
     await db
         .update(plantes)
-        .set({ ...parsed, prix: String(parsed.prix), updatedAt: new Date() })
+        .set({
+            ...parsed,
+            prix: String(parsed.prix),
+            espece: parsed.espece ?? null,
+            famille: parsed.famille ?? null,
+            description: parsed.description ?? null,
+            conseilsEntretien: parsed.conseilsEntretien ?? null,
+            noteDeLaLibrairie: parsed.noteDeLaLibrairie ?? null,
+            image: parsed.image ?? null,
+            difficulte: parsed.difficulte ?? null,
+            lumiere: parsed.lumiere ?? null,
+            arrosage: parsed.arrosage ?? null,
+            updatedAt: new Date(),
+        })
         .where(eq(plantes.id, id));
 
-    revalidatePath('/admin/plantes');
-    redirect('/admin/plantes');
+    revalidatePath('/admin/boutures');
+    revalidateTag('boutures', { expire: 0 });
+    redirect('/admin/boutures');
 }
 
 export async function deletePlante(id: number) {
     await requireAdmin();
     await db.delete(plantes).where(eq(plantes.id, id));
-    revalidatePath('/admin/plantes');
+    revalidatePath('/admin/boutures');
+    revalidateTag('boutures', { expire: 0 });
 }
 
-export async function getPlantes() {
-    return db
+export async function updateStock(id: number, stock: number) {
+    await requireAdmin();
+    await db
+        .update(plantes)
+        .set({ stock, updatedAt: new Date() })
+        .where(eq(plantes.id, id));
+    revalidatePath('/admin/boutures');
+    revalidateTag('boutures', { expire: 0 });
+}
+
+export type PlantesSort = 'nom' | 'prix' | 'difficulte' | 'stock' | 'recent';
+export type PlantesFilter = {
+    choix?: boolean;
+    difficulte?: 'facile' | 'moyen' | 'difficile';
+};
+
+export async function getPlantes(
+    sort: PlantesSort = 'recent',
+    filter: PlantesFilter = {},
+) {
+    const order =
+        sort === 'nom'
+            ? asc(plantes.nom)
+            : sort === 'prix'
+              ? asc(plantes.prix)
+              : sort === 'difficulte'
+                ? asc(plantes.difficulte)
+                : sort === 'stock'
+                  ? asc(plantes.stock)
+                  : desc(plantes.createdAt);
+
+    const conditions: SQL[] = [];
+    if (filter.choix) conditions.push(eq(plantes.choixLibrairie, true));
+    if (filter.difficulte)
+        conditions.push(eq(plantes.difficulte, filter.difficulte));
+
+    const query = db
         .select({
             id: plantes.id,
             slug: plantes.slug,
             nom: plantes.nom,
             espece: plantes.espece,
+            famille: plantes.famille,
             prix: plantes.prix,
             difficulte: plantes.difficulte,
+            lumiere: plantes.lumiere,
+            arrosage: plantes.arrosage,
+            choixLibrairie: plantes.choixLibrairie,
+            stock: plantes.stock,
+            noteMoyenne: plantes.noteMoyenne,
             createdAt: plantes.createdAt,
         })
         .from(plantes)
-        .orderBy(plantes.createdAt);
+        .orderBy(order);
+
+    if (conditions.length > 0) {
+        return query.where(and(...conditions));
+    }
+    return query;
 }
 
 export async function getPlante(id: number) {
