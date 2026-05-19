@@ -20,33 +20,38 @@ Concept hybride : livres académiques + boutures végétales. Expérience d'acha
 
 ## Pages
 
-| Route                           | Description                                                                  |
-| ------------------------------- | ---------------------------------------------------------------------------- |
-| `/`                             | Accueil — immersion visuelle, sélection du conservateur (dynamique), concept |
-| `/concept`                      | Philosophie, engagement écoconception, certifications existantes             |
-| `/livres`                       | Catalogue livres                                                             |
-| `/livres/[slug]`                | Fiche livre — détails, avis                                                  |
-| `/boutures`                     | Catalogue boutures                                                           |
-| `/boutures/[slug]`              | Fiche bouture — détails, avis                                                |
-| `/contact`                      | Formulaire → Resend                                                          |
-| `/mentions-legales`             | Mentions légales                                                             |
-| `/politique-de-confidentialite` | Politique de confidentialité                                                 |
-| `/cgv`                          | Conditions Générales de Vente                                                |
-| `/cgu`                          | Conditions Générales d'Utilisation                                           |
-| `/cookies`                      | Politique cookies + bandeau                                                  |
-| `/admin`                        | Back-office — gestion livres, boutures, avis, sélections, événements         |
-| `/admin/livres`                 | CRUD livres (incl. choix de la librairie)                                    |
-| `/admin/boutures`               | CRUD boutures                                                                |
-| `/admin/avis`                   | Modération avis                                                              |
-| `/admin/selections`             | Gestion sélections du conservateur                                           |
-| `/admin/evenements`             | CRUD événements                                                              |
+| Route                           | Description                                                                                                               |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `/`                             | Accueil — hero boutique physique, sections livres thématiques (nouveautés/rayons/choix), CTA "Me faire surprendre" en bas |
+| `/surprendre`                   | Livre aléatoire parmi `choixLibrairie` + note éditoriale + lien leslibraires.fr                                           |
+| `/concept`                      | Philosophie éditoriale — contenu réel (3 sections : concept, conservateur, lenteur)                                       |
+| `/livres`                       | Catalogue livres avec FilterBar complète (rayon, genre, série, éditeur, format, sort, choix)                              |
+| `/livres/[slug]`                | Fiche livre — détails, avis                                                                                               |
+| `/boutures`                     | Vitrine bento — section explicative + grille shift (grande/petite carte alternées). Pas de filterbar.                     |
+| `/boutures/[slug]`              | Fiche bouture — détails, avis                                                                                             |
+| `/contact`                      | Formulaire → Resend, feedback succès/erreur via redirect                                                                  |
+| `/mentions-legales`             | Mentions légales                                                                                                          |
+| `/politique-de-confidentialite` | Politique de confidentialité                                                                                              |
+| `/cgv`                          | Conditions Générales de Vente                                                                                             |
+| `/cgu`                          | Conditions Générales d'Utilisation                                                                                        |
+| `/cookies`                      | Politique cookies + bandeau                                                                                               |
+| `/admin`                        | Back-office — gestion livres, boutures, avis, sélections, événements                                                      |
+| `/admin/livres`                 | CRUD livres (incl. choix de la librairie)                                                                                 |
+| `/admin/boutures`               | CRUD boutures                                                                                                             |
+| `/admin/genres`                 | CRUD genres littéraires                                                                                                   |
+| `/admin/rayons`                 | CRUD rayons (classification commerciale)                                                                                  |
+| `/admin/avis`                   | Modération avis                                                                                                           |
+| `/admin/selections`             | Gestion sélections du conservateur                                                                                        |
+| `/admin/evenements`             | CRUD événements                                                                                                           |
 
 ---
 
 ## Fonctionnalités
 
-- **Catalogue** : recherche plein texte (titre, auteur, collection, éditeur, série) + filtres (rayon, genre, série, éditeur, format, tri, choix de la librairie)
+- **Catalogue livres** : recherche plein texte (titre, auteur, collection, éditeur, série) + filtres (rayon, genre, série, éditeur, format, tri, choix de la librairie)
+- **Vitrine boutures** : bento grid non-linéaire, section explicative (qu'est-ce qu'une bouture, entretien, démarche). Pas de filterbar — c'est une vitrine patrimoniale, pas un catalogue e-commerce. Images dans `public/cuttings/`, fallback couleur par condition lumineuse.
 - **Fiche produit** : détails, avis, recommandations (même genre, même auteur, même série)
+- **"Me faire surprendre"** : page `/surprendre`, livre aléatoire `choixLibrairie` + note éditoriale (`noteDeLaLibrairie` dans le JSON). `force-dynamic` côté serveur.
 - **Avis utilisateurs** : formulaire de dépôt d'avis sur fiche livre/plante, modération dans le back-office avant publication
 - **Sélection du Conservateur** : curations dynamiques gérées via back-office
 - **Rayons** : classification commerciale indépendante du genre éditorial (Sciences & Nature, Littérature, Imaginaire, Philosophie & Essai, BD, Manga, Jeunesse, Policier & Thriller, Biographie, Art & Beaux livres, Cuisine, Voyage, Développement personnel, Poésie & Théâtre). Chaque livre a un `rayonId`. Filtrable dans le catalogue, visible dans le breadcrumb et la fiche. Administrable en BO. Extensible via API leslibraires.fr.
