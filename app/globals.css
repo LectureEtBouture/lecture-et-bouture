@@ -19,6 +19,12 @@
 
     /* Aspect ratios */
     --aspect-book: 2 / 3;
+
+    /* Police manuscrite — remplacer par une cursive quand disponible */
+    --font-manuscript: var(--font-noto-serif);
+
+    /* Fond note de la librairie — papier vergé chaud, distinct du sable et du blanc */
+    --color-note: #fdf9f2;
 }
 
 :root {
@@ -32,4 +38,50 @@ body {
     font-family: var(--font-sans), system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+.prose {
+    & h2 {
+        @apply font-serif text-xl font-bold text-foreground mt-8 mb-4;
+    }
+
+    & h3 {
+        @apply font-serif text-lg font-bold text-foreground mt-6 mb-3;
+    }
+
+    & p {
+        @apply text-base leading-[1.75] max-w-[68ch] mb-4 text-foreground;
+    }
+
+    & ul {
+        @apply list-disc pl-6 mb-4 space-y-1;
+    }
+
+    & ol {
+        @apply list-decimal pl-6 mb-4 space-y-1;
+    }
+
+    & li {
+        @apply text-base leading-[1.75] text-foreground;
+    }
+
+    & strong {
+        @apply font-semibold;
+    }
+
+    & em {
+        @apply italic;
+    }
+
+    & a {
+        @apply underline underline-offset-4 hover:text-primary transition-colors;
+    }
+
+    & blockquote {
+        @apply border-l border-border pl-6 italic text-muted my-4;
+    }
+
+    & p:last-child {
+        @apply mb-0;
+    }
 }
