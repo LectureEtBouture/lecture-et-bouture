@@ -2,7 +2,7 @@
 
 import { revalidatePath, updateTag } from 'next/cache';
 import { db } from '@/db';
-import { avis, livres, plantes } from '@/db/schema';
+import { avis } from '@/db/schema';
 import { eq, desc, asc } from 'drizzle-orm';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
