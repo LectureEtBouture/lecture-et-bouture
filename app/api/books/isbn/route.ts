@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { rechercherParISBN } from '@/lib/services/wikidata';
+import { bookProvider } from '@/lib/services/books';
 
 export async function GET(request: NextRequest) {
     const session = await auth();
@@ -16,11 +16,11 @@ export async function GET(request: NextRequest) {
         );
     }
 
-    const result = await rechercherParISBN(isbn);
+    const result = await bookProvider.rechercherParISBN(isbn);
 
     if (!result) {
         return NextResponse.json(
-            { error: 'ISBN non trouvé dans Wikidata' },
+            { error: 'ISBN non trouvé' },
             { status: 404 },
         );
     }

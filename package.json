@@ -13,6 +13,7 @@
         "db:reset": "tsx db/reset.ts && npm run db:migrate && npm run db:seed",
         "admin:create": "tsx scripts/create-admin.ts",
         "wikidata:test": "tsx scripts/wikidata-test.ts",
+        "isbn:test": "tsx scripts/isbn-test.ts",
         "format:check": "prettier --check .",
         "format": "prettier --write .",
         "prepare": "husky"
