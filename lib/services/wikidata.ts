@@ -10,15 +10,10 @@ export type WikidataLivreResult = {
     imageUrl: string | null;
 };
 
-function normaliserISBN(isbn: string): string {
-    return isbn.replace(/[-\s]/g, '');
-}
-
 function buildSparqlQuery(isbn: string): string {
-    const clean = normaliserISBN(isbn);
     return `
 SELECT ?item ?titre ?auteurLabel ?editeurLabel ?annee ?serieLabel ?image WHERE {
-  { ?item wdt:P212 "${clean}" } UNION { ?item wdt:P957 "${clean}" }
+  { ?item wdt:P212 "${isbn}" } UNION { ?item wdt:P957 "${isbn}" }
   OPTIONAL { ?item wdt:P1476 ?titre }
   OPTIONAL { ?item wdt:P50 ?auteur }
   OPTIONAL { ?item wdt:P123 ?editeur }
