@@ -63,6 +63,7 @@
 ## Auth & Utilisateurs — fait
 
 ### Phase 1 — Table `users`
+
 - [x] Enum PostgreSQL `role_utilisateur` : `super_admin | admin | editor | moderator | contributor`
 - [x] Rename `admin_users` → `users`, PK serial → uuid, colonnes `role`, `updated_at`, `reset_token`, `reset_token_expires_at`
 - [x] `auth.ts` + `auth.config.ts` — JWT/session propagent `id` (uuid) + `role`
@@ -70,14 +71,17 @@
 - [x] `scripts/create-admin.ts` — rôle `super_admin` par défaut
 
 ### Phase 2 — UUID toutes tables
+
 - [x] PKs serial → uuid sur toutes les tables + FKs `livres_genres`
 - [x] Queries/actions mises à jour (params route → string uuid)
 
 ### Phase 3 — Logs admin
+
 - [x] Table `admin_logs` — `user_id uuid NULL FK ON DELETE SET NULL` (anonymisation), `user_email` dénormalisé
 - [x] FIFO 200 dans `createLog`, branché sur tous les modules
 
 ### Phase 4 — CRUD users + rôles + reset password
+
 - [x] `lib/actions/users.ts` — `getUsers`, `createUser`, `updateUser`, `deleteUser`, `initiatePasswordReset`, `forgotPassword`, `resetPassword`
 - [x] Rôles : matrice complète dans `ROLES.md`, `contributor` = editor + moderator combinés
 - [x] Pages BO : liste, nouveau, modifier (sélecteur rôles filtré par acteur)
@@ -86,9 +90,14 @@
 ## À faire
 
 - [x] QR code — section dans `/admin/parametres`, URL éditable (préchargée depuis `storeConfig.url`), preview temps réel, téléchargement PNG + SVG
-- [ ] Recherche assistée — autocomplete titre/auteur/éditeur + saisie ISBN → préremplissage formulaire livre
+- [ ] Recherche assistée — import livres depuis inventaire.io avec préremplissage formulaire
+    - [x] Phase 1 : adapter pattern `lib/services/books/` (providers inventaire + wikidata), Route Handler `/api/books/isbn`, script CLI `scripts/isbn-test.ts`
+    - [x] Phase 1b : description via Open Library + traduction LibreTranslate (EN→FR), `lib/services/libretranslate.ts`
+    - [ ] Phase 2 : intégration UI dans `LivreFormIdentite` — bouton "Importer depuis ISBN" + recherche titre/auteur sur inventaire
+    - [ ] Phase 3 : colonne `inventaire_uri` sur `livres` (traçabilité, migration)
 - [ ] Formbricks — vérifier trigger survey (action key `"test"` → enquête s'ouvre)
 - [ ] Meilisearch — quand catalogue > ~500 entrées
 - [ ] API leslibraires.fr (stocks / panier) — évaluer alternatives + prix
 - [x] Newsletter — Loops, `lib/actions/newsletter.ts` + `NewsletterForm` + `NewsletterSection`, intégré dans Footer
 - [ ] Éco-conception — audit thegreenwebfoundation.org
+- [ ] Lien pour les livres / stocks / paiements / commandes avec https://2dcom.fr/produits/librisoft/ Librisoft et leslibraires.fr.

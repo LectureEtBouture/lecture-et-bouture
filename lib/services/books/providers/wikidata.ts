@@ -62,6 +62,7 @@ export class WikidataProvider implements BookProvider {
             anneePublication: anneeRaw ? parseInt(anneeRaw, 10) : null,
             serie: row.serieLabel?.value ?? null,
             imageUrl: imageRaw ? imageRaw.replace('http://', 'https://') : null,
+            description: null,
         };
     }
 }

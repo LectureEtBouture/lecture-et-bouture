@@ -6,6 +6,7 @@ export type LivreMetadata = {
     anneePublication: number | null;
     serie: string | null;
     imageUrl: string | null;
+    description: string | null;
 };
 
 export interface BookProvider {
