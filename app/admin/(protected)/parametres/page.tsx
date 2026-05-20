@@ -5,11 +5,13 @@ import {
     getMaintenance,
     getReseauxSociaux,
 } from '@/lib/queries/parametres';
+import { storeConfig } from '@/lib/config';
 import { HorairesForm } from './_components/HorairesForm';
 import { FermeturesForm } from './_components/FermeturesForm';
 import { AnnonceForm } from './_components/AnnonceForm';
 import { MaintenanceForm } from './_components/MaintenanceForm';
 import { ReseauxForm } from './_components/ReseauxForm';
+import { QRCodeSection } from './_components/QRCodeSection';
 import { ParametresNav } from './_components/ParametresNav';
 
 const sectionCls =
@@ -73,6 +75,14 @@ export default async function ParametresPage() {
                     Liens affichés dans le footer.
                 </p>
                 <ReseauxForm initial={reseaux} />
+            </section>
+
+            <section id="qrcode" className={sectionCls}>
+                <h2 className={headingCls}>QR Code</h2>
+                <p className="text-sm text-muted">
+                    Générez un QR code pointant vers n&apos;importe quelle page du site.
+                </p>
+                <QRCodeSection defaultUrl={storeConfig.url} />
             </section>
         </div>
     );

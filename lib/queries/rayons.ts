@@ -4,7 +4,7 @@ import { rayons } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
 export const getRayonById = unstable_cache(
-    async (id: number) =>
+    async (id: string) =>
         db
             .select()
             .from(rayons)

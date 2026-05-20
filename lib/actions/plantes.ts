@@ -7,6 +7,7 @@ import { plantes } from '@/db/schema';
 import { eq, asc, desc, and, SQL } from 'drizzle-orm';
 import { auth } from '@/auth';
 import { z } from 'zod';
+import { createLog } from './admin-logs';
 
 async function requireAdmin() {
     const session = await auth();
@@ -75,12 +76,13 @@ export async function createPlante(formData: FormData) {
         arrosage: parsed.arrosage ?? null,
     });
 
+    await createLog({ action: 'bouture.create', entityType: 'bouture', entityLabel: parsed.nom });
     revalidatePath('/admin/boutures');
     revalidateTag('boutures', { expire: 0 });
     redirect('/admin/boutures');
 }
 
-export async function updatePlante(id: number, formData: FormData) {
+export async function updatePlante(id: string, formData: FormData) {
     await requireAdmin();
 
     const parsed = planteSchema.parse({
@@ -119,19 +121,22 @@ export async function updatePlante(id: number, formData: FormData) {
         })
         .where(eq(plantes.id, id));
 
+    await createLog({ action: 'bouture.update', entityType: 'bouture', entityId: id, entityLabel: parsed.nom });
     revalidatePath('/admin/boutures');
     revalidateTag('boutures', { expire: 0 });
     redirect('/admin/boutures');
 }
 
-export async function deletePlante(id: number) {
+export async function deletePlante(id: string) {
     await requireAdmin();
+    const row = await db.select({ nom: plantes.nom }).from(plantes).where(eq(plantes.id, id)).limit(1).then((r) => r[0]);
     await db.delete(plantes).where(eq(plantes.id, id));
+    await createLog({ action: 'bouture.delete', entityType: 'bouture', entityId: id, entityLabel: row?.nom });
     revalidatePath('/admin/boutures');
     revalidateTag('boutures', { expire: 0 });
 }
 
-export async function updateStock(id: number, stock: number) {
+export async function updateStock(id: string, stock: number) {
     await requireAdmin();
     await db
         .update(plantes)
@@ -192,7 +197,7 @@ export async function getPlantes(
     return query;
 }
 
-export async function getPlante(id: number) {
+export async function getPlante(id: string) {
     return db
         .select()
         .from(plantes)

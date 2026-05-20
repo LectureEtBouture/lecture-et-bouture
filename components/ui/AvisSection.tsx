@@ -4,7 +4,7 @@ import { AvisForm } from './AvisForm';
 
 type Props = {
     avis: AvisItem[];
-    itemId: number;
+    itemId: string;
     type: 'livre' | 'bouture';
 };
 

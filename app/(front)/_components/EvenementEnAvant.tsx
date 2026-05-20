@@ -1,9 +1,10 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import type { EvenementStatus } from '../evenements/_components/EvenementItem';
 
 type Props = {
     evenement: {
-        id: number;
+        id: string;
         titre: string;
         description: string | null;
         lieu: string | null;
@@ -47,8 +48,7 @@ export function EvenementEnAvant({
 }: Props) {
     const enCours = status === 'en_cours';
     const singleDayEndTime =
-        evenement.dateFin &&
-        isSameDay(evenement.dateDebut, evenement.dateFin);
+        evenement.dateFin && isSameDay(evenement.dateDebut, evenement.dateFin);
 
     return (
         <section className="border-t-2 border-primary">
@@ -74,7 +74,9 @@ export function EvenementEnAvant({
                     )}
                 </div>
 
-                <div className={`mt-8 ${evenement.image ? 'grid lg:grid-cols-[1fr_380px] items-stretch gap-12' : ''}`}>
+                <div
+                    className={`mt-8 ${evenement.image ? 'grid lg:grid-cols-[1fr_380px] items-stretch gap-12' : ''}`}
+                >
                     <div className="max-w-3xl">
                         <h2 className="font-serif text-[clamp(2rem,4vw,3.25rem)] font-bold text-foreground leading-[1.05] tracking-[-0.02em]">
                             {evenement.titre}
@@ -108,10 +110,11 @@ export function EvenementEnAvant({
                     </div>
                     {evenement.image && (
                         <div className="relative h-52 lg:h-auto lg:min-h-[280px]">
-                            <img
+                            <Image
                                 src={evenement.image}
                                 alt={evenement.titre}
-                                className="absolute inset-0 w-full h-full object-cover"
+                                fill
+                                className="object-cover"
                             />
                         </div>
                     )}

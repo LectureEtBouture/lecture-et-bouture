@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
-type LivreRow = { id: number; titre: string; auteur: string };
-type BoutureRow = { id: number; nom: string };
+type LivreRow = { id: string; titre: string; auteur: string };
+type BoutureRow = { id: string; nom: string };
 
 export function RupturesList({
     livres,

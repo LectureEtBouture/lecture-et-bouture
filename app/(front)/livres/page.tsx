@@ -32,8 +32,8 @@ interface Props {
 export default async function LivresPage({ searchParams }: Props) {
     const params = await searchParams;
 
-    const rayonId = params.rayon ? Number(params.rayon) : undefined;
-    const genreId = params.genre ? Number(params.genre) : undefined;
+    const rayonId = params.rayon ?? undefined;
+    const genreId = params.genre ?? undefined;
     const serie = params.serie ?? undefined;
     const editeur = params.editeur ?? undefined;
     const format = params.format ?? undefined;
@@ -162,7 +162,8 @@ export default async function LivresPage({ searchParams }: Props) {
                                         genreNom={
                                             genresList.find(
                                                 (genre) =>
-                                                    genre.id === livre.genreIds?.[0],
+                                                    genre.id ===
+                                                    livre.genreIds?.[0],
                                             )?.nom
                                         }
                                     />

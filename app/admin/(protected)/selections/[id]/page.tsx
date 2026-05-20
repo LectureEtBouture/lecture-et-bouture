@@ -14,8 +14,7 @@ export default async function SelectionItemsPage({
     params: Promise<{ id: string }>;
 }) {
     const { id } = await params;
-    const selectionId = Number(id);
-    const { selection, items } = await getSelectionWithItems(selectionId);
+    const { selection, items } = await getSelectionWithItems(id);
     if (!selection) notFound();
     const [livresList, plantesList] = await Promise.all([
         getLivres(),
@@ -46,10 +45,10 @@ export default async function SelectionItemsPage({
                 </div>
                 <SelectionItemsSortable
                     key={[...items]
-                        .sort((a, b) => a.id - b.id)
+                        .sort((a, b) => a.ordre - b.ordre)
                         .map((item) => item.id)
                         .join(',')}
-                    selectionId={selectionId}
+                    selectionId={id}
                     initial={items}
                 />
             </section>
@@ -62,9 +61,9 @@ export default async function SelectionItemsPage({
                     action={async (formData: FormData) => {
                         'use server';
                         const type = formData.get('type') as 'livre' | 'plante';
-                        const itemId = Number(formData.get('itemId'));
+                        const itemId = formData.get('itemId') as string;
                         if (!type || !itemId) return;
-                        await addSelectionItem(selectionId, type, itemId);
+                        await addSelectionItem(id, type, itemId);
                     }}
                     className="space-y-4 max-w-sm"
                 >

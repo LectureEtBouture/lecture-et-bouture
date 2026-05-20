@@ -16,9 +16,9 @@ export function LivreFormClassification({
     rayonId,
     rayonsList,
 }: {
-    selectedGenreIds: number[];
+    selectedGenreIds: string[];
     genresList: Genre[];
-    rayonId?: number | null;
+    rayonId?: string | null;
     rayonsList: Rayon[];
 }) {
     return (

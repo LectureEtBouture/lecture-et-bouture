@@ -7,7 +7,7 @@ export function RayonFilter({
     push,
 }: {
     rayons: RayonFacette[];
-    activeRayonId?: number;
+    activeRayonId?: string;
     push: (updates: Record<string, string | undefined>) => void;
 }) {
     return (

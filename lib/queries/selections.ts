@@ -4,17 +4,17 @@ import { eq, asc, sql } from 'drizzle-orm';
 
 export type SelectionItemPublique =
     | {
-          id: number;
+          id: string;
           type: 'livre';
           ordre: number;
           titre: string;
           auteur: string;
           slug: string;
           prix: string;
-          primaryGenreId: number | null;
+          primaryGenreId: string | null;
       }
     | {
-          id: number;
+          id: string;
           type: 'plante';
           ordre: number;
           nom: string;
@@ -30,7 +30,7 @@ export type SelectionItemPublique =
       };
 
 export type SelectionPublique = {
-    id: number;
+    id: string;
     titre: string;
     description: string | null;
     items: SelectionItemPublique[];
@@ -50,7 +50,9 @@ export async function getPublicSelections(): Promise<SelectionPublique[]> {
             livreAuteur: livres.auteur,
             livreSlug: livres.slug,
             livrePrix: livres.prix,
-            livreGenreId: sql<number | null>`(SELECT genre_id FROM livres_genres WHERE livre_id = ${livres.id} ORDER BY genre_id LIMIT 1)`,
+            livreGenreId: sql<
+                string | null
+            >`(SELECT genre_id FROM livres_genres WHERE livre_id = ${livres.id} ORDER BY genre_id LIMIT 1)`,
             planteId: selectionItems.planteId,
             planteNom: plantes.nom,
             planteEspece: plantes.espece,
@@ -69,7 +71,7 @@ export async function getPublicSelections(): Promise<SelectionPublique[]> {
             asc(selectionItems.ordre),
         );
 
-    const map = new Map<number, SelectionPublique>();
+    const map = new Map<string, SelectionPublique>();
 
     for (const row of rows) {
         if (!map.has(row.selectionId)) {

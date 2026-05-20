@@ -4,7 +4,7 @@ import { genres } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
 export const getGenreById = unstable_cache(
-    async (id: number) =>
+    async (id: string) =>
         db
             .select()
             .from(genres)

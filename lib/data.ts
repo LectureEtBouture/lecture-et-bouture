@@ -1,18 +1,16 @@
-// Livres — couleurs de couverture par genre
+// Livres — couleurs de couverture par genre (palette fixe, assignée par UUID hash)
+const COVER_PALETTE = [
+    '#c2c8cc', '#b8c9b0', '#ccc5b0', '#c8bcb8',
+    '#afc8c3', '#cdc3a4', '#b4bdc8', '#bfb4c8',
+];
 
-const GENRE_COLORS: Record<number, string> = {
-    1: '#c2c8cc', // Philosophie — ardoise froide
-    2: '#b8c9b0', // Botanique — sauge
-    3: '#ccc5b0', // Essai — sable chaud
-    4: '#c8bcb8', // Littérature — rose poussiéreuse
-    5: '#afc8c3', // Sciences naturelles — sarcelle atténuée
-    6: '#cdc3a4', // Histoire — or pâle
-    7: '#b4bdc8', // LitRPG — ardoise bleue
-    8: '#bfb4c8', // Fantasy — mauve atténué
-};
-
-export function getCoverColor(genreId: number | null | undefined): string {
-    return GENRE_COLORS[genreId ?? 0] ?? '#e8e5dc';
+export function getCoverColor(genreId: string | number | null | undefined): string {
+    if (!genreId) return '#e8e5dc';
+    // Déterministe : dernier chars du UUID → index dans palette
+    const str = String(genreId);
+    const hex = str.replace(/-/g, '').slice(-2);
+    const index = parseInt(hex, 16) % COVER_PALETTE.length;
+    return COVER_PALETTE[index] ?? '#e8e5dc';
 }
 
 // Boutures — couleurs de couverture par niveau de lumière

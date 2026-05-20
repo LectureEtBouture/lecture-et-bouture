@@ -7,7 +7,7 @@ import type { LivrePublique, LivresFilters } from '@/lib/queries/livres';
 
 const PAGE_SIZE = 24;
 
-type Genre = { id: number; nom: string };
+type Genre = { id: string; nom: string };
 
 export function LivresGrid({
     initialItems,

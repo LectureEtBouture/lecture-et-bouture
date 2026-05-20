@@ -1,8 +1,8 @@
 import Link from 'next/link';
 
 type LivreRef = {
-    rayonId?: number | null;
-    genreIds?: number[];
+    rayonId?: string | null;
+    genreIds?: string[];
     serie?: string | null;
     numeroSerie?: number | null;
 };
@@ -13,7 +13,7 @@ export function LivreBreadcrumb({
     rayon,
 }: {
     livre: LivreRef;
-    genre?: { nom: string; id: number };
+    genre?: { nom: string; id: string };
     rayon?: { nom: string };
 }) {
     return (

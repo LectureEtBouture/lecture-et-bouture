@@ -18,7 +18,7 @@ if (password.length < 12) {
 
 async function main() {
     const { db } = await import('../db');
-    const { adminUsers } = await import('../db/schema');
+    const { users } = await import('../db/schema');
 
     const hash = await argon2.hash(password, {
         type: argon2.argon2id,
@@ -27,9 +27,9 @@ async function main() {
         parallelism: 4,
     });
 
-    await db.insert(adminUsers).values({ email, passwordHash: hash });
+    await db.insert(users).values({ email, passwordHash: hash, role: 'super_admin' });
 
-    console.log(`Admin créé : ${email}`);
+    console.log(`Utilisateur créé : ${email} (super_admin)`);
     process.exit(0);
 }
 

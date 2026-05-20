@@ -15,8 +15,8 @@ export function LivresActiveFilters({
 }: {
     rayons: RayonFacette[];
     genres: GenreFacette[];
-    activeRayonId?: number;
-    activeGenreId?: number;
+    activeRayonId?: string;
+    activeGenreId?: string;
     activeSerie?: string;
     activeEditeur?: string;
     activeFormat?: string;

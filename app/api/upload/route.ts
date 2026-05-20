@@ -16,7 +16,10 @@ export async function POST(req: Request) {
     const folder = (formData.get('folder') as string) ?? 'uploads';
 
     if (!(file instanceof File)) {
-        return NextResponse.json({ error: 'Fichier manquant' }, { status: 400 });
+        return NextResponse.json(
+            { error: 'Fichier manquant' },
+            { status: 400 },
+        );
     }
     if (!ALLOWED_TYPES.includes(file.type)) {
         return NextResponse.json(

@@ -7,6 +7,7 @@ import { selections, selectionItems, livres, plantes } from '@/db/schema';
 import { eq, asc, count, sql, getTableColumns } from 'drizzle-orm';
 import { auth } from '@/auth';
 import { z } from 'zod';
+import { createLog } from './admin-logs';
 
 async function requireAdmin() {
     const session = await auth();
@@ -30,12 +31,13 @@ export async function createSelection(formData: FormData) {
         active: formData.get('active') === 'on',
     });
     await db.insert(selections).values({ ...parsed, ordre: existingCount });
+    await createLog({ action: 'selection.create', entityType: 'selection', entityLabel: parsed.titre });
     revalidatePath('/admin/selections');
     revalidatePath('/selections');
     redirect('/admin/selections');
 }
 
-export async function updateSelection(id: number, formData: FormData) {
+export async function updateSelection(id: string, formData: FormData) {
     await requireAdmin();
     const parsed = selectionSchema.parse({
         titre: formData.get('titre'),
@@ -51,19 +53,22 @@ export async function updateSelection(id: number, formData: FormData) {
             updatedAt: new Date(),
         })
         .where(eq(selections.id, id));
+    await createLog({ action: 'selection.update', entityType: 'selection', entityId: id, entityLabel: parsed.titre });
     revalidatePath('/admin/selections');
     revalidatePath('/selections');
     redirect('/admin/selections');
 }
 
-export async function deleteSelection(id: number) {
+export async function deleteSelection(id: string) {
     await requireAdmin();
+    const row = await db.select({ titre: selections.titre }).from(selections).where(eq(selections.id, id)).limit(1).then((r) => r[0]);
     await db.delete(selections).where(eq(selections.id, id));
+    await createLog({ action: 'selection.delete', entityType: 'selection', entityId: id, entityLabel: row?.titre });
     revalidatePath('/admin/selections');
     revalidatePath('/selections');
 }
 
-export async function toggleSelectionActive(id: number) {
+export async function toggleSelectionActive(id: string) {
     await requireAdmin();
     await db
         .update(selections)
@@ -73,7 +78,7 @@ export async function toggleSelectionActive(id: number) {
     revalidatePath('/selections');
 }
 
-export async function reorderSelections(orderedIds: number[]) {
+export async function reorderSelections(orderedIds: string[]) {
     await requireAdmin();
     await Promise.all(
         orderedIds.map((id, index) =>
@@ -87,9 +92,9 @@ export async function reorderSelections(orderedIds: number[]) {
 }
 
 export async function addSelectionItem(
-    selectionId: number,
+    selectionId: string,
     type: 'livre' | 'plante',
-    itemId: number,
+    itemId: string,
 ) {
     await requireAdmin();
     const [{ count: existingCount }] = await db
@@ -108,7 +113,7 @@ export async function addSelectionItem(
     revalidatePath('/selections');
 }
 
-export async function removeSelectionItem(selectionId: number, itemId: number) {
+export async function removeSelectionItem(selectionId: string, itemId: string) {
     await requireAdmin();
     await db.delete(selectionItems).where(eq(selectionItems.id, itemId));
     revalidatePath('/admin/selections');
@@ -117,8 +122,8 @@ export async function removeSelectionItem(selectionId: number, itemId: number) {
 }
 
 export async function reorderSelectionItems(
-    selectionId: number,
-    orderedIds: number[],
+    selectionId: string,
+    orderedIds: string[],
 ) {
     await requireAdmin();
     await Promise.all(
@@ -145,7 +150,7 @@ export async function getSelections() {
         .orderBy(asc(selections.ordre), asc(selections.createdAt));
 }
 
-export async function getSelectionById(id: number) {
+export async function getSelectionById(id: string) {
     const rows = await db
         .select()
         .from(selections)
@@ -154,7 +159,7 @@ export async function getSelectionById(id: number) {
     return rows[0] ?? null;
 }
 
-export async function getSelectionWithItems(id: number) {
+export async function getSelectionWithItems(id: string) {
     const rows = await db
         .select()
         .from(selections)

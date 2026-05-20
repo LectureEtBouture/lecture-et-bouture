@@ -5,7 +5,7 @@ type Props = { params: Promise<{ id: string }> };
 
 export default async function ModifierRayonPage({ params }: Props) {
     const { id } = await params;
-    const rayon = await getRayon(Number(id));
+    const rayon = await getRayon(id);
     if (!rayon) notFound();
 
     const action = updateRayon.bind(null, rayon.id);

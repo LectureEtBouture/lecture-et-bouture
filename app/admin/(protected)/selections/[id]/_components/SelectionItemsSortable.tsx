@@ -24,7 +24,7 @@ import {
 } from '@/lib/actions/selections';
 
 type Item = {
-    id: number;
+    id: string;
     type: string;
     livreTitre: string | null;
     planteNom: string | null;
@@ -54,7 +54,7 @@ function SortableItem({
     selectionId,
 }: {
     item: Item;
-    selectionId: number;
+    selectionId: string;
 }) {
     const {
         attributes,
@@ -109,7 +109,7 @@ export function SelectionItemsSortable({
     selectionId,
     initial,
 }: {
-    selectionId: number;
+    selectionId: string;
     initial: Item[];
 }) {
     const [items, setItems] = useState(initial);

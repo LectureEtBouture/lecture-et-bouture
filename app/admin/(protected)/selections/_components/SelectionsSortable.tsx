@@ -26,7 +26,7 @@ import {
 } from '@/lib/actions/selections';
 
 type SelectionRow = {
-    id: number;
+    id: string;
     titre: string;
     active: boolean;
     itemCount: number;
@@ -56,7 +56,7 @@ function SortableRow({
     onToggle,
 }: {
     selection: SelectionRow;
-    onToggle: (id: number) => void;
+    onToggle: (id: string) => void;
 }) {
     const {
         attributes,
@@ -166,7 +166,7 @@ export function SelectionsSortable({ initial }: { initial: SelectionRow[] }) {
         });
     }
 
-    function handleToggle(id: number) {
+    function handleToggle(id: string) {
         setItems((prev) =>
             prev.map((item) =>
                 item.id === id ? { ...item, active: !item.active } : item,

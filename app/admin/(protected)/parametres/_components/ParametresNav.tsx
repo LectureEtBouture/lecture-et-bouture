@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const SECTIONS = [
     { id: 'horaires', label: 'Horaires' },
@@ -8,31 +8,64 @@ const SECTIONS = [
     { id: 'annonce', label: 'Annonce' },
     { id: 'maintenance', label: 'Maintenance' },
     { id: 'reseaux', label: 'Réseaux' },
+    { id: 'qrcode', label: 'QR Code' },
 ];
 
 export function ParametresNav() {
     const [activeId, setActiveId] = useState('horaires');
+    const scrollingRef = useRef(false);
+    const scrollingTimeout = useRef<ReturnType<typeof setTimeout>>(undefined);
 
     useEffect(() => {
-        const observers = SECTIONS.map(({ id }) => {
-            const el = document.getElementById(id);
-            if (!el) return null;
-            const observer = new IntersectionObserver(
-                ([entry]) => {
-                    if (entry.isIntersecting) setActiveId(id);
-                },
-                { rootMargin: '-10% 0px -80% 0px', threshold: 0 },
-            );
-            observer.observe(el);
-            return observer;
-        });
-        return () => observers.forEach((obs) => obs?.disconnect());
+        const THRESHOLD = 0.25; // section active quand son top <= 25% du viewport
+
+        const compute = () => {
+            // Au bas de la page : dernière section gagne sans ambiguïté
+            if (
+                window.scrollY + window.innerHeight >=
+                document.documentElement.scrollHeight - 4
+            ) {
+                return SECTIONS[SECTIONS.length - 1].id;
+            }
+
+            const limit = window.innerHeight * THRESHOLD;
+            let active = SECTIONS[0].id;
+
+            for (const { id } of SECTIONS) {
+                const el = document.getElementById(id);
+                if (!el) continue;
+                // top <= limit → section a croisé le seuil, elle devient candidate
+                if (el.getBoundingClientRect().top <= limit) {
+                    active = id;
+                }
+            }
+
+            return active;
+        };
+
+        const onScroll = () => {
+            if (scrollingRef.current) return;
+            setActiveId(compute());
+        };
+
+        // RAF : DOM layout settled, positions valides
+        const raf = requestAnimationFrame(() => setActiveId(compute()));
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => {
+            cancelAnimationFrame(raf);
+            window.removeEventListener('scroll', onScroll);
+        };
     }, []);
 
     function scrollTo(id: string) {
-        document
-            .getElementById(id)
-            ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setActiveId(id);
+        scrollingRef.current = true;
+        clearTimeout(scrollingTimeout.current);
+        scrollingTimeout.current = setTimeout(() => {
+            scrollingRef.current = false;
+        }, 700);
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     const pillCls = (id: string) =>

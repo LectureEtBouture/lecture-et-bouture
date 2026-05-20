@@ -7,6 +7,7 @@ import { rayons } from '@/db/schema';
 import { eq, asc } from 'drizzle-orm';
 import { auth } from '@/auth';
 import { z } from 'zod';
+import { createLog } from './admin-logs';
 
 async function requireAdmin() {
     const session = await auth();
@@ -31,7 +32,7 @@ export async function getRayonsList() {
     return db.select().from(rayons).orderBy(asc(rayons.nom));
 }
 
-export async function getRayon(id: number) {
+export async function getRayon(id: string) {
     return db
         .select()
         .from(rayons)
@@ -51,12 +52,13 @@ export async function createRayon(formData: FormData) {
         slug: makeSlug(data.nom),
         description: data.description ?? null,
     });
+    await createLog({ action: 'rayon.create', entityType: 'rayon', entityLabel: data.nom });
     revalidatePath('/admin/rayons');
     revalidateTag('livres', { expire: 0 });
     redirect('/admin/rayons');
 }
 
-export async function updateRayon(id: number, formData: FormData) {
+export async function updateRayon(id: string, formData: FormData) {
     await requireAdmin();
     const data = rayonSchema.parse({
         nom: formData.get('nom'),
@@ -70,14 +72,17 @@ export async function updateRayon(id: number, formData: FormData) {
             description: data.description ?? null,
         })
         .where(eq(rayons.id, id));
+    await createLog({ action: 'rayon.update', entityType: 'rayon', entityId: id, entityLabel: data.nom });
     revalidatePath('/admin/rayons');
     revalidateTag('livres', { expire: 0 });
     redirect('/admin/rayons');
 }
 
-export async function deleteRayon(id: number) {
+export async function deleteRayon(id: string) {
     await requireAdmin();
+    const row = await db.select({ nom: rayons.nom }).from(rayons).where(eq(rayons.id, id)).limit(1).then((r) => r[0]);
     await db.delete(rayons).where(eq(rayons.id, id));
+    await createLog({ action: 'rayon.delete', entityType: 'rayon', entityId: id, entityLabel: row?.nom });
     revalidatePath('/admin/rayons');
     revalidateTag('livres', { expire: 0 });
 }

@@ -5,7 +5,7 @@ type Props = { params: Promise<{ id: string }> };
 
 export default async function ModifierGenrePage({ params }: Props) {
     const { id } = await params;
-    const genre = await getGenre(Number(id));
+    const genre = await getGenre(id);
     if (!genre) notFound();
 
     const action = updateGenre.bind(null, genre.id);

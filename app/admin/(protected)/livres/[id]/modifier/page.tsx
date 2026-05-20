@@ -14,12 +14,14 @@ export default async function ModifierLivrePage({
     params: Promise<{ id: string }>;
 }) {
     const { id } = await params;
-    const [livre, selectedGenreIds, genresList, rayonsList] = await Promise.all([
-        getLivre(Number(id)),
-        getLivreGenreIds(Number(id)),
-        getGenres(),
-        getRayons(),
-    ]);
+    const [livre, selectedGenreIds, genresList, rayonsList] = await Promise.all(
+        [
+            getLivre(id),
+            getLivreGenreIds(id),
+            getGenres(),
+            getRayons(),
+        ],
+    );
 
     if (!livre) notFound();
 

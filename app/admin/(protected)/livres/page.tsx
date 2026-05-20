@@ -32,12 +32,7 @@ export default async function AdminLivresPage({
         q?: string;
     }>;
 }) {
-    const {
-        sort: sortParam,
-        choix: choixParam,
-        rayon,
-        q,
-    } = await searchParams;
+    const { sort: sortParam, choix: choixParam, rayon, q } = await searchParams;
     const sort = (VALID_SORTS as string[]).includes(sortParam ?? '')
         ? (sortParam as LivresSort)
         : 'recent';

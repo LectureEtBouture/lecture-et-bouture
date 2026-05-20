@@ -6,39 +6,48 @@ import { avis } from '@/db/schema';
 import { eq, desc, asc } from 'drizzle-orm';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
+import { createLog } from './admin-logs';
 
 async function requireAdmin() {
     const session = await auth();
     if (!session) redirect('/admin/login');
 }
 
-export async function validerAvis(id: number) {
+export async function validerAvis(id: string) {
     await requireAdmin();
+    const row = await db.select({ auteurNom: avis.auteurNom }).from(avis).where(eq(avis.id, id)).limit(1).then((r) => r[0]);
     await db
         .update(avis)
         .set({ approuve: true, masque: false })
         .where(eq(avis.id, id));
+    await createLog({ action: 'avis.valider', entityType: 'avis', entityId: id, entityLabel: row?.auteurNom });
     updateTag('avis');
     revalidatePath('/admin/avis');
 }
 
-export async function masquerAvis(id: number) {
+export async function masquerAvis(id: string) {
     await requireAdmin();
+    const row = await db.select({ auteurNom: avis.auteurNom }).from(avis).where(eq(avis.id, id)).limit(1).then((r) => r[0]);
     await db.update(avis).set({ masque: true }).where(eq(avis.id, id));
+    await createLog({ action: 'avis.masquer', entityType: 'avis', entityId: id, entityLabel: row?.auteurNom });
     updateTag('avis');
     revalidatePath('/admin/avis');
 }
 
-export async function remettreEnLigneAvis(id: number) {
+export async function remettreEnLigneAvis(id: string) {
     await requireAdmin();
+    const row = await db.select({ auteurNom: avis.auteurNom }).from(avis).where(eq(avis.id, id)).limit(1).then((r) => r[0]);
     await db.update(avis).set({ masque: false }).where(eq(avis.id, id));
+    await createLog({ action: 'avis.remettre_en_ligne', entityType: 'avis', entityId: id, entityLabel: row?.auteurNom });
     updateTag('avis');
     revalidatePath('/admin/avis');
 }
 
-export async function deleteAvis(id: number) {
+export async function deleteAvis(id: string) {
     await requireAdmin();
+    const row = await db.select({ auteurNom: avis.auteurNom }).from(avis).where(eq(avis.id, id)).limit(1).then((r) => r[0]);
     await db.delete(avis).where(eq(avis.id, id));
+    await createLog({ action: 'avis.supprimer', entityType: 'avis', entityId: id, entityLabel: row?.auteurNom });
     updateTag('avis');
     revalidatePath('/admin/avis');
 }

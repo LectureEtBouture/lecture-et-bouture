@@ -8,7 +8,7 @@ export default async function ModifierPlantePage({
     params: Promise<{ id: string }>;
 }) {
     const { id } = await params;
-    const plante = await getPlante(Number(id));
+    const plante = await getPlante(id);
 
     if (!plante) notFound();
 

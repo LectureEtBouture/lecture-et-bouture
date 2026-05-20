@@ -8,7 +8,7 @@ export default async function ModifierEvenementPage({
     params: Promise<{ id: string }>;
 }) {
     const { id } = await params;
-    const evenement = await getEvenement(Number(id));
+    const evenement = await getEvenement(id);
     if (!evenement) notFound();
 
     const action = updateEvenement.bind(null, evenement.id);

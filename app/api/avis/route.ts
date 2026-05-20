@@ -1,24 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { avis } from '@/db/schema';
-import livresData from '@/data/livres.json';
-import bouturesData from '@/data/boutures.json';
-
-function resolveProduitNom(type: string, itemId: number): string | null {
-    if (type === 'livre') {
-        const livre = (
-            livresData as { id: number; titre: string; auteur: string }[]
-        ).find((l) => l.id === itemId);
-        return livre ? `${livre.titre} — ${livre.auteur}` : null;
-    }
-    if (type === 'bouture') {
-        const bouture = (bouturesData as { id: number; nom: string }[]).find(
-            (b) => b.id === itemId,
-        );
-        return bouture ? bouture.nom : null;
-    }
-    return null;
-}
 
 export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => null);
@@ -30,7 +12,8 @@ export async function POST(req: NextRequest) {
 
     if (
         (type !== 'livre' && type !== 'bouture') ||
-        typeof itemId !== 'number' ||
+        typeof itemId !== 'string' ||
+        itemId.length === 0 ||
         typeof auteurNom !== 'string' ||
         auteurNom.trim().length < 2 ||
         auteurNom.length > 100 ||
@@ -45,9 +28,9 @@ export async function POST(req: NextRequest) {
 
     await db.insert(avis).values({
         type,
-        livreId: type === 'livre' ? itemId : null,
-        boutureId: type === 'bouture' ? itemId : null,
-        produitNom: resolveProduitNom(type, itemId),
+        livreId: type === 'livre' ? (itemId as string) : null,
+        boutureId: type === 'bouture' ? (itemId as string) : null,
+        produitNom: null,
         auteurNom: auteurNom.trim(),
         note,
         texte: typeof texte === 'string' ? texte.trim() || null : null,

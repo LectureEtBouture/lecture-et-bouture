@@ -33,7 +33,11 @@ export function PlanteFormContenu({ plante }: { plante?: Plante }) {
                     placeholder="Pourquoi on aime cette bouture…"
                 />
             </div>
-            <ImageUpload defaultValue={plante?.image} defaultAltValue={plante?.imageAlt} folder="boutures" />
+            <ImageUpload
+                defaultValue={plante?.image}
+                defaultAltValue={plante?.imageAlt}
+                folder="boutures"
+            />
         </fieldset>
     );
 }

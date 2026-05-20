@@ -2,11 +2,11 @@ import Link from 'next/link';
 import { getCoverColor } from '@/lib/data';
 
 type RecoLivre = {
-    id: number;
+    id: string;
     slug: string;
     titre: string;
     auteur: string;
-    genreIds: number[];
+    genreIds: string[];
     noteMoyenne: string | null;
 };
 
@@ -42,7 +42,9 @@ export function RecoSection({
                         <div
                             className="aspect-2/3 w-full relative overflow-hidden"
                             style={{
-                                backgroundColor: getCoverColor(livre.genreIds?.[0]),
+                                backgroundColor: getCoverColor(
+                                    livre.genreIds?.[0],
+                                ),
                             }}
                         />
                         <div>

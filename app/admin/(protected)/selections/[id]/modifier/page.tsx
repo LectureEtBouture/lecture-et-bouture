@@ -8,7 +8,7 @@ export default async function ModifierSelectionPage({
     params: Promise<{ id: string }>;
 }) {
     const { id } = await params;
-    const selection = await getSelectionById(Number(id));
+    const selection = await getSelectionById(id);
 
     if (!selection) notFound();
 

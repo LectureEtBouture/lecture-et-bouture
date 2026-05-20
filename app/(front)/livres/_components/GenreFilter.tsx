@@ -8,7 +8,7 @@ export function GenreFilter({
     push,
 }: {
     genres: GenreFacette[];
-    activeGenreId?: number;
+    activeGenreId?: string;
     activeChoixLibrairie?: boolean;
     push: (updates: Record<string, string | undefined>) => void;
 }) {

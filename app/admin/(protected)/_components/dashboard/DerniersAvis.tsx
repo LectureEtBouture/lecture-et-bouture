@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 type AvisRow = {
-    id: number;
+    id: string;
     auteurNom: string;
     note: number;
     type: string;

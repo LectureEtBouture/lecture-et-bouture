@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 type Evenement = {
-    id: number;
+    id: string;
     titre: string;
     dateDebut: Date;
     lieu: string | null;

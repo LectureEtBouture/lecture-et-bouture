@@ -1,5 +1,7 @@
+import Image from 'next/image';
+
 type Evenement = {
-    id: number;
+    id: string;
     titre: string;
     description: string | null;
     lieu: string | null;
@@ -148,10 +150,11 @@ export function EvenementItem({
             </div>
             {evenement.image && (
                 <div className="shrink-0 w-16 h-16 sm:w-20 sm:h-20 relative">
-                    <img
+                    <Image
                         src={evenement.image}
                         alt=""
-                        className="absolute inset-0 w-full h-full object-cover"
+                        fill
+                        className="object-cover"
                     />
                 </div>
             )}

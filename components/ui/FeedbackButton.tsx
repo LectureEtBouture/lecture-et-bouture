@@ -28,7 +28,7 @@ export function FeedbackButton({ actionKey }: { actionKey: string }) {
                     strokeLinejoin="round"
                 />
             </svg>
-            Feedback
+            Votre avis nous interesse
         </button>
     );
 }

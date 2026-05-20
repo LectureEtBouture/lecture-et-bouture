@@ -4,7 +4,7 @@ import { db } from '@/db';
 import { avis } from '@/db/schema';
 
 export type AvisItem = {
-    id: number;
+    id: string;
     auteurNom: string;
     note: number;
     texte: string | null;
@@ -20,7 +20,7 @@ const select = {
 } as const;
 
 export const getAvisForLivre = unstable_cache(
-    async (livreId: number): Promise<AvisItem[]> =>
+    async (livreId: string): Promise<AvisItem[]> =>
         db
             .select(select)
             .from(avis)
@@ -38,7 +38,7 @@ export const getAvisForLivre = unstable_cache(
 );
 
 export const getAvisForBouture = unstable_cache(
-    async (boutureId: number): Promise<AvisItem[]> =>
+    async (boutureId: string): Promise<AvisItem[]> =>
         db
             .select(select)
             .from(avis)

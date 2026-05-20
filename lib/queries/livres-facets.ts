@@ -19,7 +19,7 @@ export const getLivresRayons = unstable_cache(
 );
 
 export const getGenresActifs = unstable_cache(
-    async (rayonId?: number) => {
+    async (rayonId?: string) => {
         const baseQuery = db
             .selectDistinct({
                 id: genres.id,

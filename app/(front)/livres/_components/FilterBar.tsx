@@ -15,8 +15,8 @@ interface Props {
     series: string[];
     editeurs: string[];
     formats: string[];
-    activeRayonId?: number;
-    activeGenreId?: number;
+    activeRayonId?: string;
+    activeGenreId?: string;
     activeSerie?: string;
     activeEditeur?: string;
     activeFormat?: string;

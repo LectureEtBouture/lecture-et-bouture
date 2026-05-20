@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { siteConfig } from '@/lib/metadata';
 
-const navItems = [
+const baseNavItems = [
     { href: '/admin', label: 'Dashboard' },
     { href: '/admin/livres', label: 'Livres' },
     { href: '/admin/boutures', label: 'Boutures' },
@@ -15,8 +15,18 @@ const navItems = [
     { href: '/admin/evenements', label: 'Événements' },
     { href: '/admin/selections', label: 'Sélections' },
     { href: '/admin/pages', label: 'Pages' },
-    { href: '/admin/parametres', label: 'Paramètres' },
 ];
+
+function getAdminSectionItems(role?: string) {
+    const items = [{ href: '/admin/parametres', label: 'Paramètres' }];
+    if (role === 'super_admin' || role === 'admin') {
+        items.push({ href: '/admin/users', label: 'Utilisateurs' });
+    }
+    if (role === 'super_admin') {
+        items.push({ href: '/admin/logs', label: 'Journaux' });
+    }
+    return items;
+}
 
 function useIsActive(href: string) {
     const pathname = usePathname();
@@ -37,18 +47,46 @@ function SidebarNavLink({ href, label }: { href: string; label: string }) {
     );
 }
 
+function SidebarNav({ role }: { role?: string }) {
+    const adminSectionItems = getAdminSectionItems(role);
+    return (
+        <nav className="flex-1 overflow-y-auto flex flex-col">
+            <div className="px-3 py-4 space-y-0.5">
+                {baseNavItems.map((item) => (
+                    <SidebarNavLink key={item.href} href={item.href} label={item.label} />
+                ))}
+            </div>
+            <div className="px-3 pb-4 mt-auto">
+                <div className="border-t border-border pt-3 mb-1 px-3">
+                    <span className="text-[10px] uppercase tracking-[0.12em] text-muted/60 font-medium">
+                        Administration
+                    </span>
+                </div>
+                <div className="space-y-0.5">
+                    {adminSectionItems.map((item) => (
+                        <SidebarNavLink key={item.href} href={item.href} label={item.label} />
+                    ))}
+                </div>
+            </div>
+        </nav>
+    );
+}
+
 function MobileMenu({
     open,
     onClose,
     email,
+    role,
     signOutAction,
 }: {
     open: boolean;
     onClose: () => void;
     email: string;
+    role?: string;
     signOutAction: () => Promise<void>;
 }) {
     const pathname = usePathname();
+    const adminSectionItems = getAdminSectionItems(role);
 
     if (!open) return null;
 
@@ -59,7 +97,7 @@ function MobileMenu({
                 onClick={onClose}
             />
             <div className="absolute top-0 left-0 bottom-0 w-64 bg-white flex flex-col shadow-lg">
-                <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+                <div className="px-5 py-4 border-b border-border flex items-center justify-between shrink-0">
                     <div>
                         <p className="font-serif text-sm font-bold text-primary">
                             {siteConfig.name}
@@ -78,12 +116,7 @@ function MobileMenu({
                         className="text-muted hover:text-foreground transition-colors p-1"
                         aria-label="Fermer le menu"
                     >
-                        <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 16 16"
-                            fill="none"
-                        >
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                             <path
                                 d="M2 2L14 14M14 2L2 14"
                                 stroke="currentColor"
@@ -93,28 +126,52 @@ function MobileMenu({
                         </svg>
                     </button>
                 </div>
-                <nav className="flex-1 px-3 py-4 space-y-0.5">
-                    {navItems.map((item) => {
-                        const active =
-                            item.href === '/admin'
-                                ? pathname === '/admin'
-                                : pathname.startsWith(item.href);
-                        return (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                onClick={onClose}
-                                className={`flex items-center px-3 py-2.5 text-sm rounded-sm transition-colors ${active ? 'bg-background text-primary font-medium' : 'text-foreground/70 hover:text-primary'}`}
-                            >
-                                {item.label}
-                            </Link>
-                        );
-                    })}
+
+                <nav className="flex-1 overflow-y-auto flex flex-col">
+                    <div className="px-3 py-4 space-y-0.5">
+                        {baseNavItems.map((item) => {
+                            const active =
+                                item.href === '/admin'
+                                    ? pathname === '/admin'
+                                    : pathname.startsWith(item.href);
+                            return (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    onClick={onClose}
+                                    className={`flex items-center px-3 py-2.5 text-sm rounded-sm transition-colors ${active ? 'bg-background text-primary font-medium' : 'text-foreground/70 hover:text-primary'}`}
+                                >
+                                    {item.label}
+                                </Link>
+                            );
+                        })}
+                    </div>
+                    <div className="px-3 pb-4 mt-auto">
+                        <div className="border-t border-border pt-3 mb-1 px-3">
+                            <span className="text-[10px] uppercase tracking-[0.12em] text-muted/60 font-medium">
+                                Administration
+                            </span>
+                        </div>
+                        <div className="space-y-0.5">
+                            {adminSectionItems.map((item) => {
+                                const active = pathname.startsWith(item.href);
+                                return (
+                                    <Link
+                                        key={item.href}
+                                        href={item.href}
+                                        onClick={onClose}
+                                        className={`flex items-center px-3 py-2.5 text-sm rounded-sm transition-colors ${active ? 'bg-background text-primary font-medium' : 'text-foreground/70 hover:text-primary'}`}
+                                    >
+                                        {item.label}
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </div>
                 </nav>
-                <div className="px-5 py-4 border-t border-border">
-                    <p className="text-[11px] text-muted truncate mb-2">
-                        {email}
-                    </p>
+
+                <div className="px-5 py-4 border-t border-border shrink-0">
+                    <p className="text-[11px] text-muted truncate mb-2">{email}</p>
                     <form action={signOutAction}>
                         <button
                             type="submit"
@@ -132,10 +189,12 @@ function MobileMenu({
 export function AdminShell({
     children,
     email,
+    role,
     signOutAction,
 }: {
     children: React.ReactNode;
     email: string;
+    role?: string;
     signOutAction: () => Promise<void>;
 }) {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -156,12 +215,7 @@ export function AdminShell({
                         className="text-foreground/70 hover:text-primary transition-colors p-1"
                         aria-label="Ouvrir le menu"
                     >
-                        <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 20 20"
-                            fill="none"
-                        >
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                             <path
                                 d="M3 5H17M3 10H17M3 15H17"
                                 stroke="currentColor"
@@ -177,13 +231,14 @@ export function AdminShell({
                 open={menuOpen}
                 onClose={() => setMenuOpen(false)}
                 email={email}
+                role={role}
                 signOutAction={signOutAction}
             />
 
             {/* Desktop layout */}
-            <div className="md:flex md:min-h-screen">
-                <aside className="hidden md:flex w-56 shrink-0 bg-white border-r border-border flex-col min-h-screen">
-                    <div className="px-5 py-5 border-b border-border">
+            <div className="md:flex">
+                <aside className="hidden md:flex w-56 shrink-0 bg-white border-r border-border flex-col h-screen sticky top-0">
+                    <div className="px-5 py-5 border-b border-border shrink-0">
                         <p className="font-serif text-sm font-bold text-primary tracking-tight">
                             {siteConfig.name}
                         </p>
@@ -202,19 +257,11 @@ export function AdminShell({
                             </a>
                         </div>
                     </div>
-                    <nav className="flex-1 px-3 py-4 space-y-0.5">
-                        {navItems.map((item) => (
-                            <SidebarNavLink
-                                key={item.href}
-                                href={item.href}
-                                label={item.label}
-                            />
-                        ))}
-                    </nav>
-                    <div className="px-5 py-4 border-t border-border">
-                        <p className="text-[11px] text-muted truncate mb-2">
-                            {email}
-                        </p>
+
+                    <SidebarNav role={role} />
+
+                    <div className="px-5 py-4 border-t border-border shrink-0">
+                        <p className="text-[11px] text-muted truncate mb-2">{email}</p>
                         <form action={signOutAction}>
                             <button
                                 type="submit"

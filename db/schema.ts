@@ -1,7 +1,7 @@
 import {
     pgTable,
     primaryKey,
-    serial,
+    uuid,
     text,
     varchar,
     decimal,
@@ -35,10 +35,18 @@ export const arrosagePlante = pgEnum('arrosage_plante', [
 
 export const avisType = pgEnum('avis_type', ['livre', 'plante']);
 
+export const roleUtilisateur = pgEnum('role_utilisateur', [
+    'super_admin',
+    'admin',
+    'editor',
+    'moderator',
+    'contributor',
+]);
+
 // ─── Genres ───────────────────────────────────────────────────────────────────
 
 export const genres = pgTable('genres', {
-    id: serial('id').primaryKey(),
+    id: uuid('id').primaryKey().defaultRandom(),
     nom: varchar('nom', { length: 100 }).notNull(),
     slug: varchar('slug', { length: 100 }).notNull().unique(),
 });
@@ -46,7 +54,7 @@ export const genres = pgTable('genres', {
 // ─── Rayons ───────────────────────────────────────────────────────────────────
 
 export const rayons = pgTable('rayons', {
-    id: serial('id').primaryKey(),
+    id: uuid('id').primaryKey().defaultRandom(),
     nom: varchar('nom', { length: 150 }).notNull(),
     slug: varchar('slug', { length: 150 }).notNull().unique(),
     description: text('description'),
@@ -55,12 +63,12 @@ export const rayons = pgTable('rayons', {
 // ─── Livres ───────────────────────────────────────────────────────────────────
 
 export const livres = pgTable('livres', {
-    id: serial('id').primaryKey(),
+    id: uuid('id').primaryKey().defaultRandom(),
     slug: varchar('slug', { length: 200 }).notNull().unique(),
     titre: varchar('titre', { length: 300 }).notNull(),
     auteur: varchar('auteur', { length: 200 }).notNull(),
     isbn: varchar('isbn', { length: 20 }),
-    rayonId: integer('rayon_id').references(() => rayons.id),
+    rayonId: uuid('rayon_id').references(() => rayons.id),
     editeur: varchar('editeur', { length: 200 }),
     collection: varchar('collection', { length: 200 }),
     format: varchar('format', { length: 100 }),
@@ -84,10 +92,10 @@ export const livres = pgTable('livres', {
 export const livresGenres = pgTable(
     'livres_genres',
     {
-        livreId: integer('livre_id')
+        livreId: uuid('livre_id')
             .notNull()
             .references(() => livres.id, { onDelete: 'cascade' }),
-        genreId: integer('genre_id')
+        genreId: uuid('genre_id')
             .notNull()
             .references(() => genres.id, { onDelete: 'cascade' }),
     },
@@ -97,7 +105,7 @@ export const livresGenres = pgTable(
 // ─── Plantes ──────────────────────────────────────────────────────────────────
 
 export const plantes = pgTable('plantes', {
-    id: serial('id').primaryKey(),
+    id: uuid('id').primaryKey().defaultRandom(),
     slug: varchar('slug', { length: 200 }).notNull().unique(),
     nom: varchar('nom', { length: 200 }).notNull(),
     espece: varchar('espece', { length: 200 }),
@@ -121,7 +129,7 @@ export const plantes = pgTable('plantes', {
 // ─── Sélections du conservateur ───────────────────────────────────────────────
 
 export const selections = pgTable('selections', {
-    id: serial('id').primaryKey(),
+    id: uuid('id').primaryKey().defaultRandom(),
     titre: varchar('titre', { length: 200 }).notNull(),
     description: text('description'),
     ordre: integer('ordre').notNull().default(0),
@@ -131,15 +139,15 @@ export const selections = pgTable('selections', {
 });
 
 export const selectionItems = pgTable('selection_items', {
-    id: serial('id').primaryKey(),
-    selectionId: integer('selection_id')
+    id: uuid('id').primaryKey().defaultRandom(),
+    selectionId: uuid('selection_id')
         .notNull()
         .references(() => selections.id, { onDelete: 'cascade' }),
     type: avisType('type').notNull(),
-    livreId: integer('livre_id').references(() => livres.id, {
+    livreId: uuid('livre_id').references(() => livres.id, {
         onDelete: 'cascade',
     }),
-    planteId: integer('plante_id').references(() => plantes.id, {
+    planteId: uuid('plante_id').references(() => plantes.id, {
         onDelete: 'cascade',
     }),
     ordre: integer('ordre').notNull().default(0),
@@ -148,10 +156,10 @@ export const selectionItems = pgTable('selection_items', {
 // ─── Avis ─────────────────────────────────────────────────────────────────────
 
 export const avis = pgTable('avis', {
-    id: serial('id').primaryKey(),
+    id: uuid('id').primaryKey().defaultRandom(),
     type: text('type').notNull(), // 'livre' | 'bouture'
-    livreId: integer('livre_id'),
-    boutureId: integer('bouture_id'),
+    livreId: uuid('livre_id'),
+    boutureId: uuid('bouture_id'),
     produitNom: varchar('produit_nom', { length: 300 }),
     auteurNom: varchar('auteur_nom', { length: 100 }).notNull(),
     note: integer('note').notNull(), // 1-5
@@ -164,7 +172,7 @@ export const avis = pgTable('avis', {
 // ─── Événements ───────────────────────────────────────────────────────────────
 
 export const evenements = pgTable('evenements', {
-    id: serial('id').primaryKey(),
+    id: uuid('id').primaryKey().defaultRandom(),
     titre: varchar('titre', { length: 300 }).notNull(),
     description: text('description'),
     lieu: varchar('lieu', { length: 300 }),
@@ -177,13 +185,17 @@ export const evenements = pgTable('evenements', {
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-// ─── Admin users ──────────────────────────────────────────────────────────────
+// ─── Utilisateurs ─────────────────────────────────────────────────────────────
 
-export const adminUsers = pgTable('admin_users', {
-    id: serial('id').primaryKey(),
+export const users = pgTable('users', {
+    id: uuid('id').primaryKey().defaultRandom(),
     email: varchar('email', { length: 200 }).notNull().unique(),
     passwordHash: varchar('password_hash', { length: 255 }).notNull(),
+    role: roleUtilisateur('role').notNull().default('admin'),
+    resetToken: varchar('reset_token', { length: 255 }),
+    resetTokenExpiresAt: timestamp('reset_token_expires_at'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 // ─── Paramètres boutique ──────────────────────────────────────────────────────
@@ -192,6 +204,19 @@ export const parametres = pgTable('parametres', {
     cle: varchar('cle', { length: 100 }).primaryKey(),
     valeur: text('valeur').notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// ─── Journaux admin ───────────────────────────────────────────────────────────
+
+export const adminLogs = pgTable('admin_logs', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+    userEmail: varchar('user_email', { length: 200 }).notNull(),
+    action: varchar('action', { length: 100 }).notNull(),
+    entityType: varchar('entity_type', { length: 50 }),
+    entityId: varchar('entity_id', { length: 36 }),
+    entityLabel: varchar('entity_label', { length: 300 }),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 // ─── Pages éditoriales ────────────────────────────────────────────────────────

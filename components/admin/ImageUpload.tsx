@@ -20,9 +20,7 @@ export function ImageUpload({
 }: Props) {
     const [url, setUrl] = useState(defaultValue ?? '');
     const [altText, setAltText] = useState(defaultAltValue ?? '');
-    const [mode, setMode] = useState<Mode>(
-        defaultValue ? 'url' : 'fichier',
-    );
+    const [mode, setMode] = useState<Mode>(defaultValue ? 'url' : 'fichier');
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [dragging, setDragging] = useState(false);
@@ -35,12 +33,15 @@ export function ImageUpload({
             const fd = new FormData();
             fd.append('file', file);
             fd.append('folder', folder);
-            const res = await fetch('/api/upload', { method: 'POST', body: fd });
+            const res = await fetch('/api/upload', {
+                method: 'POST',
+                body: fd,
+            });
             const data = await res.json();
             if (res.ok && data.url) {
                 setUrl(data.url);
             } else {
-                setError(data.error ?? 'Erreur lors de l\'upload');
+                setError(data.error ?? "Erreur lors de l'upload");
             }
         } catch {
             setError('Erreur réseau');
@@ -68,10 +69,18 @@ export function ImageUpload({
             <p className={labelClass}>{label}</p>
 
             <div className="flex border border-border w-fit">
-                <button type="button" onClick={() => setMode('fichier')} className={tabBtn('fichier')}>
+                <button
+                    type="button"
+                    onClick={() => setMode('fichier')}
+                    className={tabBtn('fichier')}
+                >
                     Fichier
                 </button>
-                <button type="button" onClick={() => setMode('url')} className={tabBtn('url')}>
+                <button
+                    type="button"
+                    onClick={() => setMode('url')}
+                    className={tabBtn('url')}
+                >
                     URL
                 </button>
             </div>
@@ -79,7 +88,10 @@ export function ImageUpload({
             {mode === 'fichier' && (
                 <div
                     onClick={() => !uploading && fileRef.current?.click()}
-                    onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+                    onDragOver={(e) => {
+                        e.preventDefault();
+                        setDragging(true);
+                    }}
                     onDragLeave={() => setDragging(false)}
                     onDrop={handleDrop}
                     className={`border border-dashed p-8 text-center cursor-pointer transition-colors ${
@@ -119,13 +131,12 @@ export function ImageUpload({
                 />
             )}
 
-            {error && (
-                <p className="text-[11px] text-danger">{error}</p>
-            )}
+            {error && <p className="text-[11px] text-danger">{error}</p>}
 
             {url && (
                 <div className="flex items-start gap-3">
                     <div className="relative shrink-0">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src={url}
                             alt=""
@@ -133,7 +144,11 @@ export function ImageUpload({
                         />
                         <button
                             type="button"
-                            onClick={() => { setUrl(''); setAltText(''); setError(null); }}
+                            onClick={() => {
+                                setUrl('');
+                                setAltText('');
+                                setError(null);
+                            }}
                             className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-foreground text-background text-xs flex items-center justify-center leading-none hover:bg-primary transition-colors"
                             aria-label="Supprimer l'image"
                         >

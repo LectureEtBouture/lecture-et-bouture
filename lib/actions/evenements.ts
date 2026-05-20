@@ -7,6 +7,7 @@ import { evenements } from '@/db/schema';
 import { and, eq, gt, gte, isNotNull, lt, lte, asc, desc } from 'drizzle-orm';
 import { auth } from '@/auth';
 import { z } from 'zod';
+import { createLog } from './admin-logs';
 
 async function requireAdmin() {
     const session = await auth();
@@ -52,11 +53,12 @@ export async function createEvenement(formData: FormData) {
         dateDebut: parsed.dateDebut,
         dateFin: parsed.dateFin ?? null,
     });
+    await createLog({ action: 'evenement.create', entityType: 'evenement', entityLabel: parsed.titre });
     revalidatePath('/admin/evenements');
     redirect('/admin/evenements');
 }
 
-export async function updateEvenement(id: number, formData: FormData) {
+export async function updateEvenement(id: string, formData: FormData) {
     await requireAdmin();
     const parsed = parseFormData(formData);
     await db
@@ -72,20 +74,23 @@ export async function updateEvenement(id: number, formData: FormData) {
             updatedAt: new Date(),
         })
         .where(eq(evenements.id, id));
+    await createLog({ action: 'evenement.update', entityType: 'evenement', entityId: id, entityLabel: parsed.titre });
     revalidatePath('/admin/evenements');
     redirect('/admin/evenements');
 }
 
-export async function deleteEvenement(id: number) {
+export async function deleteEvenement(id: string) {
     await requireAdmin();
+    const row = await db.select({ titre: evenements.titre }).from(evenements).where(eq(evenements.id, id)).limit(1).then((r) => r[0]);
     await db.delete(evenements).where(eq(evenements.id, id));
+    await createLog({ action: 'evenement.delete', entityType: 'evenement', entityId: id, entityLabel: row?.titre });
     revalidatePath('/admin/evenements');
 }
 
-export async function toggleEvenementPublie(id: number) {
+export async function toggleEvenementPublie(id: string) {
     await requireAdmin();
     const row = await db
-        .select({ publie: evenements.publie })
+        .select({ publie: evenements.publie, titre: evenements.titre })
         .from(evenements)
         .where(eq(evenements.id, id))
         .limit(1)
@@ -95,6 +100,7 @@ export async function toggleEvenementPublie(id: number) {
         .update(evenements)
         .set({ publie: !row.publie, updatedAt: new Date() })
         .where(eq(evenements.id, id));
+    await createLog({ action: row.publie ? 'evenement.depublier' : 'evenement.publier', entityType: 'evenement', entityId: id, entityLabel: row.titre });
     revalidatePath('/admin/evenements');
 }
 
@@ -127,7 +133,7 @@ export async function getEvenements(
     return db.select().from(evenements).where(where).orderBy(order);
 }
 
-export async function getEvenement(id: number) {
+export async function getEvenement(id: string) {
     return db
         .select()
         .from(evenements)

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 type Props = {
-    itemId: number;
+    itemId: string;
     type: 'livre' | 'bouture';
 };
 

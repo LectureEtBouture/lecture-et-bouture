@@ -5,7 +5,7 @@ import {
 } from '@/lib/actions/evenements';
 
 type Evenement = {
-    id: number;
+    id: string;
     titre: string;
     lieu: string | null;
     dateDebut: Date;
@@ -40,7 +40,7 @@ function formatDateShort(date: Date) {
     });
 }
 
-function PublieToggle({ id, publie }: { id: number; publie: boolean }) {
+function PublieToggle({ id, publie }: { id: string; publie: boolean }) {
     return (
         <form
             action={async () => {

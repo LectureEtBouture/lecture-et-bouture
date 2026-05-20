@@ -12,9 +12,9 @@ export type Recommendations = {
 
 export const getRecommendations = unstable_cache(
     async (
-        livreId: number,
+        livreId: string,
         serie: string | null,
-        genreId: number | null,
+        genreId: string | null,
         auteur: string,
         limit = 4,
     ): Promise<Recommendations> => {

@@ -13,10 +13,28 @@ export const authConfig: NextAuthConfig = {
     providers: [],
     callbacks: {
         authorized({ auth, request }) {
-            const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
-            const isLoginPage = request.nextUrl.pathname === '/admin/login';
-            if (isAdminRoute && !isLoginPage) return !!auth;
+            const { pathname } = request.nextUrl;
+            const publicAdminPaths = [
+                '/admin/login',
+                '/admin/forgot-password',
+                '/admin/reset-password',
+            ];
+            if (pathname.startsWith('/admin') && !publicAdminPaths.includes(pathname)) {
+                return !!auth;
+            }
             return true;
+        },
+        jwt({ token, user }) {
+            if (user) {
+                token.sub = user.id;
+                token.role = user.role;
+            }
+            return token;
+        },
+        session({ session, token }) {
+            session.user.id = token.sub ?? '';
+            session.user.role = token.role as string | undefined;
+            return session;
         },
     },
 };

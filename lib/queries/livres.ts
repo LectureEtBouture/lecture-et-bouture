@@ -1,6 +1,6 @@
 import { unstable_cache } from 'next/cache';
 import { db } from '@/db';
-import { livres, livresGenres } from '@/db/schema';
+import { livres } from '@/db/schema';
 import { eq, and, asc, desc, ilike, or, sql, type SQL } from 'drizzle-orm';
 
 export type SortLivres =
@@ -12,8 +12,9 @@ export type SortLivres =
     | 'editeur';
 
 export interface LivresFilters {
-    genre?: number;
-    rayon?: number;
+    genre?: string;
+    rayon?: string;
+    rayonSlug?: string;
     serie?: string;
     editeur?: string;
     format?: string;
@@ -30,7 +31,9 @@ export const livreSelect = {
     titre: livres.titre,
     auteur: livres.auteur,
     isbn: livres.isbn,
-    genreIds: sql<number[]>`COALESCE(ARRAY(SELECT lg.genre_id FROM livres_genres lg WHERE lg.livre_id = ${livres.id} ORDER BY lg.genre_id), ARRAY[]::integer[])`,
+    genreIds: sql<
+        string[]
+    >`COALESCE(ARRAY(SELECT lg.genre_id FROM livres_genres lg WHERE lg.livre_id = ${livres.id} ORDER BY lg.genre_id), ARRAY[]::uuid[])`,
     rayonId: livres.rayonId,
     editeur: livres.editeur,
     collection: livres.collection,
@@ -78,6 +81,10 @@ function buildConditions(
 ) {
     const conditions: SQL[] = [];
     if (filters.rayon) conditions.push(eq(livres.rayonId, filters.rayon));
+    if (filters.rayonSlug)
+        conditions.push(
+            sql`EXISTS (SELECT 1 FROM rayons r WHERE r.id = ${livres.rayonId} AND r.slug = ${filters.rayonSlug})`,
+        );
     if (filters.genre)
         conditions.push(
             sql`EXISTS (SELECT 1 FROM livres_genres WHERE livre_id = ${livres.id} AND genre_id = ${filters.genre})`,

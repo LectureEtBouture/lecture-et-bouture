@@ -13,12 +13,18 @@ type Rayon = InferSelectModel<typeof rayons>;
 interface Props {
     action: (formData: FormData) => Promise<void>;
     livre?: Livre;
-    selectedGenreIds?: number[];
+    selectedGenreIds?: string[];
     genresList: Genre[];
     rayonsList: Rayon[];
 }
 
-export function LivreForm({ action, livre, selectedGenreIds = [], genresList, rayonsList }: Props) {
+export function LivreForm({
+    action,
+    livre,
+    selectedGenreIds = [],
+    genresList,
+    rayonsList,
+}: Props) {
     return (
         <form action={action} className="space-y-6 max-w-2xl">
             <LivreFormIdentite livre={livre} />

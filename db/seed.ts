@@ -29,66 +29,91 @@ const db = drizzle(client);
 
 async function main() {
     await db.execute(
-        sql`TRUNCATE TABLE avis, selection_items, evenements, livres, plantes, selections, genres, rayons RESTART IDENTITY CASCADE`,
+        sql`TRUNCATE TABLE avis, selection_items, evenements, livres, plantes, selections, genres, rayons CASCADE`,
     );
     await db.execute(sql`TRUNCATE TABLE pages_editoriales`);
     await db.execute(sql`TRUNCATE TABLE parametres`);
 
-    // Genres
+    // Genres — mapping json numeric id → uuid
+    const genreIdMap = new Map<number, string>();
     const sortedGenres = [...genresJson].sort((a, b) => a.id - b.id);
     for (const genre of sortedGenres) {
-        await db.insert(genres).values({ nom: genre.nom, slug: genre.slug });
+        const [inserted] = await db
+            .insert(genres)
+            .values({ nom: genre.nom, slug: genre.slug })
+            .returning({ id: genres.id });
+        genreIdMap.set(genre.id, inserted.id);
     }
     console.log(`Genres : ${sortedGenres.length}`);
 
-    // Rayons
+    // Rayons — mapping json numeric id → uuid
+    const rayonIdMap = new Map<number, string>();
     const sortedRayons = [...rayonsJson].sort((a, b) => a.id - b.id);
     for (const rayon of sortedRayons) {
-        await db.insert(rayons).values({
-            nom: rayon.nom,
-            slug: rayon.slug,
-            description:
-                (rayon as { description?: string }).description ?? null,
-        });
+        const [inserted] = await db
+            .insert(rayons)
+            .values({
+                nom: rayon.nom,
+                slug: rayon.slug,
+                description:
+                    (rayon as { description?: string }).description ?? null,
+            })
+            .returning({ id: rayons.id });
+        rayonIdMap.set(rayon.id, inserted.id);
     }
     console.log(`Rayons : ${sortedRayons.length}`);
 
-    // Livres
+    // Livres — mapping json numeric id → uuid
+    const livreIdMap = new Map<number, string>();
     const sortedLivres = [...livresJson].sort((a, b) => a.id - b.id);
     for (const livre of sortedLivres) {
-        const [inserted] = await db.insert(livres).values({
-            slug: livre.slug,
-            titre: livre.titre,
-            auteur: livre.auteur,
-            isbn: livre.isbn ?? null,
-            rayonId: livre.rayonId ?? null,
-            editeur: livre.editeur ?? null,
-            collection: livre.collection ?? null,
-            format: livre.format ?? null,
-            edition: (livre as { edition?: string | null }).edition ?? null,
-            anneePublication: livre.anneePublication ?? null,
-            serie: (livre as { serie?: string | null }).serie ?? null,
-            numeroSerie:
-                (livre as { numeroSerie?: number | null }).numeroSerie ?? null,
-            prix: String(livre.prix),
-            description: livre.description ?? null,
-            image: livre.image ?? null,
-            noteMoyenne: livre.noteMoyenne ? String(livre.noteMoyenne) : null,
-            choixLibrairie: livre.choixLibrairie ?? false,
-            stock: livre.stock ?? 0,
-            noteDeLaLibrairie: livre.noteDeLaLibrairie ?? null,
-            publishedAt: livre.publishedAt ? new Date(livre.publishedAt) : null,
-        }).returning({ id: livres.id });
-        if (livre.genreId && inserted) {
-            await db.insert(livresGenres).values({ livreId: inserted.id, genreId: livre.genreId });
+        const rayonUuid = livre.rayonId ? rayonIdMap.get(livre.rayonId) ?? null : null;
+        const [inserted] = await db
+            .insert(livres)
+            .values({
+                slug: livre.slug,
+                titre: livre.titre,
+                auteur: livre.auteur,
+                isbn: livre.isbn ?? null,
+                rayonId: rayonUuid,
+                editeur: livre.editeur ?? null,
+                collection: livre.collection ?? null,
+                format: livre.format ?? null,
+                edition: (livre as { edition?: string | null }).edition ?? null,
+                anneePublication: livre.anneePublication ?? null,
+                serie: (livre as { serie?: string | null }).serie ?? null,
+                numeroSerie:
+                    (livre as { numeroSerie?: number | null }).numeroSerie ??
+                    null,
+                prix: String(livre.prix),
+                description: livre.description ?? null,
+                image: livre.image ?? null,
+                noteMoyenne: livre.noteMoyenne
+                    ? String(livre.noteMoyenne)
+                    : null,
+                choixLibrairie: livre.choixLibrairie ?? false,
+                stock: livre.stock ?? 0,
+                noteDeLaLibrairie: livre.noteDeLaLibrairie ?? null,
+                publishedAt: livre.publishedAt
+                    ? new Date(livre.publishedAt)
+                    : null,
+            })
+            .returning({ id: livres.id });
+        livreIdMap.set(livre.id, inserted.id);
+        const genreUuid = livre.genreId ? genreIdMap.get(livre.genreId) ?? null : null;
+        if (genreUuid) {
+            await db
+                .insert(livresGenres)
+                .values({ livreId: inserted.id, genreId: genreUuid });
         }
     }
     console.log(`Livres : ${sortedLivres.length}`);
 
-    // Plantes / boutures
+    // Plantes / boutures — mapping json numeric id → uuid
+    const planteIdMap = new Map<number, string>();
     const sortedBoutures = [...bouturesJson].sort((a, b) => a.id - b.id);
     for (const bouture of sortedBoutures) {
-        await db.insert(plantes).values({
+        const [insertedBouture] = await db.insert(plantes).values({
             slug: bouture.slug,
             nom: bouture.nom,
             espece: bouture.espece ?? null,
@@ -123,16 +148,19 @@ async function main() {
                 (bouture as { choixLibrairie?: boolean }).choixLibrairie ??
                 false,
             stock: (bouture as { stock?: number }).stock ?? 0,
-        });
+        }).returning({ id: plantes.id });
+        planteIdMap.set(bouture.id, insertedBouture.id);
     }
     console.log(`Boutures : ${sortedBoutures.length}`);
 
     // Avis
     for (const a of avisJson) {
+        const livreUuid = a.livreId ? livreIdMap.get(a.livreId) ?? null : null;
+        const bouturePlanteUuid = a.planteId ? planteIdMap.get(a.planteId) ?? null : null;
         await db.insert(avis).values({
             type: a.type === 'plante' ? 'bouture' : a.type,
-            livreId: a.livreId ?? null,
-            boutureId: a.planteId ?? null,
+            livreId: livreUuid,
+            boutureId: bouturePlanteUuid,
             produitNom: null,
             auteurNom: a.auteurNom,
             note: a.note,
@@ -141,10 +169,11 @@ async function main() {
             masque: false,
         });
     }
-    // Avis non approuvés pour test de modération
+    // Avis non approuvé pour test de modération (livre index 3 dans le JSON)
+    const livreTestUuid = livreIdMap.get(3) ?? null;
     await db.insert(avis).values({
         type: 'livre',
-        livreId: 3,
+        livreId: livreTestUuid,
         boutureId: null,
         produitNom: null,
         auteurNom: 'Marie L.',
@@ -259,20 +288,25 @@ async function main() {
         (a, b) => a.id - b.id,
     );
     for (const sel of sortedSelections) {
-        await db.insert(selections).values({
-            titre: sel.titre,
-            description: sel.description,
-            ordre: sel.ordre,
-            active: sel.active,
-        });
+        const [insertedSel] = await db
+            .insert(selections)
+            .values({
+                titre: sel.titre,
+                description: sel.description,
+                ordre: sel.ordre,
+                active: sel.active,
+            })
+            .returning({ id: selections.id });
 
         for (const [index, item] of sel.items.entries()) {
             const isLivre = item.type === 'livre';
+            const livreUuid = isLivre ? livreIdMap.get(item.id) ?? null : null;
+            const planteUuid = !isLivre ? planteIdMap.get(item.id) ?? null : null;
             await db.insert(selectionItems).values({
-                selectionId: sel.id,
+                selectionId: insertedSel.id,
                 type: isLivre ? 'livre' : 'plante',
-                livreId: isLivre ? item.id : null,
-                planteId: isLivre ? null : item.id,
+                livreId: livreUuid,
+                planteId: planteUuid,
                 ordre: index,
             });
         }

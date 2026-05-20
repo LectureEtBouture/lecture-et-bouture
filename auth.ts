@@ -2,7 +2,7 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { eq } from 'drizzle-orm';
 import { db } from '@/db';
-import { adminUsers } from '@/db/schema';
+import { users } from '@/db/schema';
 import argon2 from 'argon2';
 import { z } from 'zod';
 import { authConfig } from './auth.config';
@@ -24,8 +24,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
                 const user = await db
                     .select()
-                    .from(adminUsers)
-                    .where(eq(adminUsers.email, email))
+                    .from(users)
+                    .where(eq(users.email, email))
                     .limit(1)
                     .then((r) => r[0]);
 
@@ -34,7 +34,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 const valid = await argon2.verify(user.passwordHash, password);
                 if (!valid) return null;
 
-                return { id: String(user.id), email: user.email };
+                return { id: user.id, email: user.email, role: user.role };
             },
         }),
     ],

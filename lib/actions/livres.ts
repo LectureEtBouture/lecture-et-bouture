@@ -7,6 +7,7 @@ import { livres, genres, rayons, livresGenres } from '@/db/schema';
 import { eq, asc, desc, ilike, or, and, sql, SQL } from 'drizzle-orm';
 import { auth } from '@/auth';
 import { z } from 'zod';
+import { createLog } from './admin-logs';
 
 async function requireAdmin() {
     const session = await auth();
@@ -26,7 +27,7 @@ const livreSchema = z.object({
     titre: z.string().min(1),
     auteur: z.string().min(1),
     isbn: z.string().optional(),
-    rayonId: z.coerce.number().optional(),
+    rayonId: z.string().optional(),
     editeur: z.string().optional(),
     collection: z.string().optional(),
     format: z.string().optional(),
@@ -64,9 +65,9 @@ function parseFormData(formData: FormData) {
         choixLibrairie: formData.get('choixLibrairie') === 'on',
         noteDeLaLibrairie: formData.get('noteDeLaLibrairie') || undefined,
     });
-    const genreIds = (formData.getAll('genreIds') as string[])
-        .map(Number)
-        .filter((id) => !isNaN(id) && id > 0);
+    const genreIds = (formData.getAll('genreIds') as string[]).filter(
+        (id) => id.length > 0,
+    );
     return { ...parsed, genreIds };
 }
 
@@ -103,15 +104,18 @@ export async function createLivre(formData: FormData) {
     if (parsed.genreIds.length > 0) {
         await db
             .insert(livresGenres)
-            .values(parsed.genreIds.map((genreId) => ({ livreId: id, genreId })));
+            .values(
+                parsed.genreIds.map((genreId) => ({ livreId: id, genreId })),
+            );
     }
 
+    await createLog({ action: 'livre.create', entityType: 'livre', entityId: id, entityLabel: parsed.titre });
     revalidatePath('/admin/livres');
     revalidateTag('livres', { expire: 0 });
     redirect('/admin/livres');
 }
 
-export async function updateLivre(id: number, formData: FormData) {
+export async function updateLivre(id: string, formData: FormData) {
     await requireAdmin();
     const parsed = parseFormData(formData);
 
@@ -144,22 +148,27 @@ export async function updateLivre(id: number, formData: FormData) {
     if (parsed.genreIds.length > 0) {
         await db
             .insert(livresGenres)
-            .values(parsed.genreIds.map((genreId) => ({ livreId: id, genreId })));
+            .values(
+                parsed.genreIds.map((genreId) => ({ livreId: id, genreId })),
+            );
     }
 
+    await createLog({ action: 'livre.update', entityType: 'livre', entityId: id, entityLabel: parsed.titre });
     revalidatePath('/admin/livres');
     revalidateTag('livres', { expire: 0 });
     redirect('/admin/livres');
 }
 
-export async function deleteLivre(id: number) {
+export async function deleteLivre(id: string) {
     await requireAdmin();
+    const row = await db.select({ titre: livres.titre }).from(livres).where(eq(livres.id, id)).limit(1).then((r) => r[0]);
     await db.delete(livres).where(eq(livres.id, id));
+    await createLog({ action: 'livre.delete', entityType: 'livre', entityId: id, entityLabel: row?.titre });
     revalidatePath('/admin/livres');
     revalidateTag('livres', { expire: 0 });
 }
 
-export async function updateStock(id: number, stock: number) {
+export async function updateStock(id: string, stock: number) {
     await requireAdmin();
     await db
         .update(livres)
@@ -215,7 +224,9 @@ export async function getLivres(
             format: livres.format,
             choixLibrairie: livres.choixLibrairie,
             stock: livres.stock,
-            genreNom: sql<string | null>`(SELECT g.nom FROM livres_genres lg JOIN genres g ON g.id = lg.genre_id WHERE lg.livre_id = ${livres.id} ORDER BY lg.genre_id LIMIT 1)`,
+            genreNom: sql<
+                string | null
+            >`(SELECT g.nom FROM livres_genres lg JOIN genres g ON g.id = lg.genre_id WHERE lg.livre_id = ${livres.id} ORDER BY lg.genre_id LIMIT 1)`,
             rayonNom: rayons.nom,
             createdAt: livres.createdAt,
         })
@@ -229,7 +240,7 @@ export async function getLivres(
     return query;
 }
 
-export async function getLivre(id: number) {
+export async function getLivre(id: string) {
     return db
         .select()
         .from(livres)
@@ -246,7 +257,7 @@ export async function getRayons() {
     return db.select().from(rayons).orderBy(rayons.nom);
 }
 
-export async function getLivreGenreIds(livreId: number): Promise<number[]> {
+export async function getLivreGenreIds(livreId: string): Promise<string[]> {
     const rows = await db
         .select({ genreId: livresGenres.genreId })
         .from(livresGenres)
