@@ -44,7 +44,20 @@ services:
             - minio_data:/data
         restart: unless-stopped
 
+    libretranslate:
+        image: libretranslate/libretranslate:latest
+        container_name: leb-libretranslate
+        restart: unless-stopped
+        ports:
+            - '5000:5000'
+        environment:
+            LT_LOAD_ONLY: 'en,fr'
+            LT_UPDATE_MODELS: 'true'
+        volumes:
+            - libretranslate_data:/home/libretranslate/.local/share/argos-translate
+
 volumes:
     postgres_data:
     portainer_data:
     minio_data:
+    libretranslate_data:

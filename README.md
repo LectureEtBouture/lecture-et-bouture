@@ -51,11 +51,12 @@ npm run dev
 
 ## URLs
 
-| Service   | URL                    |
-| --------- | ---------------------- |
-| App       | https://localhost:3000 |
-| Adminer   | http://localhost:8080  |
-| Portainer | http://localhost:9000  |
+| Service        | URL                    |
+| -------------- | ---------------------- |
+| App            | https://localhost:3000 |
+| Adminer        | http://localhost:8080  |
+| Portainer      | http://localhost:9000  |
+| LibreTranslate | http://localhost:5000  |
 
 **Adminer** : serveur `leb-db` · user `leb` · password `leb` · db `leb`
 
