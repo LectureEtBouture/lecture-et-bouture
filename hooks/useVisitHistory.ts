@@ -45,9 +45,9 @@ export function addVisit(visit: Omit<Visit, 'visitedAt'>) {
 }
 
 export function removeVisit(type: Visit['type'], slug: string) {
-    writeHistory(readHistory().filter(
-        (v) => !(v.type === type && v.slug === slug),
-    ));
+    writeHistory(
+        readHistory().filter((v) => !(v.type === type && v.slug === slug)),
+    );
 }
 
 export function clearHistory() {

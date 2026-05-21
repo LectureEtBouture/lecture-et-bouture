@@ -12,7 +12,10 @@ async function validateCoverUrl(url: string): Promise<boolean> {
     try {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), 3000);
-        const res = await fetch(url, { method: 'HEAD', signal: controller.signal });
+        const res = await fetch(url, {
+            method: 'HEAD',
+            signal: controller.signal,
+        });
         clearTimeout(timer);
         if (!res.ok) return false;
         const len = res.headers.get('content-length');

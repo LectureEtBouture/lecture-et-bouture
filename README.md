@@ -86,14 +86,14 @@ npm run dev
 
 ## URLs
 
-| Service        | URL                          |
-| -------------- | ---------------------------- |
-| App            | https://localhost:3000       |
-| Back-office    | https://localhost:3000/admin |
-| Adminer        | http://localhost:8080        |
-| Portainer      | http://localhost:9000        |
-| MinIO console  | http://localhost:9101        |
-| MinIO API      | http://localhost:9100        |
+| Service       | URL                          |
+| ------------- | ---------------------------- |
+| App           | https://localhost:3000       |
+| Back-office   | https://localhost:3000/admin |
+| Adminer       | http://localhost:8080        |
+| Portainer     | http://localhost:9000        |
+| MinIO console | http://localhost:9101        |
+| MinIO API     | http://localhost:9100        |
 
 **Adminer** : serveur `leb-db` · user `leb` · password `leb` · db `leb`
 

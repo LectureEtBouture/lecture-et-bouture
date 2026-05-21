@@ -36,7 +36,9 @@ export function VusRecemment() {
                             >
                                 <div
                                     className="aspect-book w-full relative overflow-hidden"
-                                    style={{ backgroundColor: visit.coverColor }}
+                                    style={{
+                                        backgroundColor: visit.coverColor,
+                                    }}
                                 >
                                     {visit.image && (
                                         <Image

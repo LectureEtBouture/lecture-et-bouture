@@ -11,7 +11,13 @@ export function LivreFormLibrairie({ livre }: { livre?: Livre }) {
     return (
         <details
             className={fieldsetClass}
-            open={!!(livre?.choixLibrairie || livre?.noteDeLaLibrairie || livre?.image)}
+            open={
+                !!(
+                    livre?.choixLibrairie ||
+                    livre?.noteDeLaLibrairie ||
+                    livre?.image
+                )
+            }
         >
             <summary className="list-none cursor-pointer flex items-center gap-2 select-none text-xs font-medium text-foreground uppercase tracking-widest [&::-webkit-details-marker]:hidden">
                 <span className="text-[8px] text-muted [[open]_&]:rotate-90 transition-transform duration-150">
