@@ -9,7 +9,12 @@ export async function traduire(
     const response = await fetch(`${LT_URL}/translate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ q: texte, source, target: cible, format: 'text' }),
+        body: JSON.stringify({
+            q: texte,
+            source,
+            target: cible,
+            format: 'text',
+        }),
     });
     if (!response.ok) throw new Error(`LibreTranslate ${response.status}`);
     const data = await response.json();

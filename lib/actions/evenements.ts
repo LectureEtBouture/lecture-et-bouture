@@ -53,7 +53,11 @@ export async function createEvenement(formData: FormData) {
         dateDebut: parsed.dateDebut,
         dateFin: parsed.dateFin ?? null,
     });
-    await createLog({ action: 'evenement.create', entityType: 'evenement', entityLabel: parsed.titre });
+    await createLog({
+        action: 'evenement.create',
+        entityType: 'evenement',
+        entityLabel: parsed.titre,
+    });
     revalidatePath('/admin/evenements');
     redirect('/admin/evenements');
 }
@@ -74,16 +78,31 @@ export async function updateEvenement(id: string, formData: FormData) {
             updatedAt: new Date(),
         })
         .where(eq(evenements.id, id));
-    await createLog({ action: 'evenement.update', entityType: 'evenement', entityId: id, entityLabel: parsed.titre });
+    await createLog({
+        action: 'evenement.update',
+        entityType: 'evenement',
+        entityId: id,
+        entityLabel: parsed.titre,
+    });
     revalidatePath('/admin/evenements');
     redirect('/admin/evenements');
 }
 
 export async function deleteEvenement(id: string) {
     await requireAdmin();
-    const row = await db.select({ titre: evenements.titre }).from(evenements).where(eq(evenements.id, id)).limit(1).then((r) => r[0]);
+    const row = await db
+        .select({ titre: evenements.titre })
+        .from(evenements)
+        .where(eq(evenements.id, id))
+        .limit(1)
+        .then((r) => r[0]);
     await db.delete(evenements).where(eq(evenements.id, id));
-    await createLog({ action: 'evenement.delete', entityType: 'evenement', entityId: id, entityLabel: row?.titre });
+    await createLog({
+        action: 'evenement.delete',
+        entityType: 'evenement',
+        entityId: id,
+        entityLabel: row?.titre,
+    });
     revalidatePath('/admin/evenements');
 }
 
@@ -100,7 +119,12 @@ export async function toggleEvenementPublie(id: string) {
         .update(evenements)
         .set({ publie: !row.publie, updatedAt: new Date() })
         .where(eq(evenements.id, id));
-    await createLog({ action: row.publie ? 'evenement.depublier' : 'evenement.publier', entityType: 'evenement', entityId: id, entityLabel: row.titre });
+    await createLog({
+        action: row.publie ? 'evenement.depublier' : 'evenement.publier',
+        entityType: 'evenement',
+        entityId: id,
+        entityLabel: row.titre,
+    });
     revalidatePath('/admin/evenements');
 }
 

@@ -1,10 +1,18 @@
 // Livres — couleurs de couverture par genre (palette fixe, assignée par UUID hash)
 const COVER_PALETTE = [
-    '#c2c8cc', '#b8c9b0', '#ccc5b0', '#c8bcb8',
-    '#afc8c3', '#cdc3a4', '#b4bdc8', '#bfb4c8',
+    '#c2c8cc',
+    '#b8c9b0',
+    '#ccc5b0',
+    '#c8bcb8',
+    '#afc8c3',
+    '#cdc3a4',
+    '#b4bdc8',
+    '#bfb4c8',
 ];
 
-export function getCoverColor(genreId: string | number | null | undefined): string {
+export function getCoverColor(
+    genreId: string | number | null | undefined,
+): string {
     if (!genreId) return '#e8e5dc';
     // Déterministe : dernier chars du UUID → index dans palette
     const str = String(genreId);

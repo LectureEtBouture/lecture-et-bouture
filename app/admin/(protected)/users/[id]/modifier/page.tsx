@@ -11,7 +11,10 @@ const ALL_ROLES = [
 ] as const;
 
 const ADMIN_ROLES = ALL_ROLES.filter(
-    (r) => r.value === 'editor' || r.value === 'moderator' || r.value === 'contributor',
+    (r) =>
+        r.value === 'editor' ||
+        r.value === 'moderator' ||
+        r.value === 'contributor',
 );
 
 type Props = { params: Promise<{ id: string }> };
@@ -68,7 +71,8 @@ export default async function ModifierUtilisateurPage({ params }: Props) {
                     </select>
                 </div>
                 <p className="text-[11px] text-muted">
-                    Pour changer le mot de passe, utilisez le bouton &quot;Reset mdp&quot; sur la liste des utilisateurs.
+                    Pour changer le mot de passe, utilisez le bouton &quot;Reset
+                    mdp&quot; sur la liste des utilisateurs.
                 </p>
                 <div className="flex gap-3 pt-2">
                     <button

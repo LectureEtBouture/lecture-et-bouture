@@ -6,37 +6,30 @@ import type { SortLivres } from '@/lib/queries/livres';
 import type { GenreFacette, RayonFacette } from '@/lib/queries/livres-facets';
 import { RayonFilter } from './RayonFilter';
 import { GenreFilter } from './GenreFilter';
+import { CategorieFilter } from './CategorieFilter';
 import { LivresDropdownFilters } from './LivresDropdownFilters';
 import { LivresActiveFilters } from './LivresActiveFilters';
 
 interface Props {
     rayons: RayonFacette[];
     genres: GenreFacette[];
-    series: string[];
-    editeurs: string[];
-    formats: string[];
     activeRayonId?: string;
     activeGenreId?: string;
-    activeSerie?: string;
-    activeEditeur?: string;
-    activeFormat?: string;
     activeSort?: SortLivres;
     activeChoixLibrairie?: boolean;
+    activeCat?: string;
+    activeEbook?: boolean;
 }
 
 export function FilterBar({
     rayons,
     genres,
-    series,
-    editeurs,
-    formats,
     activeRayonId,
     activeGenreId,
-    activeSerie,
-    activeEditeur,
-    activeFormat,
     activeSort,
     activeChoixLibrairie,
+    activeCat,
+    activeEbook,
 }: Props) {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -67,14 +60,10 @@ export function FilterBar({
                 activeChoixLibrairie={activeChoixLibrairie}
                 push={push}
             />
+            <CategorieFilter activeCat={activeCat} push={push} />
             <LivresDropdownFilters
-                series={series}
-                editeurs={editeurs}
-                formats={formats}
-                activeSerie={activeSerie}
-                activeEditeur={activeEditeur}
-                activeFormat={activeFormat}
                 activeSort={activeSort}
+                activeEbook={activeEbook}
                 push={push}
             />
             <LivresActiveFilters
@@ -82,10 +71,8 @@ export function FilterBar({
                 genres={genres}
                 activeRayonId={activeRayonId}
                 activeGenreId={activeGenreId}
-                activeSerie={activeSerie}
-                activeEditeur={activeEditeur}
-                activeFormat={activeFormat}
                 activeChoixLibrairie={activeChoixLibrairie}
+                activeCat={activeCat}
                 push={push}
                 onReset={() => router.push('/livres')}
             />

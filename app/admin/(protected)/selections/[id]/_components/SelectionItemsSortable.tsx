@@ -26,7 +26,7 @@ import {
 type Item = {
     id: string;
     type: string;
-    livreTitre: string | null;
+    livreUri: string | null;
     planteNom: string | null;
 };
 
@@ -64,7 +64,7 @@ function SortableItem({
         transition,
         isDragging,
     } = useSortable({ id: item.id });
-    const label = item.type === 'livre' ? item.livreTitre : item.planteNom;
+    const label = item.type === 'livre' ? item.livreUri : item.planteNom;
 
     return (
         <div

@@ -64,27 +64,14 @@ export const rayons = pgTable('rayons', {
 
 export const livres = pgTable('livres', {
     id: uuid('id').primaryKey().defaultRandom(),
-    slug: varchar('slug', { length: 200 }).notNull().unique(),
-    titre: varchar('titre', { length: 300 }).notNull(),
-    auteur: varchar('auteur', { length: 200 }).notNull(),
-    isbn: varchar('isbn', { length: 20 }),
+    inventaireUri: text('inventaire_uri').notNull().unique(),
+    titre: text('titre'),
     rayonId: uuid('rayon_id').references(() => rayons.id),
-    editeur: varchar('editeur', { length: 200 }),
-    collection: varchar('collection', { length: 200 }),
-    format: varchar('format', { length: 100 }),
-    edition: varchar('edition', { length: 100 }),
-    anneePublication: integer('annee_publication'),
-    serie: varchar('serie', { length: 200 }),
-    numeroSerie: integer('numero_serie'),
-    prix: decimal('prix', { precision: 8, scale: 2 }).notNull(),
-    description: text('description'),
-    image: text('image'),
-    imageAlt: text('image_alt'),
-    noteMoyenne: decimal('note_moyenne', { precision: 3, scale: 2 }),
+    prix: decimal('prix', { precision: 8, scale: 2 }),
     choixLibrairie: boolean('choix_librairie').notNull().default(false),
-    stock: integer('stock').notNull().default(0),
     noteDeLaLibrairie: text('note_de_la_librairie'),
-    publishedAt: timestamp('published_at'),
+    numeroSerie: integer('numero_serie'),
+    noteMoyenne: decimal('note_moyenne', { precision: 3, scale: 2 }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -210,7 +197,9 @@ export const parametres = pgTable('parametres', {
 
 export const adminLogs = pgTable('admin_logs', {
     id: uuid('id').primaryKey().defaultRandom(),
-    userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+    userId: uuid('user_id').references(() => users.id, {
+        onDelete: 'set null',
+    }),
     userEmail: varchar('user_email', { length: 200 }).notNull(),
     action: varchar('action', { length: 100 }).notNull(),
     entityType: varchar('entity_type', { length: 50 }),

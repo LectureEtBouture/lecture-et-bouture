@@ -80,7 +80,8 @@ export default async function ParametresPage() {
             <section id="qrcode" className={sectionCls}>
                 <h2 className={headingCls}>QR Code</h2>
                 <p className="text-sm text-muted">
-                    Générez un QR code pointant vers n&apos;importe quelle page du site.
+                    Générez un QR code pointant vers n&apos;importe quelle page
+                    du site.
                 </p>
                 <QRCodeSection defaultUrl={storeConfig.url} />
             </section>

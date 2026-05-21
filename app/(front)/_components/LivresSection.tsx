@@ -1,11 +1,11 @@
 import Link from 'next/link';
 import { LivreCard } from '@/components/ui/LivreCard';
-import type { LivrePublique } from '@/lib/queries/livres';
+import type { LivreComplet } from '@/lib/queries/livres';
 
 interface Props {
     titre: string;
     description: string;
-    livres: LivrePublique[];
+    livres: LivreComplet[];
     href: string;
 }
 
@@ -32,7 +32,7 @@ export function LivresSection({ titre, description, livres, href }: Props) {
 
                 <div className="flex gap-5 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     {livres.map((livre) => (
-                        <div key={livre.id} className="flex-none w-40 sm:w-44">
+                        <div key={livre.inventaireUri} className="flex-none w-40 sm:w-44">
                             <LivreCard livre={livre} />
                         </div>
                     ))}

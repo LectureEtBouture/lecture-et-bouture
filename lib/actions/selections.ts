@@ -31,7 +31,11 @@ export async function createSelection(formData: FormData) {
         active: formData.get('active') === 'on',
     });
     await db.insert(selections).values({ ...parsed, ordre: existingCount });
-    await createLog({ action: 'selection.create', entityType: 'selection', entityLabel: parsed.titre });
+    await createLog({
+        action: 'selection.create',
+        entityType: 'selection',
+        entityLabel: parsed.titre,
+    });
     revalidatePath('/admin/selections');
     revalidatePath('/selections');
     redirect('/admin/selections');
@@ -53,7 +57,12 @@ export async function updateSelection(id: string, formData: FormData) {
             updatedAt: new Date(),
         })
         .where(eq(selections.id, id));
-    await createLog({ action: 'selection.update', entityType: 'selection', entityId: id, entityLabel: parsed.titre });
+    await createLog({
+        action: 'selection.update',
+        entityType: 'selection',
+        entityId: id,
+        entityLabel: parsed.titre,
+    });
     revalidatePath('/admin/selections');
     revalidatePath('/selections');
     redirect('/admin/selections');
@@ -61,9 +70,19 @@ export async function updateSelection(id: string, formData: FormData) {
 
 export async function deleteSelection(id: string) {
     await requireAdmin();
-    const row = await db.select({ titre: selections.titre }).from(selections).where(eq(selections.id, id)).limit(1).then((r) => r[0]);
+    const row = await db
+        .select({ titre: selections.titre })
+        .from(selections)
+        .where(eq(selections.id, id))
+        .limit(1)
+        .then((r) => r[0]);
     await db.delete(selections).where(eq(selections.id, id));
-    await createLog({ action: 'selection.delete', entityType: 'selection', entityId: id, entityLabel: row?.titre });
+    await createLog({
+        action: 'selection.delete',
+        entityType: 'selection',
+        entityId: id,
+        entityLabel: row?.titre,
+    });
     revalidatePath('/admin/selections');
     revalidatePath('/selections');
 }
@@ -174,7 +193,7 @@ export async function getSelectionWithItems(id: string) {
             ordre: selectionItems.ordre,
             livreId: selectionItems.livreId,
             planteId: selectionItems.planteId,
-            livreTitre: livres.titre,
+            livreUri: livres.inventaireUri,
             planteNom: plantes.nom,
         })
         .from(selectionItems)

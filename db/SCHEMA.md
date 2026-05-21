@@ -10,7 +10,7 @@ Genres littéraires (Philosophie, Botanique, etc.).
 
 | Colonne | Type         | Contraintes      |
 | ------- | ------------ | ---------------- |
-| id      | serial       | PK               |
+| id      | uuid         | PK, DEFAULT gen_random_uuid() |
 | nom     | varchar(100) | NOT NULL         |
 | slug    | varchar(100) | NOT NULL, UNIQUE |
 
@@ -20,41 +20,40 @@ Rayons thématiques (Sciences & Nature, Imaginaire, etc.) — catégories de nav
 
 | Colonne     | Type         | Contraintes      |
 | ----------- | ------------ | ---------------- |
-| id          | serial       | PK               |
+| id          | uuid         | PK               |
 | nom         | varchar(150) | NOT NULL         |
 | slug        | varchar(150) | NOT NULL, UNIQUE |
 | description | text         | nullable         |
 
 ### `livres`
 
-Catalogue livres.
+Table d'**enrichissements** principalement. Les métadonnées catalogue (auteur, isbn, éditeur, description, image…) sont gérées par l'API externe (Google Books / inventaire.io). Seul `titre` est dénormalisé localement à des fins d'affichage BO (évite un appel API sur chaque page liste/modifier).
 
-| Colonne              | Type         | Contraintes                        |
-| -------------------- | ------------ | ---------------------------------- |
-| id                   | serial       | PK                                 |
-| slug                 | varchar(200) | NOT NULL, UNIQUE                   |
-| titre                | varchar(300) | NOT NULL                           |
-| auteur               | varchar(200) | NOT NULL                           |
-| isbn                 | varchar(20)  | nullable                           |
-| genre_id             | integer      | FK → genres.id                     |
-| rayon_id             | integer      | FK → rayons.id                     |
-| editeur              | varchar(200) | nullable                           |
-| collection           | varchar(200) | nullable                           |
-| format               | varchar(100) | nullable (relié / poche / broché…) |
-| edition              | varchar(100) | nullable                           |
-| annee_publication    | integer      | nullable                           |
-| serie                | varchar(200) | nullable                           |
-| numero_serie         | integer      | nullable                           |
-| prix                 | numeric(8,2) | NOT NULL                           |
-| description          | text         | nullable                           |
-| image                | text         | nullable (URL)                     |
-| note_moyenne         | numeric(3,2) | nullable                           |
-| choix_librairie      | boolean      | NOT NULL, DEFAULT false            |
-| stock                | integer      | NOT NULL, DEFAULT 0                |
-| note_de_la_librairie | text         | nullable                           |
-| published_at         | timestamp    | nullable                           |
-| created_at           | timestamp    | NOT NULL, DEFAULT now()            |
-| updated_at           | timestamp    | NOT NULL, DEFAULT now()            |
+| Colonne              | Type         | Contraintes                                    |
+| -------------------- | ------------ | ---------------------------------------------- |
+| id                   | uuid         | PK                                             |
+| inventaire_uri       | text         | NOT NULL, UNIQUE — ex: `isbn:9782070347858`    |
+| titre                | text         | nullable (snapshot, renseigné au save du form) |
+| rayon_id             | uuid         | FK → rayons.id, nullable                       |
+| prix                 | numeric(8,2) | nullable (indicatif, surchargeable)            |
+| choix_librairie      | boolean      | NOT NULL, DEFAULT false                        |
+| note_de_la_librairie | text         | nullable                                       |
+| numero_serie         | integer      | nullable                                       |
+| note_moyenne         | numeric(3,2) | nullable                                       |
+| created_at           | timestamp    | NOT NULL, DEFAULT now()                        |
+| updated_at           | timestamp    | NOT NULL, DEFAULT now()                        |
+
+> Slugs publics dérivés de `inventaire_uri` : `isbn:9782070347858` → slug `9782070347858`, `wd:Q43361` → slug `wd-Q43361`. Logique dans `lib/services/books/slug.ts`.
+
+### `livres_genres`
+
+Relation N-N livres ↔ genres.
+
+| Colonne  | Type | Contraintes                              |
+| -------- | ---- | ---------------------------------------- |
+| livre_id | uuid | NOT NULL, FK → livres.id (CASCADE DELETE) |
+| genre_id | uuid | NOT NULL, FK → genres.id (CASCADE DELETE) |
+| PK       | —    | (livre_id, genre_id)                     |
 
 ### `plantes`
 
@@ -62,7 +61,7 @@ Catalogue boutures / plantes.
 
 | Colonne              | Type                                              | Contraintes             |
 | -------------------- | ------------------------------------------------- | ----------------------- |
-| id                   | serial                                            | PK                      |
+| id                   | uuid                                              | PK                      |
 | slug                 | varchar(200)                                      | NOT NULL, UNIQUE        |
 | nom                  | varchar(200)                                      | NOT NULL                |
 | espece               | varchar(200)                                      | nullable                |
@@ -73,7 +72,8 @@ Catalogue boutures / plantes.
 | difficulte           | enum(facile, moyen, difficile)                    | nullable                |
 | lumiere              | enum(ombre, mi-ombre, lumiere-vive, plein-soleil) | nullable                |
 | arrosage             | enum(rare, modere, regulier, abondant)            | nullable                |
-| image                | text                                              | nullable (URL)          |
+| image                | text                                              | nullable (chemin MinIO) |
+| image_alt            | text                                              | nullable                |
 | note_moyenne         | numeric(3,2)                                      | nullable                |
 | choix_librairie      | boolean                                           | NOT NULL, DEFAULT false |
 | stock                | integer                                           | NOT NULL, DEFAULT 0     |
@@ -87,11 +87,11 @@ Avis clients — livres et boutures.
 
 | Colonne     | Type         | Contraintes                            |
 | ----------- | ------------ | -------------------------------------- |
-| id          | serial       | PK                                     |
+| id          | uuid         | PK                                     |
 | type        | text         | NOT NULL — `'livre'` ou `'bouture'`    |
-| livre_id    | integer      | nullable                               |
-| bouture_id  | integer      | nullable                               |
-| produit_nom | varchar(300) | nullable (snapshot au moment du dépôt) |
+| livre_id    | uuid         | nullable (pas de FK — avis orphelins OK) |
+| bouture_id  | uuid         | nullable                               |
+| produit_nom | varchar(300) | nullable (snapshot au dépôt)           |
 | auteur_nom  | varchar(100) | NOT NULL                               |
 | note        | integer      | NOT NULL (1–5)                         |
 | texte       | text         | nullable                               |
@@ -99,7 +99,7 @@ Avis clients — livres et boutures.
 | masque      | boolean      | NOT NULL, DEFAULT false                |
 | created_at  | timestamp    | NOT NULL, DEFAULT now()                |
 
-> `livre_id` et `bouture_id` n'ont pas de FK (supprimées en migration 0001 pour permettre des avis orphelins si le produit est retiré).
+> `livre_id` FK → `livres.id`. Lors d'un dépôt d'avis public, si aucune ligne `livres` n'existe pour cet `inventaire_uri`, `getOrCreateEnrichissement()` en crée une minimale automatiquement. `bouture_id` sans FK — permet des avis orphelins si la bouture est retirée.
 
 ### `evenements`
 
@@ -107,12 +107,15 @@ Agenda de la librairie.
 
 | Colonne     | Type         | Contraintes             |
 | ----------- | ------------ | ----------------------- |
-| id          | serial       | PK                      |
+| id          | uuid         | PK                      |
 | titre       | varchar(300) | NOT NULL                |
 | description | text         | nullable                |
 | lieu        | varchar(300) | nullable                |
 | date_debut  | timestamp    | NOT NULL                |
 | date_fin    | timestamp    | nullable                |
+| publie      | boolean      | NOT NULL, DEFAULT true  |
+| image       | text         | nullable (chemin MinIO) |
+| image_alt   | text         | nullable                |
 | created_at  | timestamp    | NOT NULL, DEFAULT now() |
 | updated_at  | timestamp    | NOT NULL, DEFAULT now() |
 
@@ -122,7 +125,7 @@ Sélections du conservateur — listes curatées mixant livres et boutures.
 
 | Colonne     | Type         | Contraintes                                |
 | ----------- | ------------ | ------------------------------------------ |
-| id          | serial       | PK                                         |
+| id          | uuid         | PK                                         |
 | titre       | varchar(200) | NOT NULL                                   |
 | description | text         | nullable                                   |
 | ordre       | integer      | NOT NULL, DEFAULT 0                        |
@@ -134,40 +137,83 @@ Sélections du conservateur — listes curatées mixant livres et boutures.
 
 Items d'une sélection (livre ou plante).
 
-| Colonne      | Type                | Contraintes                                   |
-| ------------ | ------------------- | --------------------------------------------- |
-| id           | serial              | PK                                            |
-| selection_id | integer             | NOT NULL, FK → selections.id (CASCADE DELETE) |
-| type         | enum(livre, plante) | NOT NULL                                      |
-| livre_id     | integer             | nullable, FK → livres.id (CASCADE DELETE)     |
-| plante_id    | integer             | nullable, FK → plantes.id (CASCADE DELETE)    |
-| ordre        | integer             | NOT NULL, DEFAULT 0                           |
+| Colonne      | Type                | Contraintes                                    |
+| ------------ | ------------------- | ---------------------------------------------- |
+| id           | uuid                | PK                                             |
+| selection_id | uuid                | NOT NULL, FK → selections.id (CASCADE DELETE)  |
+| type         | enum(livre, plante) | NOT NULL                                       |
+| livre_id     | uuid                | nullable, FK → livres.id (CASCADE DELETE)      |
+| plante_id    | uuid                | nullable, FK → plantes.id (CASCADE DELETE)     |
+| ordre        | integer             | NOT NULL, DEFAULT 0                            |
 
-### `admin_users`
+### `pages_editoriales`
+
+Pages de contenu éditorial (concept, mentions légales, CGV…).
+
+| Colonne    | Type         | Contraintes             |
+| ---------- | ------------ | ----------------------- |
+| slug       | varchar(100) | PK                      |
+| titre      | varchar(200) | NOT NULL                |
+| contenu    | text         | nullable (HTML Tiptap)  |
+| publiee    | boolean      | NOT NULL, DEFAULT true  |
+| updated_at | timestamp    | NOT NULL, DEFAULT now() |
+
+### `parametres`
+
+Table clé-valeur pour la configuration librairie (horaires, annonce, réseaux sociaux, maintenance…).
+
+| Colonne    | Type         | Contraintes             |
+| ---------- | ------------ | ----------------------- |
+| cle        | varchar(100) | PK                      |
+| valeur     | text         | NOT NULL                |
+| updated_at | timestamp    | NOT NULL, DEFAULT now() |
+
+### `users`
 
 Comptes back-office.
 
-| Colonne       | Type         | Contraintes             |
-| ------------- | ------------ | ----------------------- |
-| id            | serial       | PK                      |
-| email         | varchar(200) | NOT NULL, UNIQUE        |
-| password_hash | varchar(255) | NOT NULL (Argon2id)     |
-| created_at    | timestamp    | NOT NULL, DEFAULT now() |
+| Colonne               | Type                | Contraintes                          |
+| --------------------- | ------------------- | ------------------------------------ |
+| id                    | uuid                | PK                                   |
+| email                 | varchar(200)        | NOT NULL, UNIQUE                     |
+| password_hash         | varchar(255)        | NOT NULL (Argon2id)                  |
+| role                  | enum(role_utilisateur) | NOT NULL, DEFAULT 'admin'         |
+| reset_token           | varchar(255)        | nullable                             |
+| reset_token_expires_at| timestamp           | nullable                             |
+| created_at            | timestamp           | NOT NULL, DEFAULT now()              |
+| updated_at            | timestamp           | NOT NULL, DEFAULT now()              |
+
+### `admin_logs`
+
+Journal d'actions back-office — FIFO 200 entrées.
+
+| Colonne      | Type         | Contraintes                              |
+| ------------ | ------------ | ---------------------------------------- |
+| id           | uuid         | PK                                       |
+| user_id      | uuid         | nullable, FK → users.id (ON DELETE SET NULL) |
+| user_email   | varchar(200) | NOT NULL (dénormalisé pour traçabilité)  |
+| action       | varchar(100) | NOT NULL (ex: `livre.create`)            |
+| entity_type  | varchar(50)  | nullable                                 |
+| entity_id    | varchar(36)  | nullable                                 |
+| entity_label | varchar(300) | nullable                                 |
+| created_at   | timestamp    | NOT NULL, DEFAULT now()                  |
+
+> FIFO : `createLog` supprime les entrées au-delà des 200 plus récentes après chaque insertion.
 
 ## Enums PostgreSQL
 
-| Nom                 | Valeurs                                                        |
-| ------------------- | -------------------------------------------------------------- |
-| `difficulte_plante` | facile, moyen, difficile                                       |
-| `lumiere_plante`    | ombre, mi-ombre, lumiere-vive, plein-soleil                    |
-| `arrosage_plante`   | rare, modere, regulier, abondant                               |
-| `avis_type`         | livre, plante — utilisé dans `selection_items.type` uniquement |
+| Nom                 | Valeurs                                                           |
+| ------------------- | ----------------------------------------------------------------- |
+| `difficulte_plante` | facile, moyen, difficile                                          |
+| `lumiere_plante`    | ombre, mi-ombre, lumiere-vive, plein-soleil                       |
+| `arrosage_plante`   | rare, modere, regulier, abondant                                  |
+| `avis_type`         | livre, plante — utilisé dans `selection_items.type` uniquement    |
+| `role_utilisateur`  | super_admin, admin, editor, moderator, contributor                |
 
 ## Commandes
 
 ```bash
-npm run db:generate    # Génère une migration Drizzle après modif du schéma
-npm run db:migrate     # Applique les migrations en attente
+npm run db:migrate     # Applique les migrations (idempotent, SQL brut)
 npm run db:seed        # Insère les données de seed (truncate + réinsert)
 npm run db:reset       # Reset complet : drop schéma → migrate → seed
 npm run db:studio      # Interface Drizzle Studio
@@ -175,7 +221,10 @@ npm run db:studio      # Interface Drizzle Studio
 
 ## Notes
 
+- PKs uuid sur toutes les tables — `gen_random_uuid()`.
+- `livres.inventaire_uri` — clé de liaison avec l'API externe (ex: `isbn:9782070347858`, `wd:Q43361`). NOT NULL UNIQUE.
+- `livres.titre` — dénormalisé pour le BO (liste + heading modifier), évite un appel API. NULL pour les livres créés avant la migration — fallback sur Google Books dans la liste admin.
+- `livres.prix` est stocké en `numeric(8,2)` — Drizzle le renvoie en string JavaScript. Nullable (indicatif, peut être surchargé par l'admin).
 - `selections.active = false` par défaut — une sélection est privée jusqu'à publication explicite.
-- `avis.masque` permet de masquer un avis sans le supprimer (différent de `approuve`).
-- `plantes.image` est une URL simple (texte) — pas de tableau. Les images boutures seront gérées via MinIO quand le module upload sera implémenté.
-- Les `prix` sont stockés en `numeric(8,2)` — Drizzle les renvoie en string JavaScript, pas en number.
+- `avis.masque` permet de masquer sans supprimer (distinct de `approuve`).
+- Images : chemin MinIO relatif (ex: `livres/mon-image.jpg`) ou URL externe. Résolu via `MINIO_PUBLIC_URL` dans `next.config.ts`.

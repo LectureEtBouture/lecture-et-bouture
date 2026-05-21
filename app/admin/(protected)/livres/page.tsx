@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
-import { getLivres, getRayons, type LivresSort } from '@/lib/actions/livres';
+import { getLivres, type LivresSort } from '@/lib/actions/livres';
+import { getRayons } from '@/lib/actions/livres-meta';
+import { bookProvider } from '@/lib/services/books';
 import { LivresSortFilter } from './_components/LivresSortFilter';
 import { LivresTable } from './_components/LivresTable';
 import { AdminSearchBar } from './_components/AdminSearchBar';
@@ -14,13 +16,7 @@ function buildHref(params: Record<string, string | undefined>) {
     return qs ? `/admin/livres?${qs}` : '/admin/livres';
 }
 
-const VALID_SORTS: LivresSort[] = [
-    'recent',
-    'titre',
-    'auteur',
-    'prix',
-    'stock',
-];
+const VALID_SORTS: LivresSort[] = ['recent', 'choix'];
 
 export default async function AdminLivresPage({
     searchParams,
@@ -39,9 +35,14 @@ export default async function AdminLivresPage({
     const choix = choixParam === '1';
 
     const [data, rayonsList] = await Promise.all([
-        getLivres(sort, { choix: choix || undefined, rayon, search: q }),
+        getLivres(sort, { choix: choix || undefined, search: q }),
         getRayons(),
     ]);
+
+    const uris = data.map((livre) => livre.inventaireUri);
+    const bookMetas = uris.length > 0
+        ? await bookProvider.rechercherParUris(uris)
+        : new Map<string, { titre: string | null; imageUrl: string | null }>();
 
     return (
         <div className="space-y-6">
@@ -72,7 +73,7 @@ export default async function AdminLivresPage({
                 rayonsList={rayonsList}
                 buildHref={buildHref}
             />
-            <LivresTable data={data} />
+            <LivresTable data={data} bookMetas={bookMetas} />
         </div>
     );
 }

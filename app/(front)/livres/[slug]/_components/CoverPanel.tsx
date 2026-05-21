@@ -1,48 +1,53 @@
 import Image from 'next/image';
-import type { LivrePublique } from '@/lib/queries/livres';
-
-function capitalize(str: string) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
+import type { LivreComplet } from '@/lib/queries/livres';
+import { uriToISBN } from '@/lib/services/books/slug';
 
 export function CoverPanel({
     livre,
     coverColor,
     rayon,
 }: {
-    livre: LivrePublique;
+    livre: LivreComplet;
     coverColor: string;
     rayon?: { nom: string };
 }) {
-    const mainImage = livre.image ?? null;
+    const isbn = uriToISBN(livre.inventaireUri) ?? livre.isbn;
+    const achatUrl = isbn
+        ? `https://www.leslibraires.fr/recherche/?q=${isbn}`
+        : `https://www.leslibraires.fr/recherche/?q=${encodeURIComponent(livre.titre)}`;
+
+    function formatDate(raw: string | null | undefined): string | null {
+        if (!raw) return null;
+        const parts = raw.split('-');
+        if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        if (parts.length === 2) return `${parts[1]}/${parts[0]}`;
+        return raw;
+    }
 
     const rawFields: { label: string; value: string | null | undefined }[] = [
-        { label: 'Prix', value: `${livre.prix} €` },
+        ...(livre.prix
+            ? [{ label: 'Prix', value: `${livre.prix} € (indicatif)` }]
+            : []),
+        ...(livre.prixNumerique
+            ? [{ label: 'Ebook', value: `${livre.prixNumerique.toFixed(2)} €` }]
+            : []),
         ...(rayon ? [{ label: 'Rayon', value: rayon.nom }] : []),
         { label: 'Éditeur', value: livre.editeur },
-        ...(livre.collection
-            ? [{ label: 'Collection', value: livre.collection }]
+        ...(livre.publishedDateRaw
+            ? [{ label: 'Publication', value: formatDate(livre.publishedDateRaw) }]
+            : livre.anneePublication
+              ? [{ label: 'Publication', value: String(livre.anneePublication) }]
+              : []),
+        ...(livre.nombrePages
+            ? [{ label: 'Pages', value: String(livre.nombrePages) }]
             : []),
-        ...(livre.format
-            ? [{ label: 'Format', value: capitalize(livre.format) }]
-            : []),
-        ...(livre.anneePublication
-            ? [{ label: 'Publication', value: String(livre.anneePublication) }]
-            : []),
-        { label: 'ISBN', value: livre.isbn },
-        ...(livre.edition ? [{ label: 'Édition', value: livre.edition }] : []),
+        { label: 'ISBN', value: isbn },
         ...(livre.serie
-            ? [
-                  {
-                      label: 'Série',
-                      value: `${livre.serie} · Tome ${livre.numeroSerie}`,
-                  },
-              ]
+            ? [{ label: 'Série', value: `${livre.serie} · Tome ${livre.numeroSerie}` }]
             : []),
     ];
     const fields = rawFields.filter(
-        (field): field is { label: string; value: string } =>
-            field.value != null,
+        (field): field is { label: string; value: string } => field.value != null,
     );
 
     return (
@@ -51,9 +56,9 @@ export function CoverPanel({
                 className="aspect-book w-full relative overflow-hidden"
                 style={{ backgroundColor: coverColor }}
             >
-                {mainImage ? (
+                {livre.imageUrl ? (
                     <Image
-                        src={mainImage}
+                        src={livre.imageUrl}
                         alt={livre.titre}
                         fill
                         className="object-cover"
@@ -76,41 +81,52 @@ export function CoverPanel({
                 )}
             </div>
 
-            <div className="flex items-center gap-2.5">
-                <span
-                    className={`w-2 h-2 rounded-full shrink-0 ${livre.stock > 0 ? 'bg-primary' : 'bg-border'}`}
-                />
-                <span className="text-[10px] uppercase tracking-widest text-muted">
-                    {livre.stock > 0 ? 'Disponible en magasin' : 'Sur commande'}
-                </span>
-            </div>
-
-            <div className="space-y-3">
+            <div className="space-y-2">
                 <a
-                    href={`https://www.leslibraires.fr/recherche/?q=${encodeURIComponent(livre.titre + ' ' + livre.auteur)}`}
+                    href={achatUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block w-full py-3 bg-primary text-background text-xs uppercase tracking-widest text-center hover:bg-primary-light transition-colors"
                 >
                     Voir sur leslibraires.fr
                 </a>
-                <p className="text-xs text-muted text-center">
-                    Achat via notre librairie partenaire
+                {livre.previewLink && (
+                    <a
+                        href={livre.previewLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block w-full py-2.5 border border-border text-xs uppercase tracking-widest text-center text-muted hover:text-foreground hover:border-foreground transition-colors"
+                    >
+                        Aperçu Google Books
+                    </a>
+                )}
+                <p className="text-[10px] text-muted text-center leading-relaxed">
+                    Soutenez votre librairie indépendante
+                    <br />
+                    Lecture &amp; Bouture
                 </p>
             </div>
 
-            <dl className="space-y-2 border-t border-border pt-4">
-                {fields.map(({ label, value }) => (
-                    <div key={label} className="flex justify-between gap-4">
-                        <dt className="text-[10px] uppercase tracking-widest text-muted shrink-0">
-                            {label}
-                        </dt>
-                        <dd className="text-xs text-foreground text-right">
-                            {value}
-                        </dd>
-                    </div>
-                ))}
-            </dl>
+            {fields.length > 0 && (
+                <dl className="space-y-2 border-t border-border pt-4">
+                    {fields.map(({ label, value }) => (
+                        <div key={label} className="flex justify-between gap-4">
+                            <dt className="text-[10px] uppercase tracking-widest text-muted shrink-0">
+                                {label}
+                            </dt>
+                            <dd className="text-xs text-foreground text-right">
+                                {value}
+                            </dd>
+                        </div>
+                    ))}
+                </dl>
+            )}
+
+            {livre.isEbook && (
+                <p className="text-[10px] uppercase tracking-widest text-muted border-t border-border pt-4">
+                    Disponible en ebook
+                </p>
+            )}
         </div>
     );
 }

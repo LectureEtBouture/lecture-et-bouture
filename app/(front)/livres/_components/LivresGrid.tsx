@@ -3,39 +3,50 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { LivreCard } from '@/components/ui/LivreCard';
 import { loadMoreLivres } from '@/lib/actions/livres-publiques';
-import type { LivrePublique, LivresFilters } from '@/lib/queries/livres';
-
-const PAGE_SIZE = 24;
+import type { LivreComplet, LivresFilters } from '@/lib/queries/livres';
 
 type Genre = { id: string; nom: string };
+
+// Google Books always pages in 40-item chunks.
+// For cat browse, the offset must be a multiple of 40 regardless of how many
+// items survived the ebook filter — otherwise we'd re-fetch an overlapping slice.
+const API_PAGE_SIZE = 40;
 
 export function LivresGrid({
     initialItems,
     filters,
     genresList,
+    pageSize,
 }: {
-    initialItems: LivrePublique[];
+    initialItems: LivreComplet[];
     filters: LivresFilters;
     genresList: Genre[];
+    pageSize: number;
 }) {
-    const [items, setItems] = useState(initialItems);
+    const isCat = !!filters.cat;
+    const [items, setItems] = useState<LivreComplet[]>(initialItems);
     const [loading, setLoading] = useState(false);
-    const [hasMore, setHasMore] = useState(initialItems.length === PAGE_SIZE);
+    // For cat browse: assume more if we got any results (raw API may have filtered more).
+    // For regular browse: hasMore only if we filled the page exactly.
+    const [hasMore, setHasMore] = useState(
+        isCat ? initialItems.length > 0 : initialItems.length === pageSize,
+    );
     const sentinelRef = useRef<HTMLDivElement>(null);
     const loadingRef = useRef(false);
-    const offsetRef = useRef(initialItems.length);
+    // For cat browse, always step by API_PAGE_SIZE to avoid overlapping slices.
+    const offsetRef = useRef(isCat ? API_PAGE_SIZE : initialItems.length);
 
     const loadMore = useCallback(async () => {
         if (loadingRef.current || !hasMore) return;
         loadingRef.current = true;
         setLoading(true);
         const next = await loadMoreLivres(filters, offsetRef.current);
-        offsetRef.current += next.length;
-        if (next.length < PAGE_SIZE) setHasMore(false);
+        offsetRef.current += isCat ? API_PAGE_SIZE : next.length;
+        if (next.length === 0 || (!isCat && next.length < pageSize)) setHasMore(false);
         setItems((prev) => [...prev, ...next]);
         setLoading(false);
         loadingRef.current = false;
-    }, [filters, hasMore]);
+    }, [filters, hasMore, pageSize, isCat]);
 
     useEffect(() => {
         const sentinel = sentinelRef.current;
@@ -53,9 +64,9 @@ export function LivresGrid({
     return (
         <>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {items.map((livre) => (
+                {items.map((livre, i) => (
                     <LivreCard
-                        key={livre.id}
+                        key={`${livre.inventaireUri}-${i}`}
                         livre={livre}
                         genreNom={
                             genresList.find(
@@ -68,10 +79,20 @@ export function LivresGrid({
             <div
                 ref={sentinelRef}
                 aria-hidden="true"
-                className="h-16 flex items-center justify-center text-sm text-muted"
-            >
-                {loading && 'Chargement…'}
-            </div>
+                className="h-4"
+            />
+            {hasMore && (
+                <div className="flex justify-center pt-2">
+                    <button
+                        type="button"
+                        onClick={loadMore}
+                        disabled={loading}
+                        className="px-6 py-2 text-sm border border-border text-muted hover:border-primary hover:text-primary transition-colors disabled:opacity-50"
+                    >
+                        {loading ? 'Chargement…' : 'Charger plus'}
+                    </button>
+                </div>
+            )}
         </>
     );
 }

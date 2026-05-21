@@ -1,94 +1,37 @@
-import type { BookProvider, LivreMetadata } from '../types';
+import type { BookProvider, LivreMetadata, LivreSearchResult } from '../types';
 import { traduire } from '@/lib/services/libretranslate';
+import {
+    BASE_URL,
+    LANG_FR,
+    USER_AGENT,
+    normaliserISBN,
+    labelFr,
+    extractYear,
+    langCode,
+    resolveRedirect,
+    fetchInvEntities,
+    fetchOLDescription,
+    type InventaireEntity,
+    type InventaireResponse,
+} from './inventaire-helpers';
 
-const BASE_URL = 'https://inventaire.io';
-const OL_BASE = 'https://openlibrary.org';
-const LANG_FR = 'wd:Q150';
-
-type InventaireEntity = {
-    uri: string;
-    type: string;
-    labels: Record<string, string>;
-    descriptions?: Record<string, string>;
-    claims: Record<string, string[]>;
-    image?: { url: string };
-    originalLang?: string;
-};
-
-type InventaireResponse = {
-    entities: Record<string, InventaireEntity>;
-    redirects?: Record<string, string>;
-};
-
-function normaliserISBN(isbn: string): string {
-    return isbn.replace(/[-\s]/g, '');
-}
-
-function labelFr(entity: InventaireEntity | undefined): string | null {
-    if (!entity) return null;
-    return entity.labels?.fr ?? entity.labels?.en ?? null;
-}
-
-function extractYear(dateStr: string | undefined): number | null {
-    if (!dateStr) return null;
-    const year = parseInt(dateStr.slice(0, 4), 10);
-    return isNaN(year) ? null : year;
-}
-
-function langCode(wikidataLangUri: string): string {
-    const map: Record<string, string> = {
-        'wd:Q150': 'fr',
-        'wd:Q1860': 'en',
-        'wd:Q188': 'de',
-        'wd:Q1321': 'es',
-        'wd:Q652': 'it',
-        'wd:Q5146': 'pt',
-    };
-    return map[wikidataLangUri] ?? 'en';
-}
-
-async function fetchInvEntities(
-    uris: string[],
-): Promise<Record<string, InventaireEntity>> {
-    const url = `${BASE_URL}/api/entities/by-uris?uris=${uris.join('|')}`;
-    const res = await fetch(url, {
-        headers: { 'User-Agent': 'LectureEtBouture/1.0 (contact@lectureetboutures.fr)' },
-    });
-    if (!res.ok) throw new Error(`Inventaire ${res.status}`);
-    const data: InventaireResponse = await res.json();
-    return data.entities ?? {};
-}
-
-async function fetchOLDescription(olId: string): Promise<string | null> {
-    const res = await fetch(`${OL_BASE}/works/${olId}.json`, {
-        headers: { 'User-Agent': 'LectureEtBouture/1.0 (contact@lectureetboutures.fr)' },
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    const desc = data.description;
-    if (!desc) return null;
-    if (typeof desc === 'string') return desc;
-    if (typeof desc === 'object' && desc.value) return desc.value as string;
-    return null;
-}
-
-function resolveRedirect(
-    entities: Record<string, InventaireEntity>,
-    redirects: Record<string, string>,
-    uri: string,
-): InventaireEntity | null {
-    const resolved = redirects[uri] ?? uri;
-    return entities[resolved] ?? null;
+function entityToMeta(uri: string, entity: InventaireEntity): Partial<LivreMetadata> {
+    const titre = entity.claims['wdt:P1476']?.[0] ?? entity.labels?.fr ?? entity.labels?.en ?? null;
+    const anneePublication = extractYear(entity.claims['wdt:P577']?.[0]);
+    const imageUrl = entity.image?.url ? `${BASE_URL}${entity.image.url}` : null;
+    const isbn = entity.claims['wdt:P212']?.[0] ?? entity.claims['wdt:P957']?.[0] ?? null;
+    const description = entity.descriptions?.fr ?? entity.descriptions?.en ?? null;
+    return { sourceId: uri, titre, anneePublication, imageUrl, isbn, description };
 }
 
 export class InventaireProvider implements BookProvider {
     async rechercherParISBN(isbn: string): Promise<LivreMetadata | null> {
         const isbnUri = `isbn:${normaliserISBN(isbn)}`;
 
-        // Appel 1 : édition
-        const res1 = await fetch(`${BASE_URL}/api/entities/by-uris?uris=${isbnUri}`, {
-            headers: { 'User-Agent': 'LectureEtBouture/1.0 (contact@lectureetboutures.fr)' },
-        });
+        const res1 = await fetch(
+            `${BASE_URL}/api/entities/by-uris?uris=${isbnUri}`,
+            { headers: { 'User-Agent': USER_AGENT } },
+        );
         if (!res1.ok) throw new Error(`Inventaire ${res1.status}`);
         const data1: InventaireResponse = await res1.json();
         const edition = resolveRedirect(data1.entities, data1.redirects ?? {}, isbnUri);
@@ -109,12 +52,10 @@ export class InventaireProvider implements BookProvider {
         );
 
         if (toResolve.length === 0) {
-            return { sourceId, titre, auteur: null, editeur: null, anneePublication, serie: null, imageUrl, description: null };
+            return { sourceId, titre, auteur: null, isbn: normaliserISBN(isbn), editeur: null, anneePublication, publishedDateRaw: null, serie: null, imageUrl, description: null, language: null };
         }
 
-        // Appel 2 : éditeur + série + auteur + œuvre
         const resolved = await fetchInvEntities(toResolve);
-
         const editeur = labelFr(publisherUri ? resolved[publisherUri] : undefined);
         const serie = labelFr(seriesUri ? resolved[seriesUri] : undefined);
         let auteur = labelFr(authorUri ? resolved[authorUri] : undefined);
@@ -125,7 +66,6 @@ export class InventaireProvider implements BookProvider {
         const olId = work?.claims['wdt:P648']?.[0] ?? null;
         const wdDescription = work?.descriptions?.fr ?? work?.descriptions?.en ?? null;
 
-        // Appel 3 (conditionnel) : auteur depuis l'œuvre
         if (!auteur && work) {
             const workAuthorUri = work.claims['wdt:P50']?.[0] ?? null;
             if (workAuthorUri) {
@@ -134,17 +74,104 @@ export class InventaireProvider implements BookProvider {
             }
         }
 
-        // Appel 4 (conditionnel) : description Open Library
         let description: string | null = null;
         if (olId) {
             const raw = await fetchOLDescription(olId);
             if (raw) {
-                description = isFrench ? raw : await traduire(raw, langCode(workLangUri ?? ''), 'fr').catch(() => raw);
+                description = isFrench
+                    ? raw
+                    : await traduire(raw, langCode(workLangUri ?? ''), 'fr').catch(() => raw);
             }
         }
-        // Fallback : description courte Wikidata
         if (!description) description = wdDescription;
 
-        return { sourceId, titre, auteur, editeur, anneePublication, serie, imageUrl, description };
+        return { sourceId, titre, auteur, isbn: normaliserISBN(isbn), editeur, anneePublication, publishedDateRaw: null, serie, imageUrl, description, language: null };
+    }
+
+    async rechercherParUri(uri: string): Promise<LivreMetadata | null> {
+        if (uri.startsWith('isbn:')) return this.rechercherParISBN(uri.slice(5));
+
+        const entities = await fetchInvEntities([uri]);
+        const entity = entities[uri];
+        if (!entity) return null;
+
+        const base = entityToMeta(uri, entity);
+        const publisherUri = entity.claims['wdt:P123']?.[0] ?? null;
+        const seriesUri = entity.claims['wdt:P179']?.[0] ?? null;
+        const authorUri = entity.claims['wdt:P50']?.[0] ?? null;
+        const olId = entity.claims['wdt:P648']?.[0] ?? null;
+        const workLangUri = entity.claims['wdt:P407']?.[0] ?? null;
+        const isFrench = workLangUri === LANG_FR;
+
+        const toResolve = [publisherUri, seriesUri, authorUri].filter((u): u is string => u !== null);
+        const resolved = toResolve.length > 0 ? await fetchInvEntities(toResolve) : {};
+
+        const editeur = labelFr(publisherUri ? resolved[publisherUri] : undefined);
+        const serie = labelFr(seriesUri ? resolved[seriesUri] : undefined);
+        const auteur = labelFr(authorUri ? resolved[authorUri] : undefined);
+
+        let description = base.description ?? null;
+        if (olId) {
+            const raw = await fetchOLDescription(olId);
+            if (raw) {
+                description = isFrench
+                    ? raw
+                    : await traduire(raw, langCode(workLangUri ?? ''), 'fr').catch(() => raw);
+            }
+        }
+
+        return { ...base, sourceId: uri, auteur, editeur, serie, description } as LivreMetadata;
+    }
+
+    async rechercherParUris(uris: string[]): Promise<Map<string, LivreMetadata>> {
+        if (uris.length === 0) return new Map();
+
+        // local: URIs n'existent pas sur inventaire.io — on les filtre
+        const invUris = uris.filter((uri) => !uri.startsWith('local:'));
+        if (invUris.length === 0) return new Map();
+
+        const entities = await fetchInvEntities(invUris);
+
+        const authorUriSet = new Set<string>();
+        for (const entity of Object.values(entities)) {
+            const authorUri = entity.claims['wdt:P50']?.[0];
+            if (authorUri) authorUriSet.add(authorUri);
+        }
+        const authorEntities = authorUriSet.size > 0
+            ? await fetchInvEntities([...authorUriSet])
+            : {};
+
+        const result = new Map<string, LivreMetadata>();
+        for (const uri of uris) {
+            const entity = entities[uri];
+            if (!entity) continue;
+            const base = entityToMeta(uri, entity);
+            const authorUri = entity.claims['wdt:P50']?.[0] ?? null;
+            const auteur = authorUri ? labelFr(authorEntities[authorUri]) : null;
+            result.set(uri, { ...base, sourceId: uri, auteur, editeur: null, serie: null } as LivreMetadata);
+        }
+        return result;
+    }
+
+    async rechercherParTitre(query: string): Promise<LivreSearchResult[]> {
+        const url = `${BASE_URL}/api/search?q=${encodeURIComponent(query)}&types=works&lang=fr&limit=8`;
+        const res = await fetch(url, { headers: { 'User-Agent': USER_AGENT } });
+        if (!res.ok) return [];
+        const data = await res.json();
+        const results: { uri: string; label: string; description?: string; image?: { url: string } }[] =
+            data.results ?? [];
+        return results.map((item) => ({
+            uri: item.uri,
+            titre: item.label,
+            description: item.description ?? null,
+            imageUrl: item.image?.url ? `${BASE_URL}${item.image.url}` : null,
+            auteur: null,
+            isbn: null,
+            editeur: null,
+            anneePublication: null,
+            categories: [],
+            prixNumerique: null,
+            isEbook: false,
+        }));
     }
 }

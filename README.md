@@ -1,20 +1,53 @@
 # Lecture & Bouture
 
-Boutique hybride livres académiques + boutures végétales.
+Boutique hybride livres + boutures végétales. Catalogue livres via Google Books API (source de vérité), enrichissements éditoriaux en base locale, achat via leslibraires.fr.
 
 ## Stack
 
-- **Next.js 16** (App Router) — front + back-office + API
-- **PostgreSQL 16** — base de données
-- **Drizzle ORM** — schéma typé
-- **NextAuth v5** — auth back-office (JWT, httpOnly cookies)
-- **Argon2id** — hashing mots de passe
-- **Tiptap** — éditeur rich text (pages éditoriales, descriptions)
-- **Raleway** — police principale (corps, UI)
-- **Dancing Script** — police manuscrite (note de la librairie)
-- **Caddy** — reverse proxy HTTPS local
-- **Adminer** — interface BDD
-- **Portainer** — interface Docker
+| Couche | Choix |
+|---|---|
+| Framework | Next.js 16 App Router — front + back-office + API Routes |
+| Base de données | PostgreSQL 16 + Drizzle ORM (PKs uuid, migrations SQL idempotentes) |
+| Auth | NextAuth v5 — JWT, httpOnly cookies, 5 rôles |
+| **Catalogue public** | **Google Books API** — browse, search, discovery (tendances/nouveautés/genres) |
+| **Import BO** | **inventaire.io + Open Library** — enrichissement métadonnées FR lors de l'import ISBN |
+| Traduction | LibreTranslate — descriptions EN→FR importées depuis Open Library |
+| Stockage images | MinIO self-hosted (livres, boutures, événements) |
+| Rich text | Tiptap — pages éditoriales |
+| Email | Resend — reset password + notifications |
+| Newsletter | Loops |
+| Analytics | Umami (privacy-first) |
+| Fonts | Raleway (principal) + Dancing Script (note librairie) |
+| Proxy | Caddy (HTTPS local) |
+| Outils dev | Adminer, Portainer, Drizzle Studio |
+
+---
+
+## Architecture livres
+
+**Source de vérité = Google Books API.** La base locale ne stocke que les enrichissements éditoriaux.
+
+```
+Google Books API          DB locale (livres)
+─────────────────         ──────────────────
+titre, auteur             inventaire_uri (clé de liaison)
+isbn, éditeur             titre (dénormalisé BO, snapshot)
+description (HTML)        rayon, genres
+image (zoom=0)            prix indicatif
+catégories BISAC          note librairie
+previewLink               choix librairie
+isEbook, prixNum.         avis
+nombrePages
+```
+
+**Modes d'affichage `/livres` :**
+- **Découverte** (défaut, pas de filtre) : Choix librairie (DB) → Tendances (GB `orderBy=relevance`) → Nouveautés (GB `orderBy=newest`). Infinite scroll via `startIndex` (step 40). Pas de `langRestrict` — requêtes françaises assurent la pertinence.
+- **Catalogue** (filtres DB : rayon/genre/choix) : enrichissements + overlay métadonnées GB. Tri : alpha, date, note, prix (toujours visible).
+- **Recherche** (`?q=...`) : live Google Books, 40 par batch, enrichis en overlay, infinite scroll. Si rayon actif : termes BISAC français injectés dans la query. Expansion auteur si < 4 résultats physiques d'un même auteur.
+- **Toggle ebook** (`?ebook=1`, défaut off) : filtre post-fetch applicable sur toutes les vues.
+- **Pagination** : offset API toujours en multiples de 40 (évite les slices chevauchantes après filtre ebook). Bouton "Charger plus" en fallback de l'IntersectionObserver.
+
+**URI format :** `isbn:XXXXXXXXXXXXX` → slug `XXXXXXXXXXXXX` · `gbid:VOLUMEID` → slug `gbid-VOLUMEID`
 
 ---
 
@@ -29,21 +62,23 @@ Boutique hybride livres académiques + boutures végétales.
 
 ```bash
 npm install
+cp .env.example .env.local
+# Remplir les vars (voir section Variables d'environnement)
 ```
 
 ---
 
 ## Démarrage
 
-### 1. Lancer les services Docker
-
 ```bash
+# 1. Services Docker (PostgreSQL, MinIO, LibreTranslate, Adminer, Portainer)
 docker compose up -d
-```
 
-### 2. Lancer Next.js
+# 2. Migrations + seed
+npm run db:migrate
+npm run db:seed
 
-```bash
+# 3. App
 npm run dev
 ```
 
@@ -51,12 +86,15 @@ npm run dev
 
 ## URLs
 
-| Service        | URL                    |
-| -------------- | ---------------------- |
-| App            | https://localhost:3000 |
-| Adminer        | http://localhost:8080  |
-| Portainer      | http://localhost:9000  |
-| LibreTranslate | http://localhost:5000  |
+| Service | URL |
+|---|---|
+| App | https://localhost:3000 |
+| Back-office | https://localhost:3000/admin |
+| Adminer | http://localhost:8080 |
+| Portainer | http://localhost:9000 |
+| MinIO console | http://localhost:9101 |
+| MinIO API | http://localhost:9100 |
+| LibreTranslate | http://localhost:5000 |
 
 **Adminer** : serveur `leb-db` · user `leb` · password `leb` · db `leb`
 
@@ -65,51 +103,76 @@ npm run dev
 ## Base de données
 
 ```bash
-# Créer les tables (idempotent — safe à rejouer)
-npm run db:migrate
-
-# Peupler avec les données de démo
-npm run db:seed
-
-# Reset complet (drop + migrate + seed)
-npm run db:reset
-
-# Interface Drizzle Studio
-npm run db:studio
+npm run db:migrate    # créer/mettre à jour les tables (idempotent)
+npm run db:seed       # peupler avec données de démo
+npm run db:reset      # drop + migrate + seed
+npm run db:studio     # Drizzle Studio (UI)
 ```
 
-Schéma : `db/schema.ts`  
-Migration : `db/migrate.ts` (SQL brut idempotent, une table à la fois)  
-Seed : `db/seed.ts`  
-Connexion : `db/index.ts`
+Schéma : `db/schema.ts` · `db/SCHEMA.md`
 
-Variables d'environnement dans `.env.local` :
+---
+
+## Variables d'environnement
 
 ```env
+# Base
 DATABASE_URL=postgresql://leb:leb@localhost:5432/leb
-AUTH_SECRET=<générer avec: openssl rand -base64 33>
+AUTH_SECRET=<openssl rand -base64 33>
+AUTH_URL=http://localhost:3000
+PREVIEW_SECRET=<openssl rand -base64 20>
+
+# Google Books API (catalogue public — browse, search, discovery)
+GOOGLE_BOOKS_API_KEY=
+
+# Boutique (config publique)
+NEXT_PUBLIC_STORE_NAME=Lecture & Bouture
+NEXT_PUBLIC_STORE_TAGLINE=Cultiver l'esprit, nourrir la terre.
+NEXT_PUBLIC_STORE_DESCRIPTION=...
+NEXT_PUBLIC_STORE_URL=https://lectureetbouture.fr
+NEXT_PUBLIC_STORE_ADDRESS_STREET=...
+NEXT_PUBLIC_STORE_ADDRESS_CITY=...
+NEXT_PUBLIC_STORE_LAT=...
+NEXT_PUBLIC_STORE_LNG=...
+NEXT_PUBLIC_STORE_LOCALE=fr
+
+# MinIO (stockage images)
+MINIO_ENDPOINT=localhost
+MINIO_PORT=9100
+MINIO_USE_SSL=false
+MINIO_ACCESS_KEY=
+MINIO_SECRET_KEY=
+MINIO_BUCKET=leb
+MINIO_PUBLIC_URL=http://localhost:9100/leb
+
+# Email (Resend)
+RESEND_API_KEY=
+RESEND_FROM_EMAIL=contact@lectureetbouture.fr
+RESEND_TO_EMAIL=contact@lectureetbouture.fr
+
+# Newsletter (Loops)
+LOOPS_API_KEY=
+
+# Analytics (Umami)
+NEXT_PUBLIC_UMAMI_WEBSITE_ID=
+NEXT_PUBLIC_UMAMI_HOST=https://cloud.umami.is
+
+# Surveys (Formbricks)
+NEXT_PUBLIC_FORMBRICKS_ENV_ID=
+NEXT_PUBLIC_FORMBRICKS_HOST=
+
+# Import livres BO (inventaire.io/wikidata)
+BOOK_IMPORT_PROVIDER=inventaire     # inventaire (défaut) | wikidata
+LIBRETRANSLATE_URL=http://localhost:5000
 ```
 
 ---
 
-## Back-office
-
-Accès : https://app.localhost/admin
-
-### Créer le premier compte admin
+## Créer le premier admin
 
 ```bash
 npm run admin:create <email> <mot-de-passe>
-```
-
-Mot de passe minimum 12 caractères.
-
----
-
-## Arrêter les services
-
-```bash
-docker compose down
+# Mot de passe minimum 12 caractères
 ```
 
 ---
@@ -118,45 +181,41 @@ docker compose down
 
 ### Front public
 
-- Accueil — sections livres thématiques + événement mis en avant + CTA "Surprendre"
-- `/livres` — catalogue avec filtres complets (rayon, genre, série, éditeur, format, tri, choix)
-- `/livres/[slug]` — fiche avec avis et recommandations
-- `/boutures` — vitrine bento (grande/petite carte alternées, section explicative)
+- `/` — Hero + Choix librairie + Nouveautés + Tendances + sections genre (Google Books)
+- `/livres` — 3 modes : découverte (infinite scroll GB), catalogue (filtres DB), recherche (live GB + BISAC)
+- `/livres/[slug]` — fiche complète : description HTML (masquée si non-FR ou < 20 chars), catégories BISAC traduites, date dd/mm/yyyy, pages, ebook, aperçu. Avis avant recos. Recos : même genre (DB) + même auteur (`inauthor:`) + même univers (BISAC rayon)
+- `/boutures` — vitrine bento
 - `/boutures/[slug]` — fiche avec avis
-- `/surprendre` — livre aléatoire parmi les choix de la librairie
-- `/evenements` — agenda avec état en cours / à venir / passé
+- `/surprendre` — livre aléatoire parmi les choix librairie
+- `/evenements` — agenda (en cours / à venir / passé)
 - `/selections` — sélections actives du conservateur
-- `/contact` — formulaire + section "Nous trouver" avec adresse et carte Leaflet (CartoDB light, SSR:false)
-- `/concept`, `/mentions-legales`, `/cgv`, `/cgu`, `/cookies`, `/politique-de-confidentialite` — pages éditoriales (contenu géré via RTE en back-office)
-- 404 et 500 custom
+- `/contact` — formulaire + carte Leaflet
+- Pages éditoriales — concept, mentions légales, CGV, CGU, cookies, politique
 
-### Back-office
+### Back-office (`/admin`)
 
 - Dashboard — stats, alertes, agenda
-- Logo `leb-nobg.png` — nav + footer
-- Navbar responsive — burger menu mobile (overlay, animation X)
-- Livres — CRUD complet + filtres + tri
-- Boutures — CRUD complet + filtres + tri
-- Genres, Rayons — CRUD
-- Avis — modération (3 états : en attente / visible / masqué) + toggle rapide par ligne
-- Sélections — CRUD + ordre drag-and-drop
-- Événements — CRUD + filtre état + tri date + toggle publié/privé par ligne
-- Pages éditoriales — éditeur Tiptap riche + toggle publiée/privée par ligne
-- Formulaire livre — section "Sélection librairie" repliable (choix librairie + note, indépendants)
+- Livres — CRUD + import ISBN (inventaire.io) + recherche titre/auteur + liste avec titre & couverture (batch Google Books)
+- Boutures, Genres, Rayons — CRUD
+- Avis — modération 3 états, titre + couverture du livre affichés (batch fetch Google Books), lien vers fiche front
+- Sélections, Événements — CRUD + ordre/toggle
+- Pages éditoriales — Tiptap + prévisualisation Draft Mode
+- Paramètres — horaires, fermetures, annonce, maintenance, réseaux sociaux, QR code
+- Utilisateurs — CRUD + rôles (voir `ROLES.md`)
+- Journaux — FIFO 200, guard `super_admin`
 
 ### Infra
 
-- PostgreSQL + Drizzle — migration SQL brute idempotente (pas de drizzle-kit push)
-- Seed — livres, boutures, genres, rayons, avis, pages éditoriales, admin user
-- sanitize-html côté serveur pour tout contenu RTE affiché en front
+- PostgreSQL + Drizzle — PKs uuid, migrations idempotentes
+- MinIO — images livres, boutures, événements
+- LibreTranslate — traduction EN→FR (import BO uniquement)
+- inventaire.io + Open Library — import BO : ISBN → préremplissage formulaire enrichissement
 
 ---
 
 ## Backlog
 
-- Google Books API — ISBN → auto-fill + recherche titre autocomplete
-- MinIO — stockage images boutures
-- Meilisearch — recherche full-text (> ~500 entrées)
-- Analytics Umami
-- Newsletter Loops
-- Éco-conception
+- Formbricks — vérifier trigger survey (`NEXT_PUBLIC_FORMBRICKS_ENV_ID`)
+- ~~Meilisearch~~ — obsolète, recherche full-text assurée par Google Books API
+- API leslibraires.fr / Librisoft — stocks temps réel, panier, commandes
+- Éco-conception — audit thegreenwebfoundation.org

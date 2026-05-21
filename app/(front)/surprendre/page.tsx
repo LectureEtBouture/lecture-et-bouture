@@ -39,8 +39,11 @@ export default async function SurprendrePage() {
     const primaryGenreId = livre.genreIds?.[0];
     const coverColor = getCoverColor(primaryGenreId);
     const genre = primaryGenreId ? await getGenreById(primaryGenreId) : null;
-    const coverImage = livre.image ?? null;
-    const achatUrl = `https://www.leslibraires.fr/recherche/?q=${encodeURIComponent(livre.titre + ' ' + livre.auteur)}`;
+    const coverImage = livre.imageUrl ?? null;
+    const isbn = livre.isbn;
+    const achatUrl = isbn
+        ? `https://www.leslibraires.fr/recherche/?q=${isbn}`
+        : `https://www.leslibraires.fr/recherche/?q=${encodeURIComponent(livre.titre)}`;
 
     return (
         <div className="max-w-4xl mx-auto px-6 py-16 lg:py-24">

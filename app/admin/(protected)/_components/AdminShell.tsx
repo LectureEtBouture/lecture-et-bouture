@@ -53,7 +53,11 @@ function SidebarNav({ role }: { role?: string }) {
         <nav className="flex-1 overflow-y-auto flex flex-col">
             <div className="px-3 py-4 space-y-0.5">
                 {baseNavItems.map((item) => (
-                    <SidebarNavLink key={item.href} href={item.href} label={item.label} />
+                    <SidebarNavLink
+                        key={item.href}
+                        href={item.href}
+                        label={item.label}
+                    />
                 ))}
             </div>
             <div className="px-3 pb-4 mt-auto">
@@ -64,7 +68,11 @@ function SidebarNav({ role }: { role?: string }) {
                 </div>
                 <div className="space-y-0.5">
                     {adminSectionItems.map((item) => (
-                        <SidebarNavLink key={item.href} href={item.href} label={item.label} />
+                        <SidebarNavLink
+                            key={item.href}
+                            href={item.href}
+                            label={item.label}
+                        />
                     ))}
                 </div>
             </div>
@@ -116,7 +124,12 @@ function MobileMenu({
                         className="text-muted hover:text-foreground transition-colors p-1"
                         aria-label="Fermer le menu"
                     >
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 16 16"
+                            fill="none"
+                        >
                             <path
                                 d="M2 2L14 14M14 2L2 14"
                                 stroke="currentColor"
@@ -171,7 +184,9 @@ function MobileMenu({
                 </nav>
 
                 <div className="px-5 py-4 border-t border-border shrink-0">
-                    <p className="text-[11px] text-muted truncate mb-2">{email}</p>
+                    <p className="text-[11px] text-muted truncate mb-2">
+                        {email}
+                    </p>
                     <form action={signOutAction}>
                         <button
                             type="submit"
@@ -215,7 +230,12 @@ export function AdminShell({
                         className="text-foreground/70 hover:text-primary transition-colors p-1"
                         aria-label="Ouvrir le menu"
                     >
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 20 20"
+                            fill="none"
+                        >
                             <path
                                 d="M3 5H17M3 10H17M3 15H17"
                                 stroke="currentColor"
@@ -261,7 +281,9 @@ export function AdminShell({
                     <SidebarNav role={role} />
 
                     <div className="px-5 py-4 border-t border-border shrink-0">
-                        <p className="text-[11px] text-muted truncate mb-2">{email}</p>
+                        <p className="text-[11px] text-muted truncate mb-2">
+                            {email}
+                        </p>
                         <form action={signOutAction}>
                             <button
                                 type="submit"

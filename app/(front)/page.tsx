@@ -1,6 +1,11 @@
 import type { Metadata } from 'next';
 import { siteConfig } from '@/lib/metadata';
-import { getLivresPubliques } from '@/lib/queries/livres';
+import {
+    getLivresMisEnAvant,
+    getLivresNouveautes,
+    getLivresTendances,
+    getLivresParSujet,
+} from '@/lib/queries/livres';
 import { getEvenementMisEnAvant } from '@/lib/queries/evenements';
 import { HeroSection } from './_components/HeroSection';
 import { LivresSection } from './_components/LivresSection';
@@ -11,62 +16,61 @@ export const metadata: Metadata = {
     title: siteConfig.name,
 };
 
-const LIMIT = 8;
+export const dynamic = 'force-dynamic';
 
-const SECTIONS = [
-    {
-        id: 'nouveautes',
-        titre: 'Nouveautés',
-        description: 'Les dernières arrivées dans nos rayons.',
-        filters: { sort: 'date' as const },
-        href: '/livres?sort=date',
-    },
+const GENRE_SECTIONS = [
     {
         id: 'imaginaire',
         titre: 'Imaginaire',
         description: 'Science-fiction, fantasy, mondes à part entière.',
-        filters: { rayonSlug: 'imaginaire' },
-        href: '/livres',
+        query: 'subject:fantasy subject:science-fiction roman',
+        href: '/livres?q=fantasy+science-fiction',
     },
     {
         id: 'sciences-nature',
         titre: 'Sciences & Nature',
         description: 'Botanique, écologie, sciences du vivant.',
-        filters: { rayonSlug: 'sciences-nature' },
-        href: '/livres',
-    },
-    {
-        id: 'choix',
-        titre: 'Choix de la librairie',
-        description: 'Ce que notre équipe aime vraiment.',
-        filters: { choixLibrairie: true as const },
-        href: '/livres?choix=1',
+        query: 'botanique nature écologie sciences',
+        href: '/livres?q=botanique+nature',
     },
 ] as const;
 
-export const dynamic = 'force-dynamic';
-
 export default async function HomePage() {
-    const [livresParSection, evenementMisEnAvant] = await Promise.all([
-        Promise.all(
-            SECTIONS.map((section) =>
-                getLivresPubliques(section.filters).then((livres) =>
-                    livres.slice(0, LIMIT),
-                ),
-            ),
-        ),
+    const [choix, nouveautes, tendances, evenementMisEnAvant, ...genreLivres] = await Promise.all([
+        getLivresMisEnAvant(),
+        getLivresNouveautes(0),
+        getLivresTendances(0),
         getEvenementMisEnAvant(),
+        ...GENRE_SECTIONS.map((section) => getLivresParSujet(section.query)),
     ]);
 
     return (
         <>
             <HeroSection />
-            {SECTIONS.map((section, index) => (
+            <LivresSection
+                titre="Choix de la librairie"
+                description="Ce que notre équipe aime vraiment."
+                livres={choix}
+                href="/livres?choix=1"
+            />
+            <LivresSection
+                titre="Nouveautés"
+                description="Les dernières parutions."
+                livres={nouveautes}
+                href="/livres?sort=newest"
+            />
+            <LivresSection
+                titre="Tendances"
+                description="Ce qu'on lit en ce moment."
+                livres={tendances}
+                href="/livres?sort=relevance"
+            />
+            {GENRE_SECTIONS.map((section, index) => (
                 <LivresSection
                     key={section.id}
                     titre={section.titre}
                     description={section.description}
-                    livres={livresParSection[index]}
+                    livres={genreLivres[index]}
                     href={section.href}
                 />
             ))}

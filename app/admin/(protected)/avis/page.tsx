@@ -7,8 +7,9 @@ import {
     deleteAvis,
     type AvisSort,
 } from '@/lib/actions/avis';
+import { bookProvider } from '@/lib/services/books';
 import { AvisSection } from './_components/AvisSection';
-import { AvisRow } from './_components/AvisRow';
+import { AvisRow, type BookMeta } from './_components/AvisRow';
 import { ActionBtn } from './_components/ActionBtn';
 
 const SORT_OPTIONS: { value: AvisSort; label: string }[] = [
@@ -32,6 +33,14 @@ export default async function AdminAvisPage({
         : 'date-desc';
 
     const data = await getAvis(sort);
+
+    const livreUris = [...new Set(
+        data.filter((a) => a.type === 'livre' && a.inventaireUri).map((a) => a.inventaireUri!)
+    )];
+    const bookMetaMap = livreUris.length > 0
+        ? await bookProvider.rechercherParUris(livreUris)
+        : new Map<string, BookMeta>();
+
     const enAttente = data.filter((a) => !a.approuve && !a.masque);
     const visibles = data.filter((a) => a.approuve && !a.masque);
     const masques = data.filter((a) => a.masque);
@@ -60,7 +69,7 @@ export default async function AdminAvisPage({
                 vide="Aucun avis en attente."
             >
                 {enAttente.map((a) => (
-                    <AvisRow key={a.id} avis={a}>
+                    <AvisRow key={a.id} avis={a} bookMeta={a.inventaireUri ? bookMetaMap.get(a.inventaireUri) : undefined}>
                         <ActionBtn
                             action={async () => {
                                 'use server';
@@ -86,7 +95,7 @@ export default async function AdminAvisPage({
                 vide="Aucun avis publié."
             >
                 {visibles.map((a) => (
-                    <AvisRow key={a.id} avis={a}>
+                    <AvisRow key={a.id} avis={a} bookMeta={a.inventaireUri ? bookMetaMap.get(a.inventaireUri) : undefined}>
                         <ActionBtn
                             action={async () => {
                                 'use server';
@@ -112,7 +121,7 @@ export default async function AdminAvisPage({
                 vide="Aucun avis masqué."
             >
                 {masques.map((a) => (
-                    <AvisRow key={a.id} avis={a}>
+                    <AvisRow key={a.id} avis={a} bookMeta={a.inventaireUri ? bookMetaMap.get(a.inventaireUri) : undefined}>
                         <ActionBtn
                             action={async () => {
                                 'use server';

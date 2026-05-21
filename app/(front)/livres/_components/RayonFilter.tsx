@@ -26,9 +26,9 @@ export function RayonFilter({
                     <button
                         key={rayon.id}
                         onClick={() =>
-                            push({ rayon: String(rayon.id), genre: undefined })
+                            push({ rayon: rayon.slug, genre: undefined })
                         }
-                        className={pill(activeRayonId === rayon.id)}
+                        className={pill(activeRayonId === rayon.slug)}
                     >
                         {rayon.nom}
                     </button>

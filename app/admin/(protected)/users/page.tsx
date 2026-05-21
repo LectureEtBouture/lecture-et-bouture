@@ -1,7 +1,11 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { auth } from '@/auth';
-import { getUsers, deleteUser, initiatePasswordReset } from '@/lib/actions/users';
+import {
+    getUsers,
+    deleteUser,
+    initiatePasswordReset,
+} from '@/lib/actions/users';
 
 const ROLE_LABELS: Record<string, string> = {
     super_admin: 'Super Admin',
@@ -84,7 +88,8 @@ export default async function AdminUsersPage() {
                                     </td>
                                     <td className="py-3 pr-6">
                                         <span className="text-[10px] uppercase tracking-[0.08em] px-1.5 py-0.5 border border-border text-muted leading-none">
-                                            {ROLE_LABELS[user.role] ?? user.role}
+                                            {ROLE_LABELS[user.role] ??
+                                                user.role}
                                         </span>
                                     </td>
                                     <td className="py-3 pr-6 text-xs text-muted hidden sm:table-cell">
@@ -101,7 +106,9 @@ export default async function AdminUsersPage() {
                                             <form
                                                 action={async () => {
                                                     'use server';
-                                                    await initiatePasswordReset(user.id);
+                                                    await initiatePasswordReset(
+                                                        user.id,
+                                                    );
                                                 }}
                                                 className="contents"
                                             >
@@ -116,7 +123,9 @@ export default async function AdminUsersPage() {
                                                 <form
                                                     action={async () => {
                                                         'use server';
-                                                        await deleteUser(user.id);
+                                                        await deleteUser(
+                                                            user.id,
+                                                        );
                                                     }}
                                                     className="contents"
                                                 >

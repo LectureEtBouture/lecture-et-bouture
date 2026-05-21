@@ -19,7 +19,10 @@ export const authConfig: NextAuthConfig = {
                 '/admin/forgot-password',
                 '/admin/reset-password',
             ];
-            if (pathname.startsWith('/admin') && !publicAdminPaths.includes(pathname)) {
+            if (
+                pathname.startsWith('/admin') &&
+                !publicAdminPaths.includes(pathname)
+            ) {
                 return !!auth;
             }
             return true;

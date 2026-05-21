@@ -7,10 +7,7 @@ type Rayon = InferSelectModel<typeof rayons>;
 
 const SORT_OPTIONS: { value: LivresSort; label: string }[] = [
     { value: 'recent', label: 'Récents' },
-    { value: 'titre', label: 'Titre A→Z' },
-    { value: 'auteur', label: 'Auteur A→Z' },
-    { value: 'prix', label: 'Prix croissant' },
-    { value: 'stock', label: 'Stock croissant' },
+    { value: 'choix', label: 'Choix librairie' },
 ];
 
 function chip(active: boolean) {
@@ -57,17 +54,8 @@ export function LivresSortFilter({
             </div>
             <div className="flex items-center gap-2 overflow-x-auto pb-0.5 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
                 <span className="text-[10px] uppercase tracking-[0.1em] text-muted w-12 shrink-0">
-                    Filtres
+                    Rayon
                 </span>
-                <Link
-                    href={buildHref({
-                        ...base,
-                        choix: choix ? undefined : '1',
-                    })}
-                    className={`${chip(choix)} shrink-0`}
-                >
-                    Choix librairie
-                </Link>
                 {rayonsList.map((r) => (
                     <Link
                         key={r.id}

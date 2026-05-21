@@ -1,68 +1,69 @@
 import { unstable_cache } from 'next/cache';
 import { db } from '@/db';
-import { livres } from '@/db/schema';
-import { and, asc, desc, eq, notInArray, ne, sql, type SQL } from 'drizzle-orm';
-import { livreSelect, type LivrePublique } from './livres';
+import { livres, livresGenres } from '@/db/schema';
+import { and, ne, notInArray, sql, eq, type SQL } from 'drizzle-orm';
+import type { LivreComplet, EnrichissementLocal } from '@/lib/services/books/types';
+import { bookProvider } from '@/lib/services/books';
+import { fusionnerListe } from '@/lib/services/books/merge';
+import { getEnrichissementByUri } from './enrichissements';
+
+async function getEnrichissementsByIds(ids: string[]): Promise<EnrichissementLocal[]> {
+    if (ids.length === 0) return [];
+    const { livresGenres: lg } = await import('@/db/schema');
+    const rows = await db.select({
+        id: livres.id,
+        inventaireUri: livres.inventaireUri,
+        prix: livres.prix,
+        choixLibrairie: livres.choixLibrairie,
+        noteDeLaLibrairie: livres.noteDeLaLibrairie,
+        rayonId: livres.rayonId,
+        numeroSerie: livres.numeroSerie,
+        noteMoyenne: livres.noteMoyenne,
+    }).from(livres).where(
+        ids.length === 1 ? eq(livres.id, ids[0]) : sql`${livres.id} = ANY(${ids})`,
+    );
+    return Promise.all(rows.map(async (row) => {
+        const genreRows = await db.select({ genreId: lg.genreId }).from(lg).where(eq(lg.livreId, row.id));
+        return { localId: row.id, ...row, genreIds: genreRows.map((g) => g.genreId) };
+    }));
+}
 
 export type Recommendations = {
-    memeSerie: LivrePublique[];
-    memeGenre: LivrePublique[];
-    memeAuteur: LivrePublique[];
+    memeGenre: LivreComplet[];
 };
 
 export const getRecommendations = unstable_cache(
-    async (
-        livreId: string,
-        serie: string | null,
-        genreId: string | null,
-        auteur: string,
-        limit = 4,
-    ): Promise<Recommendations> => {
-        const memeSerie = serie
-            ? await db
-                  .select(livreSelect)
-                  .from(livres)
-                  .where(and(eq(livres.serie, serie), ne(livres.id, livreId)))
-                  .orderBy(asc(livres.numeroSerie))
-            : [];
+    async (localId: string, genreId: string | null, limit = 4): Promise<Recommendations> => {
+        if (!genreId) return { memeGenre: [] };
 
-        const excludeForGenre = memeSerie.map((livre) => livre.id);
-        const genreConditions: SQL[] = [ne(livres.id, livreId)];
-        if (genreId)
-            genreConditions.push(
-                sql`EXISTS (SELECT 1 FROM livres_genres WHERE livre_id = ${livres.id} AND genre_id = ${genreId})`,
-            );
-        if (excludeForGenre.length > 0)
-            genreConditions.push(notInArray(livres.id, excludeForGenre));
+        const conditions: SQL[] = [ne(livres.id, localId)];
+        conditions.push(
+            sql`EXISTS (SELECT 1 FROM livres_genres WHERE livre_id = ${livres.id} AND genre_id = ${genreId})`,
+        );
 
-        const memeGenre = genreId
-            ? await db
-                  .select(livreSelect)
-                  .from(livres)
-                  .where(and(...genreConditions))
-                  .orderBy(desc(livres.noteMoyenne))
-                  .limit(limit)
-            : [];
-
-        const excludeForAuteur = [
-            ...memeSerie.map((livre) => livre.id),
-            ...memeGenre.map((livre) => livre.id),
-        ];
-        const auteurConditions: SQL[] = [
-            eq(livres.auteur, auteur),
-            ne(livres.id, livreId),
-        ];
-        if (excludeForAuteur.length > 0)
-            auteurConditions.push(notInArray(livres.id, excludeForAuteur));
-
-        const memeAuteur = await db
-            .select(livreSelect)
+        const rows = await db
+            .select({
+                id: livres.id,
+                inventaireUri: livres.inventaireUri,
+            })
             .from(livres)
-            .where(and(...auteurConditions))
-            .orderBy(desc(livres.noteMoyenne))
+            .where(and(...conditions))
             .limit(limit);
 
-        return { memeSerie, memeGenre, memeAuteur };
+        if (rows.length === 0) return { memeGenre: [] };
+
+        const uris = rows.map((row) => row.inventaireUri);
+        const [metas, enrichissements] = await Promise.all([
+            bookProvider.rechercherParUris(uris),
+            Promise.all(uris.map((uri) => getEnrichissementByUri(uri))),
+        ]);
+        const enrichMap = new Map<string, EnrichissementLocal>(
+            uris
+                .map((uri, i) => [uri, enrichissements[i]] as const)
+                .filter((pair): pair is [string, EnrichissementLocal] => pair[1] !== null),
+        );
+
+        return { memeGenre: fusionnerListe(metas, enrichMap, uris) };
     },
     ['livres-recos'],
     { tags: ['livres'] },

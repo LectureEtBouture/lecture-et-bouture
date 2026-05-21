@@ -21,6 +21,16 @@ const nextConfig: NextConfig = {
     images: {
         remotePatterns: [
             ...(minioPattern ? [minioPattern] : []),
+            {
+                protocol: 'https',
+                hostname: 'books.google.com',
+                pathname: '/books/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'covers.openlibrary.org',
+                pathname: '/b/**',
+            },
         ],
     },
 };

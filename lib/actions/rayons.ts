@@ -52,7 +52,11 @@ export async function createRayon(formData: FormData) {
         slug: makeSlug(data.nom),
         description: data.description ?? null,
     });
-    await createLog({ action: 'rayon.create', entityType: 'rayon', entityLabel: data.nom });
+    await createLog({
+        action: 'rayon.create',
+        entityType: 'rayon',
+        entityLabel: data.nom,
+    });
     revalidatePath('/admin/rayons');
     revalidateTag('livres', { expire: 0 });
     redirect('/admin/rayons');
@@ -72,7 +76,12 @@ export async function updateRayon(id: string, formData: FormData) {
             description: data.description ?? null,
         })
         .where(eq(rayons.id, id));
-    await createLog({ action: 'rayon.update', entityType: 'rayon', entityId: id, entityLabel: data.nom });
+    await createLog({
+        action: 'rayon.update',
+        entityType: 'rayon',
+        entityId: id,
+        entityLabel: data.nom,
+    });
     revalidatePath('/admin/rayons');
     revalidateTag('livres', { expire: 0 });
     redirect('/admin/rayons');
@@ -80,9 +89,19 @@ export async function updateRayon(id: string, formData: FormData) {
 
 export async function deleteRayon(id: string) {
     await requireAdmin();
-    const row = await db.select({ nom: rayons.nom }).from(rayons).where(eq(rayons.id, id)).limit(1).then((r) => r[0]);
+    const row = await db
+        .select({ nom: rayons.nom })
+        .from(rayons)
+        .where(eq(rayons.id, id))
+        .limit(1)
+        .then((r) => r[0]);
     await db.delete(rayons).where(eq(rayons.id, id));
-    await createLog({ action: 'rayon.delete', entityType: 'rayon', entityId: id, entityLabel: row?.nom });
+    await createLog({
+        action: 'rayon.delete',
+        entityType: 'rayon',
+        entityId: id,
+        entityLabel: row?.nom,
+    });
     revalidatePath('/admin/rayons');
     revalidateTag('livres', { expire: 0 });
 }

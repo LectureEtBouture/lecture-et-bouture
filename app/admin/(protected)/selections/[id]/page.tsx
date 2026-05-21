@@ -83,7 +83,7 @@ export default async function SelectionItemsPage({
                                         key={`l-${livre.id}`}
                                         value={livre.id}
                                     >
-                                        {livre.titre}
+                                        {livre.inventaireUri}
                                     </option>
                                 ))}
                             </optgroup>

@@ -1,5 +1,6 @@
 import { LivreForm } from '@/components/admin/LivreForm';
-import { createLivre, getGenres, getRayons } from '@/lib/actions/livres';
+import { createLivre } from '@/lib/actions/livres';
+import { getGenres, getRayons } from '@/lib/actions/livres-meta';
 
 export default async function NouveauLivrePage() {
     const [genresList, rayonsList] = await Promise.all([

@@ -2,48 +2,48 @@
 
 ## Rôles disponibles
 
-| Rôle | Description |
-|---|---|
-| `super_admin` | Accès total, gestion des utilisateurs et rôles, journaux |
-| `admin` | Gestion du contenu + utilisateurs editor/moderator/contributor |
-| `editor` | Création et édition du contenu |
-| `moderator` | Modération des avis uniquement |
-| `contributor` | Contenu + modération des avis (editor + moderator combinés) |
+| Rôle          | Description                                                    |
+| ------------- | -------------------------------------------------------------- |
+| `super_admin` | Accès total, gestion des utilisateurs et rôles, journaux       |
+| `admin`       | Gestion du contenu + utilisateurs editor/moderator/contributor |
+| `editor`      | Création et édition du contenu                                 |
+| `moderator`   | Modération des avis uniquement                                 |
+| `contributor` | Contenu + modération des avis (editor + moderator combinés)    |
 
 ## Matrice des droits
 
 ### Contenu (livres, boutures, genres, rayons, événements, sélections, pages, paramètres)
 
-| Action | super_admin | admin | editor | moderator | contributor |
-|---|---|---|---|---|---|
-| Créer | ✓ | ✓ | ✓ | — | ✓ |
-| Modifier | ✓ | ✓ | ✓ | — | ✓ |
-| Supprimer | ✓ | ✓ | ✓ | — | ✓ |
+| Action    | super_admin | admin | editor | moderator | contributor |
+| --------- | ----------- | ----- | ------ | --------- | ----------- |
+| Créer     | ✓           | ✓     | ✓      | —         | ✓           |
+| Modifier  | ✓           | ✓     | ✓      | —         | ✓           |
+| Supprimer | ✓           | ✓     | ✓      | —         | ✓           |
 
 ### Avis
 
-| Action | super_admin | admin | editor | moderator | contributor |
-|---|---|---|---|---|---|
-| Valider / masquer | ✓ | ✓ | — | ✓ | ✓ |
-| Supprimer | ✓ | ✓ | — | ✓ | ✓ |
+| Action            | super_admin | admin | editor | moderator | contributor |
+| ----------------- | ----------- | ----- | ------ | --------- | ----------- |
+| Valider / masquer | ✓           | ✓     | —      | ✓         | ✓           |
+| Supprimer         | ✓           | ✓     | —      | ✓         | ✓           |
 
 ### Utilisateurs
 
-| Action | super_admin | admin | editor | moderator | contributor |
-|---|---|---|---|---|---|
-| Voir la liste | ✓ | ✓ | — | — | — |
-| Créer un user | ✓ | ✓ (editor/moderator/contributor) | — | — | — |
-| Modifier un user | ✓ | ✓ (non-super_admin) | — | — | — |
-| Changer le rôle | ✓ (tous) | ✓ (editor/moderator/contributor) | — | — | — |
-| Supprimer un user | ✓ (guard: dernier super_admin) | ✓ (non-super_admin) | — | — | — |
-| Réinitialiser mdp (BO) | ✓ | ✓ (non-super_admin) | — | — | — |
+| Action                 | super_admin                    | admin                            | editor | moderator | contributor |
+| ---------------------- | ------------------------------ | -------------------------------- | ------ | --------- | ----------- |
+| Voir la liste          | ✓                              | ✓                                | —      | —         | —           |
+| Créer un user          | ✓                              | ✓ (editor/moderator/contributor) | —      | —         | —           |
+| Modifier un user       | ✓                              | ✓ (non-super_admin)              | —      | —         | —           |
+| Changer le rôle        | ✓ (tous)                       | ✓ (editor/moderator/contributor) | —      | —         | —           |
+| Supprimer un user      | ✓ (guard: dernier super_admin) | ✓ (non-super_admin)              | —      | —         | —           |
+| Réinitialiser mdp (BO) | ✓                              | ✓ (non-super_admin)              | —      | —         | —           |
 
 ### Administration
 
-| Action | super_admin | admin | editor | moderator | contributor |
-|---|---|---|---|---|---|
-| Journaux (`/admin/logs`) | ✓ | — | — | — | — |
-| Dashboard | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Action                   | super_admin | admin | editor | moderator | contributor |
+| ------------------------ | ----------- | ----- | ------ | --------- | ----------- |
+| Journaux (`/admin/logs`) | ✓           | —     | —      | —         | —           |
+| Dashboard                | ✓           | ✓     | ✓      | ✓         | ✓           |
 
 ## Reset password
 

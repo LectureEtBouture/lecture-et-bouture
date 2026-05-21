@@ -42,7 +42,11 @@ export async function createGenre(formData: FormData) {
     await requireAdmin();
     const { nom } = genreSchema.parse({ nom: formData.get('nom') });
     await db.insert(genres).values({ nom, slug: makeSlug(nom) });
-    await createLog({ action: 'genre.create', entityType: 'genre', entityLabel: nom });
+    await createLog({
+        action: 'genre.create',
+        entityType: 'genre',
+        entityLabel: nom,
+    });
     revalidatePath('/admin/genres');
     revalidateTag('livres', { expire: 0 });
     redirect('/admin/genres');
@@ -55,7 +59,12 @@ export async function updateGenre(id: string, formData: FormData) {
         .update(genres)
         .set({ nom, slug: makeSlug(nom) })
         .where(eq(genres.id, id));
-    await createLog({ action: 'genre.update', entityType: 'genre', entityId: id, entityLabel: nom });
+    await createLog({
+        action: 'genre.update',
+        entityType: 'genre',
+        entityId: id,
+        entityLabel: nom,
+    });
     revalidatePath('/admin/genres');
     revalidateTag('livres', { expire: 0 });
     redirect('/admin/genres');
@@ -63,9 +72,19 @@ export async function updateGenre(id: string, formData: FormData) {
 
 export async function deleteGenre(id: string) {
     await requireAdmin();
-    const row = await db.select({ nom: genres.nom }).from(genres).where(eq(genres.id, id)).limit(1).then((r) => r[0]);
+    const row = await db
+        .select({ nom: genres.nom })
+        .from(genres)
+        .where(eq(genres.id, id))
+        .limit(1)
+        .then((r) => r[0]);
     await db.delete(genres).where(eq(genres.id, id));
-    await createLog({ action: 'genre.delete', entityType: 'genre', entityId: id, entityLabel: row?.nom });
+    await createLog({
+        action: 'genre.delete',
+        entityType: 'genre',
+        entityId: id,
+        entityLabel: row?.nom,
+    });
     revalidatePath('/admin/genres');
     revalidateTag('livres', { expire: 0 });
 }

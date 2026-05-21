@@ -103,7 +103,8 @@ export function QRCodeSection({ defaultUrl }: { defaultUrl: string }) {
                                 />
                             </div>
                             <p className="text-[10px] text-muted text-center">
-                                Aperçu — export {QR_EXPORT_SIZE}×{QR_EXPORT_SIZE}px
+                                Aperçu — export {QR_EXPORT_SIZE}×
+                                {QR_EXPORT_SIZE}px
                             </p>
                             {/* Hidden high-res canvas for PNG export */}
                             <div ref={canvasRef} className="hidden">
@@ -129,7 +130,10 @@ export function QRCodeSection({ defaultUrl }: { defaultUrl: string }) {
                     ) : (
                         <div
                             className="border border-dashed border-border bg-surface flex items-center justify-center text-muted text-[11px] tracking-[0.08em] uppercase"
-                            style={{ width: QR_DISPLAY_SIZE + 24, height: QR_DISPLAY_SIZE + 24 }}
+                            style={{
+                                width: QR_DISPLAY_SIZE + 24,
+                                height: QR_DISPLAY_SIZE + 24,
+                            }}
                         >
                             Aperçu
                         </div>

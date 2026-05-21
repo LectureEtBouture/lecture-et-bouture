@@ -1,3 +1,5 @@
+'use client';
+
 import type { InferSelectModel } from 'drizzle-orm';
 import type { genres, rayons } from '@/db/schema';
 import {
@@ -11,15 +13,23 @@ type Genre = InferSelectModel<typeof genres>;
 type Rayon = InferSelectModel<typeof rayons>;
 
 export function LivreFormClassification({
-    selectedGenreIds,
+    checkedGenreIds,
+    onGenreChange,
     genresList,
-    rayonId,
+    rayonIdValue,
+    onRayonChange,
     rayonsList,
+    suggestedCategories = [],
+    suggestedRayonLabel,
 }: {
-    selectedGenreIds: string[];
+    checkedGenreIds: string[];
+    onGenreChange: (id: string, checked: boolean) => void;
     genresList: Genre[];
-    rayonId?: string | null;
+    rayonIdValue: string;
+    onRayonChange: (id: string) => void;
     rayonsList: Rayon[];
+    suggestedCategories?: string[];
+    suggestedRayonLabel?: string;
 }) {
     return (
         <fieldset className={fieldsetClass}>
@@ -28,7 +38,8 @@ export function LivreFormClassification({
                 <label className={labelClass}>Rayon</label>
                 <select
                     name="rayonId"
-                    defaultValue={rayonId ?? ''}
+                    value={rayonIdValue}
+                    onChange={(e) => onRayonChange(e.target.value)}
                     className={inputClass}
                 >
                     <option value="">— Aucun —</option>
@@ -38,6 +49,14 @@ export function LivreFormClassification({
                         </option>
                     ))}
                 </select>
+                {suggestedRayonLabel && !rayonIdValue && (
+                    <p className="mt-1 text-[11px] text-muted">
+                        Suggestion Google Books : {suggestedRayonLabel}
+                        {rayonsList.every((r) => r.nom !== suggestedRayonLabel) && (
+                            <span className="text-amber-600"> (rayon à créer)</span>
+                        )}
+                    </p>
+                )}
             </div>
             <div>
                 <p className={labelClass}>Genres</p>
@@ -51,9 +70,8 @@ export function LivreFormClassification({
                                 type="checkbox"
                                 name="genreIds"
                                 value={genre.id}
-                                defaultChecked={selectedGenreIds.includes(
-                                    genre.id,
-                                )}
+                                checked={checkedGenreIds.includes(genre.id)}
+                                onChange={(e) => onGenreChange(genre.id, e.target.checked)}
                                 className="accent-primary"
                             />
                             <span className="text-[12px] text-foreground">
@@ -62,6 +80,11 @@ export function LivreFormClassification({
                         </label>
                     ))}
                 </div>
+                {suggestedCategories.length > 0 && (
+                    <p className="mt-2 text-[11px] text-muted">
+                        Google Books : {suggestedCategories.join(' · ')}
+                    </p>
+                )}
             </div>
         </fieldset>
     );

@@ -1,41 +1,30 @@
-import type { InferSelectModel } from 'drizzle-orm';
-import type { livres } from '@/db/schema';
-import {
-    inputClass,
-    labelClass,
-    fieldsetClass,
-    legendClass,
-} from './formStyles';
+'use client';
 
-type Livre = InferSelectModel<typeof livres>;
+import { inputClass, labelClass, fieldsetClass, legendClass } from './formStyles';
 
-export function LivreFormCommerce({ livre }: { livre?: Livre }) {
+interface Props {
+    prixValue: string;
+    onPrixChange: (v: string) => void;
+}
+
+export function LivreFormCommerce({ prixValue, onPrixChange }: Props) {
     return (
         <fieldset className={fieldsetClass}>
             <legend className={legendClass}>Commerce</legend>
-            <div className="grid grid-cols-2 gap-4">
-                <div>
-                    <label className={labelClass}>Prix (€) *</label>
-                    <input
-                        name="prix"
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        defaultValue={livre?.prix ?? ''}
-                        required
-                        className={inputClass}
-                    />
-                </div>
-                <div>
-                    <label className={labelClass}>Stock</label>
-                    <input
-                        name="stock"
-                        type="number"
-                        min="0"
-                        defaultValue={livre?.stock ?? 0}
-                        className={inputClass}
-                    />
-                </div>
+            <div>
+                <label className={labelClass}>Prix indicatif (€)</label>
+                <input
+                    name="prix"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={prixValue}
+                    onChange={(e) => onPrixChange(e.target.value)}
+                    className={inputClass}
+                />
+                <p className="text-[11px] text-muted mt-1">
+                    Prix physique indicatif — à renseigner manuellement.
+                </p>
             </div>
         </fieldset>
     );

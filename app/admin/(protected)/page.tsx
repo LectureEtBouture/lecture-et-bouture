@@ -5,7 +5,6 @@ import { getProchainEvenements } from '@/lib/actions/evenements';
 import { siteConfig } from '@/lib/metadata';
 import { StatsLedger } from './_components/dashboard/StatsLedger';
 import { AlerteBar } from './_components/dashboard/AlerteBar';
-import { RupturesList } from './_components/dashboard/RupturesList';
 import { DerniersAvis } from './_components/dashboard/DerniersAvis';
 import { AgendaPanel } from './_components/dashboard/AgendaPanel';
 
@@ -24,8 +23,6 @@ export default async function AdminPage() {
         [totalBoutures],
         [avisEnAttente],
         [avisPublies],
-        livresSansStock,
-        boutureSansStock,
         derniersAvis,
         prochainEvenements,
     ] = await Promise.all([
@@ -39,20 +36,6 @@ export default async function AdminPage() {
             .select({ count: count() })
             .from(avis)
             .where(and(eq(avis.approuve, true), eq(avis.masque, false))),
-        db
-            .select({
-                id: livres.id,
-                titre: livres.titre,
-                auteur: livres.auteur,
-            })
-            .from(livres)
-            .where(eq(livres.stock, 0))
-            .limit(8),
-        db
-            .select({ id: plantes.id, nom: plantes.nom })
-            .from(plantes)
-            .where(eq(plantes.stock, 0))
-            .limit(8),
         db
             .select({
                 id: avis.id,
@@ -70,11 +53,9 @@ export default async function AdminPage() {
         getProchainEvenements(5),
     ]);
 
-    const ruptures = livresSansStock.length + boutureSansStock.length;
-
     const statsLines = [
         {
-            label: 'Livres en catalogue',
+            label: 'Livres enrichis',
             value: totalLivres.count,
             href: '/admin/livres',
         },
@@ -96,11 +77,6 @@ export default async function AdminPage() {
             count: avisEnAttente.count,
             href: '/admin/avis',
         },
-        {
-            label: 'rupture' + (ruptures > 1 ? 's' : '') + ' de stock',
-            count: ruptures,
-            href: '/admin/livres',
-        },
     ];
 
     return (
@@ -118,13 +94,7 @@ export default async function AdminPage() {
             <AlerteBar alertes={alertes} />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-2">
-                <div className="space-y-8">
-                    <RupturesList
-                        livres={livresSansStock}
-                        boutures={boutureSansStock}
-                    />
-                    <DerniersAvis avis={derniersAvis} />
-                </div>
+                <DerniersAvis avis={derniersAvis} />
                 <AgendaPanel evenements={prochainEvenements} />
             </div>
         </div>

@@ -2,13 +2,15 @@ import { config } from 'dotenv';
 
 config({ path: '.env.local' });
 
-import { bookProvider } from '../lib/services/books';
+import { bookProvider } from '@/lib/services/books';
 
 const isbn = process.argv[2];
 
 if (!isbn) {
     console.error('Usage: npx tsx scripts/isbn-test.ts <isbn>');
-    console.error('       BOOK_PROVIDER=wikidata npx tsx scripts/isbn-test.ts <isbn>');
+    console.error(
+        '       BOOK_PROVIDER=wikidata npx tsx scripts/isbn-test.ts <isbn>',
+    );
     process.exit(1);
 }
 

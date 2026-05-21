@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og';
-import { getLivreBySlug, getLivresPubliques } from '@/lib/queries/livres';
+import { getLivreBySlug } from '@/lib/queries/livres';
 import { getGenreById } from '@/lib/queries/genres';
 import { getCoverColor } from '@/lib/data';
 import { loadOgFonts } from '@/lib/og-fonts';
@@ -7,11 +7,6 @@ import { siteConfig } from '@/lib/metadata';
 
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
-
-export async function generateStaticParams() {
-    const livres = await getLivresPubliques();
-    return livres.map((livre) => ({ slug: livre.slug }));
-}
 
 export default async function Image({
     params,

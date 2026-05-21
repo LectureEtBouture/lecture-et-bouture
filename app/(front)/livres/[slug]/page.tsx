@@ -1,17 +1,18 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getLivreBySlug, getLivresPubliques } from '@/lib/queries/livres';
+import { sanitizeRte } from '@/lib/sanitize';
+import { getLivreBySlug, getMemeAuteur, getMemeCategorie } from '@/lib/queries/livres';
 import { getGenreById } from '@/lib/queries/genres';
 import { getRayonById } from '@/lib/queries/rayons';
 import { getRecommendations } from '@/lib/queries/recommendations';
 import { getAvisForLivre } from '@/lib/db/avis';
 import { getCoverColor } from '@/lib/data';
+import { translateCategory } from '@/lib/services/books/categories-fr';
 import { CoverPanel } from './_components/CoverPanel';
 import { NoteLibrairie } from './_components/NoteLibrairie';
 import { RecoSection } from './_components/RecoSection';
 import { LivreBreadcrumb } from './_components/LivreBreadcrumb';
 import { LivreHeader } from './_components/LivreHeader';
-import { AutresTomes } from './_components/AutresTomes';
 import { AvisSection } from '@/components/ui/AvisSection';
 import { VisitTracker } from '@/components/ui/VisitTracker';
 
@@ -24,29 +25,29 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: livre.titre, description: livre.description ?? undefined };
 }
 
-export async function generateStaticParams() {
-    const livres = await getLivresPubliques();
-    return livres.map((livre) => ({ slug: livre.slug }));
-}
-
 export default async function LivrePage({ params }: Props) {
     const { slug } = await params;
     const livre = await getLivreBySlug(slug);
     if (!livre) notFound();
 
     const primaryGenreId = livre.genreIds?.[0];
-    const [genre, rayon, avis, reco] = await Promise.all([
+    const [genre, rayon, avis, reco, livresMemeAuteur, livresMemeCategorie] = await Promise.all([
         primaryGenreId ? getGenreById(primaryGenreId) : Promise.resolve(null),
         livre.rayonId ? getRayonById(livre.rayonId) : Promise.resolve(null),
-        getAvisForLivre(livre.id),
-        getRecommendations(
-            livre.id,
-            livre.serie ?? null,
-            primaryGenreId ?? null,
-            livre.auteur,
-        ),
+        livre.localId ? getAvisForLivre(livre.localId) : Promise.resolve([]),
+        livre.localId !== null && primaryGenreId
+            ? getRecommendations(livre.localId, primaryGenreId)
+            : Promise.resolve({ memeGenre: [] }),
+        livre.auteur ? getMemeAuteur(livre.auteur, livre.inventaireUri) : Promise.resolve([]),
+        livre.categories.length > 0 ? getMemeCategorie(livre.categories, livre.inventaireUri) : Promise.resolve([]),
     ]);
     const coverColor = getCoverColor(primaryGenreId);
+    const descriptionRaw = livre.description ? sanitizeRte(livre.description) : null;
+    const descriptionText = descriptionRaw?.replace(/<[^>]*>/g, '').trim() ?? '';
+    const descriptionHtml =
+        descriptionText.length >= 20 && (livre.language === 'fr' || livre.language === null)
+            ? descriptionRaw
+            : null;
 
     return (
         <div className="max-w-6xl mx-auto px-6 py-16">
@@ -54,9 +55,9 @@ export default async function LivrePage({ params }: Props) {
                 type="livre"
                 slug={livre.slug}
                 titre={livre.titre}
-                auteur={livre.auteur}
+                auteur={livre.auteur ?? ''}
                 coverColor={coverColor}
-                image={livre.image ?? undefined}
+                image={livre.imageUrl ?? undefined}
             />
             <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-16">
                 <CoverPanel
@@ -73,14 +74,29 @@ export default async function LivrePage({ params }: Props) {
                     />
                     <LivreHeader livre={livre} />
 
-                    {livre.description && (
+                    {descriptionHtml && (
                         <div className="space-y-2">
                             <h2 className="text-xs uppercase tracking-widest text-muted">
                                 Description
                             </h2>
-                            <p className="text-base text-foreground leading-relaxed max-w-[68ch]">
-                                {livre.description}
-                            </p>
+                            <div
+                                className="text-base text-foreground leading-relaxed max-w-[68ch] [&_p]:mb-3 [&_p:last-child]:mb-0"
+                                // Content sanitized server-side via sanitizeRte (sanitize-html)
+                                dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+                            />
+                        </div>
+                    )}
+
+                    {livre.categories.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                            {livre.categories.map((categorie) => (
+                                <span
+                                    key={categorie}
+                                    className="text-[10px] uppercase tracking-widest text-muted border border-border px-2 py-1"
+                                >
+                                    {translateCategory(categorie)}
+                                </span>
+                            ))}
                         </div>
                     )}
 
@@ -88,12 +104,11 @@ export default async function LivrePage({ params }: Props) {
                         <NoteLibrairie note={livre.noteDeLaLibrairie} />
                     )}
 
-                    {livre.serie && reco.memeSerie.length > 0 && (
-                        <AutresTomes
-                            serie={livre.serie}
-                            tomes={reco.memeSerie}
-                        />
-                    )}
+                    <AvisSection
+                        avis={avis}
+                        itemId={livre.inventaireUri}
+                        type="livre"
+                    />
 
                     {reco.memeGenre.length > 0 && genre && (
                         <RecoSection
@@ -103,16 +118,24 @@ export default async function LivrePage({ params }: Props) {
                             livres={reco.memeGenre}
                         />
                     )}
-                    {reco.memeAuteur.length > 0 && (
+
+                    {livresMemeAuteur.length > 0 && livre.auteur && (
                         <RecoSection
-                            prefix="Par"
+                            prefix="Du même auteur"
                             label={livre.auteur}
-                            href={`/livres?q=${encodeURIComponent(livre.auteur)}`}
-                            livres={reco.memeAuteur}
+                            href={`/livres?q=${encodeURIComponent(`inauthor:"${livre.auteur}"`)}`}
+                            livres={livresMemeAuteur}
                         />
                     )}
 
-                    <AvisSection avis={avis} itemId={livre.id} type="livre" />
+                    {livresMemeCategorie.length > 0 && (
+                        <RecoSection
+                            prefix="Dans le même univers"
+                            label=""
+                            href={`/livres?cat=${encodeURIComponent(livre.categories[0] ?? '')}`}
+                            livres={livresMemeCategorie}
+                        />
+                    )}
                 </div>
             </div>
         </div>

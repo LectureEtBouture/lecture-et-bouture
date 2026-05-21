@@ -1,162 +1,247 @@
 import { unstable_cache } from 'next/cache';
-import { db } from '@/db';
-import { livres } from '@/db/schema';
-import { eq, and, asc, desc, ilike, or, sql, type SQL } from 'drizzle-orm';
+import { bookProvider, discoveryProvider } from '@/lib/services/books';
+import { fusionner, fusionnerListe } from '@/lib/services/books/merge';
+import { fetchOLDescriptionByISBN } from '@/lib/services/books/providers/inventaire-helpers';
+import type { LivreComplet, EnrichissementLocal } from '@/lib/services/books/types';
+import {
+    getEnrichissements,
+    getEnrichissementsCount,
+    getChoixLibrairie,
+    getEnrichissementByUri,
+    type SortEnrichissements,
+} from './enrichissements';
+import { slugToUri } from '@/lib/services/books/slug';
+import { bisacForRayon } from '@/lib/services/books/bisac';
+import { suggestRayonSlug } from '@/lib/services/books/categories-fr';
 
-export type SortLivres =
-    | 'alpha'
-    | 'prix-asc'
-    | 'prix-desc'
-    | 'note'
-    | 'date'
-    | 'editeur';
+export type { LivreComplet };
+
+export type SortLivres = 'alpha' | 'date' | 'note' | 'prix-asc' | 'prix-desc' | 'relevance' | 'newest';
 
 export interface LivresFilters {
-    genre?: string;
-    rayon?: string;
+    rayonId?: string;
     rayonSlug?: string;
-    serie?: string;
-    editeur?: string;
-    format?: string;
-    sort?: SortLivres;
-    q?: string;
+    genreId?: string;
     choixLibrairie?: boolean;
+    q?: string;
+    sort?: SortLivres;
     limit?: number;
     offset?: number;
+    cat?: string;
+    ebook?: boolean;
 }
 
-export const livreSelect = {
-    id: livres.id,
-    slug: livres.slug,
-    titre: livres.titre,
-    auteur: livres.auteur,
-    isbn: livres.isbn,
-    genreIds: sql<
-        string[]
-    >`COALESCE(ARRAY(SELECT lg.genre_id FROM livres_genres lg WHERE lg.livre_id = ${livres.id} ORDER BY lg.genre_id), ARRAY[]::uuid[])`,
-    rayonId: livres.rayonId,
-    editeur: livres.editeur,
-    collection: livres.collection,
-    format: livres.format,
-    edition: livres.edition,
-    anneePublication: livres.anneePublication,
-    serie: livres.serie,
-    numeroSerie: livres.numeroSerie,
-    prix: livres.prix,
-    description: livres.description,
-    image: livres.image,
-    imageAlt: livres.imageAlt,
-    noteMoyenne: livres.noteMoyenne,
-    choixLibrairie: livres.choixLibrairie,
-    stock: livres.stock,
-    noteDeLaLibrairie: livres.noteDeLaLibrairie,
-    publishedAt: livres.publishedAt,
-} as const;
-
-export type LivrePublique = Awaited<
-    ReturnType<typeof getLivresPubliques>
->[number];
-
-function buildOrderBy(sort?: SortLivres) {
-    switch (sort) {
-        case 'alpha':
-            return asc(livres.titre);
-        case 'prix-asc':
-            return asc(livres.prix);
-        case 'prix-desc':
-            return desc(livres.prix);
-        case 'note':
-            return desc(livres.noteMoyenne);
-        case 'date':
-            return desc(livres.publishedAt);
-        case 'editeur':
-            return asc(livres.editeur);
-        default:
-            return asc(livres.titre);
-    }
-}
-
-function buildConditions(
-    filters: Omit<LivresFilters, 'sort' | 'limit' | 'offset'>,
-) {
-    const conditions: SQL[] = [];
-    if (filters.rayon) conditions.push(eq(livres.rayonId, filters.rayon));
-    if (filters.rayonSlug)
-        conditions.push(
-            sql`EXISTS (SELECT 1 FROM rayons r WHERE r.id = ${livres.rayonId} AND r.slug = ${filters.rayonSlug})`,
-        );
-    if (filters.genre)
-        conditions.push(
-            sql`EXISTS (SELECT 1 FROM livres_genres WHERE livre_id = ${livres.id} AND genre_id = ${filters.genre})`,
-        );
-    if (filters.serie) conditions.push(eq(livres.serie, filters.serie));
-    if (filters.editeur) conditions.push(eq(livres.editeur, filters.editeur));
-    if (filters.format) conditions.push(eq(livres.format, filters.format));
-    if (filters.choixLibrairie)
-        conditions.push(eq(livres.choixLibrairie, true));
-    if (filters.q) {
-        const pattern = `%${filters.q}%`;
-        const searchCondition = or(
-            ilike(livres.titre, pattern),
-            ilike(livres.auteur, pattern),
-            ilike(livres.collection, pattern),
-            ilike(livres.editeur, pattern),
-            ilike(livres.serie, pattern),
-        );
-        if (searchCondition) conditions.push(searchCondition);
-    }
-    return conditions;
-}
-
+// Browse (no query): enriched books from local DB + inventaire batch fetch
 export const getLivresPubliques = unstable_cache(
-    async (filters: LivresFilters = {}) => {
-        const conditions = buildConditions(filters);
-        const base = db
-            .select(livreSelect)
-            .from(livres)
-            .where(conditions.length > 0 ? and(...conditions) : undefined)
-            .orderBy(buildOrderBy(filters.sort));
-        if (filters.limit !== undefined) {
-            return base.limit(filters.limit).offset(filters.offset ?? 0);
+    async (filters: LivresFilters = {}): Promise<LivreComplet[]> => {
+        if (filters.q) return getLivresSearch(filters.q, filters);
+
+        const isAlpha = filters.sort === 'alpha';
+        const enrichissements = await getEnrichissements({
+            rayonId: filters.rayonId,
+            rayonSlug: filters.rayonSlug,
+            genreId: filters.genreId,
+            choixLibrairie: filters.choixLibrairie,
+            sort: isAlpha ? undefined : (filters.sort as SortEnrichissements | undefined),
+            limit: isAlpha ? undefined : filters.limit,
+            offset: isAlpha ? undefined : filters.offset,
+        });
+
+        if (enrichissements.length === 0) return [];
+
+        const uris = enrichissements.map((e) => e.inventaireUri);
+        const metas = await bookProvider.rechercherParUris(uris);
+        const enrichMap = new Map<string, EnrichissementLocal>(
+            enrichissements.map((e) => [e.inventaireUri, e]),
+        );
+
+        let result = fusionnerListe(metas, enrichMap, uris);
+
+        if (isAlpha) {
+            result = result.sort((a, b) => a.titre.localeCompare(b.titre, 'fr'));
+            if (filters.limit !== undefined) {
+                const off = filters.offset ?? 0;
+                result = result.slice(off, off + filters.limit);
+            }
         }
-        return base;
+
+        return result;
     },
     ['livres-publiques'],
     { tags: ['livres'] },
 );
 
+// Search: Google Books live search + overlay enrichissements
+// rechercherParTitre retourne déjà toutes les métadonnées nécessaires — pas besoin
+// d'appeler rechercherParUris (N appels supplémentaires pour les mêmes données).
+async function getLivresSearch(
+    q: string,
+    filters: LivresFilters,
+): Promise<LivreComplet[]> {
+    const orderBy = filters.sort === 'newest' ? 'newest' : 'relevance';
+    const bisac = filters.rayonSlug ? bisacForRayon(filters.rayonSlug) : null;
+    const queryWithBisac = bisac ? `${q} ${bisac}` : q;
+    const offset = filters.offset ?? 0;
+    const results = await bookProvider.rechercherParTitre(queryWithBisac, { orderBy, startIndex: offset, maxResults: 40 });
+    if (results.length === 0) return [];
+
+    const toMeta = (r: import('@/lib/services/books/types').LivreSearchResult): import('@/lib/services/books/types').LivreMetadata => ({
+        sourceId: r.uri,
+        titre: r.titre,
+        auteur: r.auteur,
+        isbn: r.isbn,
+        editeur: r.editeur,
+        anneePublication: r.anneePublication,
+        publishedDateRaw: null,
+        serie: null,
+        imageUrl: r.imageUrl,
+        description: r.description,
+        language: null,
+        categories: r.categories,
+        previewLink: null,
+        isEbook: r.isEbook,
+        prixNumerique: r.prixNumerique,
+        nombrePages: null,
+    });
+
+    const metas = new Map<string, import('@/lib/services/books/types').LivreMetadata>(
+        results.map((r) => [r.uri, toMeta(r)]),
+    );
+
+    // Expansion auteur: si peu de résultats physiques et un seul auteur domine,
+    // compléter avec inauthor: pour retrouver les autres tomes d'une série.
+    if (offset === 0 && !filters.rayonSlug && !bisac) {
+        const physical = results.filter((r) => !r.isEbook);
+        if (physical.length < 4 && physical.length >= 2) {
+            const authorCounts = new Map<string, number>();
+            for (const r of physical) {
+                if (r.auteur) authorCounts.set(r.auteur, (authorCounts.get(r.auteur) ?? 0) + 1);
+            }
+            const topEntry = [...authorCounts.entries()].sort((a, b) => b[1] - a[1])[0];
+            if (topEntry && topEntry[1] >= 2) {
+                const expanded = await bookProvider.rechercherParTitre(`inauthor:"${topEntry[0]}"`, { orderBy: 'relevance', startIndex: 0, maxResults: 40 });
+                for (const r of expanded) {
+                    if (!metas.has(r.uri)) metas.set(r.uri, toMeta(r));
+                }
+            }
+        }
+    }
+
+    const uris = [...metas.keys()];
+    const enrichissements = await Promise.all(uris.map((uri) => getEnrichissementByUri(uri)));
+    const enrichMap = new Map<string, EnrichissementLocal>(
+        uris
+            .map((uri, i) => [uri, enrichissements[i]] as const)
+            .filter((pair): pair is [string, EnrichissementLocal] => pair[1] !== null),
+    );
+
+    let livres = fusionnerListe(metas, enrichMap, uris);
+
+    if (filters.rayonId) livres = livres.filter((livre) => livre.rayonId === filters.rayonId);
+    if (filters.genreId) livres = livres.filter((livre) => livre.genreIds.includes(filters.genreId!));
+    if (filters.choixLibrairie) livres = livres.filter((livre) => livre.choixLibrairie);
+
+    return livres;
+}
+
 export const getLivresCount = unstable_cache(
-    async (filters: Omit<LivresFilters, 'sort' | 'limit' | 'offset'> = {}) => {
-        const conditions = buildConditions(filters);
-        const [row] = await db
-            .select({ total: sql<number>`count(*)` })
-            .from(livres)
-            .where(conditions.length > 0 ? and(...conditions) : undefined);
-        return Number(row.total);
+    async (filters: Omit<LivresFilters, 'limit' | 'offset'> = {}) => {
+        if (filters.q) {
+            const results = await getLivresSearch(filters.q, filters);
+            return results.length;
+        }
+        return getEnrichissementsCount({
+            rayonId: filters.rayonId,
+            rayonSlug: filters.rayonSlug,
+            genreId: filters.genreId,
+            choixLibrairie: filters.choixLibrairie,
+        });
     },
     ['livres-count'],
     { tags: ['livres'] },
 );
 
-export const getLivreBySlug = unstable_cache(
-    async (slug: string) =>
-        db
-            .select(livreSelect)
-            .from(livres)
-            .where(eq(livres.slug, slug))
-            .limit(1)
-            .then((rows) => rows[0] ?? null),
-    ['livre-by-slug'],
-    { tags: ['livres'] },
-);
-
 export const getLivresMisEnAvant = unstable_cache(
-    async () =>
-        db
-            .select(livreSelect)
-            .from(livres)
-            .where(eq(livres.choixLibrairie, true))
-            .orderBy(asc(livres.titre)),
+    async (): Promise<LivreComplet[]> => {
+        const enrichissements = await getChoixLibrairie();
+        if (enrichissements.length === 0) return [];
+        const uris = enrichissements.map((e) => e.inventaireUri);
+        const metas = await bookProvider.rechercherParUris(uris);
+        const enrichMap = new Map<string, EnrichissementLocal>(
+            enrichissements.map((e) => [e.inventaireUri, e]),
+        );
+        return fusionnerListe(metas, enrichMap, uris);
+    },
     ['livres-mis-en-avant'],
     { tags: ['livres'] },
 );
+
+export async function getLivreBySlug(slug: string): Promise<LivreComplet | null> {
+    const uri = slugToUri(slug);
+    const [meta, enrichissement] = await Promise.all([
+        bookProvider.rechercherParUri(uri),
+        getEnrichissementByUri(uri),
+    ]);
+    if (!meta) return null;
+    if (!meta.description && meta.isbn) {
+        const desc = await fetchOLDescriptionByISBN(meta.isbn);
+        if (desc) meta = { ...meta, description: desc };
+    }
+    return fusionner(meta, enrichissement);
+}
+
+export async function buildDiscoveryList(metas: import('@/lib/services/books/types').LivreMetadata[]): Promise<LivreComplet[]> {
+    const uris = metas.map((meta) => meta.sourceId);
+    const enrichissements = await Promise.all(uris.map((uri) => getEnrichissementByUri(uri)));
+    const enrichMap = new Map<string, EnrichissementLocal>(
+        uris
+            .map((uri, i) => [uri, enrichissements[i]] as const)
+            .filter((pair): pair is [string, EnrichissementLocal] => pair[1] !== null),
+    );
+    return metas.map((meta) => fusionner(meta, enrichMap.get(meta.sourceId) ?? null));
+}
+
+export async function getLivresParCategorie(catSlug: string, startIndex = 0): Promise<LivreComplet[]> {
+    const bisacQuery = bisacForRayon(catSlug) ?? catSlug;
+    const metas = await discoveryProvider.rechercherParSujet(bisacQuery, startIndex);
+    if (metas.length === 0) return [];
+    const uris = metas.map((meta) => meta.sourceId);
+    const enrichissements = await Promise.all(uris.map((uri) => getEnrichissementByUri(uri)));
+    const enrichMap = new Map<string, EnrichissementLocal>(
+        uris
+            .map((uri, i) => [uri, enrichissements[i]] as const)
+            .filter((pair): pair is [string, EnrichissementLocal] => pair[1] !== null),
+    );
+    return metas.map((meta) => fusionner(meta, enrichMap.get(meta.sourceId) ?? null));
+}
+
+export async function getLivresTendances(startIndex = 0): Promise<LivreComplet[]> {
+    const metas = await discoveryProvider.rechercherTendances(startIndex);
+    return buildDiscoveryList(metas);
+}
+
+export async function getLivresNouveautes(startIndex = 0): Promise<LivreComplet[]> {
+    const metas = await discoveryProvider.rechercherNouveautes(startIndex);
+    return buildDiscoveryList(metas);
+}
+
+export async function getLivresParSujet(query: string): Promise<LivreComplet[]> {
+    const metas = await discoveryProvider.rechercherParSujet(query);
+    return buildDiscoveryList(metas);
+}
+
+export async function getMemeAuteur(auteur: string, excludeUri: string, limit = 4): Promise<LivreComplet[]> {
+    const metas = await discoveryProvider.rechercherParSujet(`inauthor:"${auteur}"`);
+    const filtered = metas.filter((meta) => meta.sourceId !== excludeUri).slice(0, limit);
+    return buildDiscoveryList(filtered);
+}
+
+export async function getMemeCategorie(categories: string[], excludeUri: string, limit = 4): Promise<LivreComplet[]> {
+    const rayonSlug = suggestRayonSlug(categories);
+    if (!rayonSlug) return [];
+    const query = bisacForRayon(rayonSlug);
+    if (!query) return [];
+    const metas = await discoveryProvider.rechercherParSujet(query);
+    const filtered = metas.filter((meta) => meta.sourceId !== excludeUri).slice(0, limit);
+    return buildDiscoveryList(filtered);
+}

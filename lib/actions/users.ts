@@ -17,7 +17,11 @@ const ASSIGNABLE_BY_ADMIN = ['editor', 'moderator', 'contributor'] as const;
 async function requireUserManager() {
     const session = await auth();
     if (!session) redirect('/admin/login');
-    if (!ADMIN_ROLES.includes(session.user?.role as (typeof ADMIN_ROLES)[number])) {
+    if (
+        !ADMIN_ROLES.includes(
+            session.user?.role as (typeof ADMIN_ROLES)[number],
+        )
+    ) {
         redirect('/admin');
     }
     return session;
@@ -35,32 +39,49 @@ function canManageTarget(actorRole: string | undefined, targetRole: string) {
 
 function canAssignRole(actorRole: string | undefined, targetRole: string) {
     if (actorRole === 'super_admin') return true;
-    if (actorRole === 'admin') return ASSIGNABLE_BY_ADMIN.includes(targetRole as (typeof ASSIGNABLE_BY_ADMIN)[number]);
+    if (actorRole === 'admin')
+        return ASSIGNABLE_BY_ADMIN.includes(
+            targetRole as (typeof ASSIGNABLE_BY_ADMIN)[number],
+        );
     return false;
 }
 
 export async function getUsers() {
     const session = await requireUserManager();
-    const all = await db.select({
-        id: users.id,
-        email: users.email,
-        role: users.role,
-        createdAt: users.createdAt,
-        updatedAt: users.updatedAt,
-    }).from(users).orderBy(users.createdAt);
+    const all = await db
+        .select({
+            id: users.id,
+            email: users.email,
+            role: users.role,
+            createdAt: users.createdAt,
+            updatedAt: users.updatedAt,
+        })
+        .from(users)
+        .orderBy(users.createdAt);
 
     if (isSuperAdmin(session.user?.role)) return all;
     return all.filter((user) => user.role !== 'super_admin');
 }
 
 export async function getUser(id: string) {
-    return db.select().from(users).where(eq(users.id, id)).limit(1).then((r) => r[0] ?? null);
+    return db
+        .select()
+        .from(users)
+        .where(eq(users.id, id))
+        .limit(1)
+        .then((r) => r[0] ?? null);
 }
 
 const createUserSchema = z.object({
     email: z.string().email(),
     password: z.string().min(8),
-    role: z.enum(['super_admin', 'admin', 'editor', 'moderator', 'contributor']),
+    role: z.enum([
+        'super_admin',
+        'admin',
+        'editor',
+        'moderator',
+        'contributor',
+    ]),
 });
 
 export async function createUser(formData: FormData) {
@@ -88,7 +109,13 @@ export async function createUser(formData: FormData) {
 
 const updateUserSchema = z.object({
     email: z.string().email(),
-    role: z.enum(['super_admin', 'admin', 'editor', 'moderator', 'contributor']),
+    role: z.enum([
+        'super_admin',
+        'admin',
+        'editor',
+        'moderator',
+        'contributor',
+    ]),
 });
 
 export async function updateUser(id: string, formData: FormData) {
@@ -109,11 +136,14 @@ export async function updateUser(id: string, formData: FormData) {
         throw new Error('Rôle non autorisé.');
     }
 
-    await db.update(users).set({
-        email: parsed.email,
-        role: parsed.role,
-        updatedAt: new Date(),
-    }).where(eq(users.id, id));
+    await db
+        .update(users)
+        .set({
+            email: parsed.email,
+            role: parsed.role,
+            updatedAt: new Date(),
+        })
+        .where(eq(users.id, id));
 
     revalidatePath('/admin/users');
     redirect('/admin/users');
@@ -155,11 +185,14 @@ export async function initiatePasswordReset(id: string) {
     const token = randomBytes(32).toString('hex');
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
 
-    await db.update(users).set({
-        resetToken: token,
-        resetTokenExpiresAt: expiresAt,
-        updatedAt: new Date(),
-    }).where(eq(users.id, id));
+    await db
+        .update(users)
+        .set({
+            resetToken: token,
+            resetTokenExpiresAt: expiresAt,
+            updatedAt: new Date(),
+        })
+        .where(eq(users.id, id));
 
     const baseUrl = process.env.NEXTAUTH_URL ?? 'http://localhost:3000';
     await sendResetPasswordEmail({
@@ -188,11 +221,14 @@ export async function forgotPassword(formData: FormData) {
     const token = randomBytes(32).toString('hex');
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
 
-    await db.update(users).set({
-        resetToken: token,
-        resetTokenExpiresAt: expiresAt,
-        updatedAt: new Date(),
-    }).where(eq(users.id, user.id));
+    await db
+        .update(users)
+        .set({
+            resetToken: token,
+            resetTokenExpiresAt: expiresAt,
+            updatedAt: new Date(),
+        })
+        .where(eq(users.id, user.id));
 
     const baseUrl = process.env.NEXTAUTH_URL ?? 'http://localhost:3000';
     await sendResetPasswordEmail({
@@ -216,12 +252,17 @@ export async function resetPassword(formData: FormData) {
     if (!parsed.success) return { error: 'Données invalides.' };
 
     const user = await db
-        .select({ id: users.id, resetTokenExpiresAt: users.resetTokenExpiresAt })
+        .select({
+            id: users.id,
+            resetTokenExpiresAt: users.resetTokenExpiresAt,
+        })
         .from(users)
-        .where(and(
-            eq(users.resetToken, parsed.data.token),
-            ne(users.resetToken, ''),
-        ))
+        .where(
+            and(
+                eq(users.resetToken, parsed.data.token),
+                ne(users.resetToken, ''),
+            ),
+        )
         .limit(1)
         .then((r) => r[0]);
 
@@ -231,12 +272,15 @@ export async function resetPassword(formData: FormData) {
     }
 
     const passwordHash = await argon2.hash(parsed.data.password);
-    await db.update(users).set({
-        passwordHash,
-        resetToken: null,
-        resetTokenExpiresAt: null,
-        updatedAt: new Date(),
-    }).where(eq(users.id, user.id));
+    await db
+        .update(users)
+        .set({
+            passwordHash,
+            resetToken: null,
+            resetTokenExpiresAt: null,
+            updatedAt: new Date(),
+        })
+        .where(eq(users.id, user.id));
 
     return { success: true };
 }

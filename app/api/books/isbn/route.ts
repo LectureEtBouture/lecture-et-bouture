@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { bookProvider } from '@/lib/services/books';
+import { importProvider, bookProvider } from '@/lib/services/books';
 
 export async function GET(request: NextRequest) {
     const session = await auth();
@@ -16,14 +16,16 @@ export async function GET(request: NextRequest) {
         );
     }
 
-    const result = await bookProvider.rechercherParISBN(isbn);
+    const needsGbCategories = importProvider !== bookProvider;
+    const [result, gbMeta] = await Promise.all([
+        importProvider.rechercherParISBN(isbn),
+        needsGbCategories ? bookProvider.rechercherParISBN(isbn) : Promise.resolve(null),
+    ]);
 
     if (!result) {
-        return NextResponse.json(
-            { error: 'ISBN non trouvé' },
-            { status: 404 },
-        );
+        return NextResponse.json({ error: 'ISBN non trouvé' }, { status: 404 });
     }
 
-    return NextResponse.json(result);
+    const categories = gbMeta?.categories ?? result.categories ?? [];
+    return NextResponse.json({ ...result, categories });
 }

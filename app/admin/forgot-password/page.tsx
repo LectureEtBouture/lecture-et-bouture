@@ -30,13 +30,17 @@ export default function ForgotPasswordPage() {
                     <h1 className="text-xl font-semibold text-foreground">
                         Mot de passe oublié
                     </h1>
-                    <p className="text-sm text-neutral-500">{siteConfig.name}</p>
+                    <p className="text-sm text-neutral-500">
+                        {siteConfig.name}
+                    </p>
                 </div>
 
                 {state === 'done' ? (
                     <div className="space-y-4">
                         <p className="text-sm text-foreground">
-                            Si un compte existe avec cet email, un lien de réinitialisation vous a été envoyé. Vérifiez votre boîte mail.
+                            Si un compte existe avec cet email, un lien de
+                            réinitialisation vous a été envoyé. Vérifiez votre
+                            boîte mail.
                         </p>
                         <Link
                             href="/admin/login"
@@ -64,14 +68,18 @@ export default function ForgotPasswordPage() {
                             />
                         </div>
 
-                        {error && <p className="text-sm text-red-600">{error}</p>}
+                        {error && (
+                            <p className="text-sm text-red-600">{error}</p>
+                        )}
 
                         <button
                             type="submit"
                             disabled={state === 'loading'}
                             className="w-full py-2 bg-[#2D4B3E] text-white text-sm font-medium rounded-lg hover:bg-[#243d32] disabled:opacity-50 transition-colors"
                         >
-                            {state === 'loading' ? 'Envoi...' : 'Envoyer le lien'}
+                            {state === 'loading'
+                                ? 'Envoi...'
+                                : 'Envoyer le lien'}
                         </button>
 
                         <div className="text-center">

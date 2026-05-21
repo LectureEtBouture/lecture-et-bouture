@@ -3,315 +3,130 @@ import postgres from 'postgres';
 import { sql } from 'drizzle-orm';
 import { config } from 'dotenv';
 import {
-    genres,
-    rayons,
-    livres,
-    livresGenres,
     plantes,
-    avis,
     evenements,
-    selections,
-    selectionItems,
     pagesEditoriales,
     parametres,
 } from './schema';
-import genresJson from '../data/genres.json';
-import rayonsJson from '../data/rayons.json';
-import livresJson from '../data/livres.json';
 import bouturesJson from '../data/boutures.json';
 import avisJson from '../data/avis.json';
-import selectionsJson from '../data/selections.json';
 
 config({ path: '.env.local' });
+
+type BoutureJson = {
+    id: number;
+    slug: string;
+    nom: string;
+    espece: string | null;
+    famille: string | null;
+    prix: string;
+    description: string | null;
+    conseilsEntretien: string | null;
+    difficulte: 'facile' | 'moyen' | 'difficile' | null;
+    lumiere: 'ombre' | 'mi-ombre' | 'lumiere-vive' | 'plein-soleil' | null;
+    arrosage: 'rare' | 'modere' | 'regulier' | 'abondant' | null;
+    images: string[];
+    noteMoyenne: string | null;
+    choixLibrairie: boolean;
+    stock: number;
+};
+
+type AvisJson = {
+    id: number;
+    type: string;
+    livreId: number | null;
+    planteId: number | null;
+    auteurNom: string;
+    note: number;
+    texte: string | null;
+    approuve: boolean;
+};
 
 const client = postgres(process.env['DATABASE_URL'] as string);
 const db = drizzle(client);
 
 async function main() {
     await db.execute(
-        sql`TRUNCATE TABLE avis, selection_items, evenements, livres, plantes, selections, genres, rayons CASCADE`,
+        sql`TRUNCATE TABLE avis, selection_items, evenements, livres_genres, livres, plantes, selections, genres, rayons CASCADE`,
     );
     await db.execute(sql`TRUNCATE TABLE pages_editoriales`);
     await db.execute(sql`TRUNCATE TABLE parametres`);
 
-    // Genres — mapping json numeric id → uuid
-    const genreIdMap = new Map<number, string>();
-    const sortedGenres = [...genresJson].sort((a, b) => a.id - b.id);
-    for (const genre of sortedGenres) {
-        const [inserted] = await db
-            .insert(genres)
-            .values({ nom: genre.nom, slug: genre.slug })
-            .returning({ id: genres.id });
-        genreIdMap.set(genre.id, inserted.id);
-    }
-    console.log(`Genres : ${sortedGenres.length}`);
-
-    // Rayons — mapping json numeric id → uuid
-    const rayonIdMap = new Map<number, string>();
-    const sortedRayons = [...rayonsJson].sort((a, b) => a.id - b.id);
-    for (const rayon of sortedRayons) {
-        const [inserted] = await db
-            .insert(rayons)
-            .values({
-                nom: rayon.nom,
-                slug: rayon.slug,
-                description:
-                    (rayon as { description?: string }).description ?? null,
-            })
-            .returning({ id: rayons.id });
-        rayonIdMap.set(rayon.id, inserted.id);
-    }
-    console.log(`Rayons : ${sortedRayons.length}`);
-
-    // Livres — mapping json numeric id → uuid
-    const livreIdMap = new Map<number, string>();
-    const sortedLivres = [...livresJson].sort((a, b) => a.id - b.id);
-    for (const livre of sortedLivres) {
-        const rayonUuid = livre.rayonId ? rayonIdMap.get(livre.rayonId) ?? null : null;
-        const [inserted] = await db
-            .insert(livres)
-            .values({
-                slug: livre.slug,
-                titre: livre.titre,
-                auteur: livre.auteur,
-                isbn: livre.isbn ?? null,
-                rayonId: rayonUuid,
-                editeur: livre.editeur ?? null,
-                collection: livre.collection ?? null,
-                format: livre.format ?? null,
-                edition: (livre as { edition?: string | null }).edition ?? null,
-                anneePublication: livre.anneePublication ?? null,
-                serie: (livre as { serie?: string | null }).serie ?? null,
-                numeroSerie:
-                    (livre as { numeroSerie?: number | null }).numeroSerie ??
-                    null,
-                prix: String(livre.prix),
-                description: livre.description ?? null,
-                image: livre.image ?? null,
-                noteMoyenne: livre.noteMoyenne
-                    ? String(livre.noteMoyenne)
-                    : null,
-                choixLibrairie: livre.choixLibrairie ?? false,
-                stock: livre.stock ?? 0,
-                noteDeLaLibrairie: livre.noteDeLaLibrairie ?? null,
-                publishedAt: livre.publishedAt
-                    ? new Date(livre.publishedAt)
-                    : null,
-            })
-            .returning({ id: livres.id });
-        livreIdMap.set(livre.id, inserted.id);
-        const genreUuid = livre.genreId ? genreIdMap.get(livre.genreId) ?? null : null;
-        if (genreUuid) {
-            await db
-                .insert(livresGenres)
-                .values({ livreId: inserted.id, genreId: genreUuid });
-        }
-    }
-    console.log(`Livres : ${sortedLivres.length}`);
-
-    // Plantes / boutures — mapping json numeric id → uuid
+    // Boutures / plantes
     const planteIdMap = new Map<number, string>();
-    const sortedBoutures = [...bouturesJson].sort((a, b) => a.id - b.id);
+    const sortedBoutures = [...(bouturesJson as BoutureJson[])].sort((a, b) => a.id - b.id);
     for (const bouture of sortedBoutures) {
-        const [insertedBouture] = await db.insert(plantes).values({
-            slug: bouture.slug,
-            nom: bouture.nom,
-            espece: bouture.espece ?? null,
-            famille: bouture.famille ?? null,
-            prix: String(bouture.prix),
-            description: bouture.description ?? null,
-            conseilsEntretien: bouture.conseilsEntretien ?? null,
-            difficulte: (bouture.difficulte ?? null) as
-                | 'facile'
-                | 'moyen'
-                | 'difficile'
-                | null,
-            lumiere: (bouture.lumiere ?? null) as
-                | 'ombre'
-                | 'mi-ombre'
-                | 'lumiere-vive'
-                | 'plein-soleil'
-                | null,
-            arrosage: (bouture.arrosage ?? null) as
-                | 'rare'
-                | 'modere'
-                | 'regulier'
-                | 'abondant'
-                | null,
-            image: Array.isArray((bouture as { images?: string[] }).images)
-                ? ((bouture as { images: string[] }).images[0] ?? null)
-                : null,
-            noteMoyenne: bouture.noteMoyenne
-                ? String(bouture.noteMoyenne)
-                : null,
-            choixLibrairie:
-                (bouture as { choixLibrairie?: boolean }).choixLibrairie ??
-                false,
-            stock: (bouture as { stock?: number }).stock ?? 0,
-        }).returning({ id: plantes.id });
-        planteIdMap.set(bouture.id, insertedBouture.id);
+        const [row] = await db
+            .insert(plantes)
+            .values({
+                slug: bouture.slug,
+                nom: bouture.nom,
+                espece: bouture.espece ?? null,
+                famille: bouture.famille ?? null,
+                prix: bouture.prix,
+                description: bouture.description ?? null,
+                conseilsEntretien: bouture.conseilsEntretien ?? null,
+                difficulte: bouture.difficulte ?? null,
+                lumiere: bouture.lumiere ?? null,
+                arrosage: bouture.arrosage ?? null,
+                image: bouture.images[0] ?? null,
+                noteMoyenne: bouture.noteMoyenne ?? null,
+                choixLibrairie: bouture.choixLibrairie,
+                stock: bouture.stock,
+            })
+            .returning({ id: plantes.id });
+        planteIdMap.set(bouture.id, row.id);
     }
     console.log(`Boutures : ${sortedBoutures.length}`);
-
-    // Avis
-    for (const a of avisJson) {
-        const livreUuid = a.livreId ? livreIdMap.get(a.livreId) ?? null : null;
-        const bouturePlanteUuid = a.planteId ? planteIdMap.get(a.planteId) ?? null : null;
-        await db.insert(avis).values({
-            type: a.type === 'plante' ? 'bouture' : a.type,
-            livreId: livreUuid,
-            boutureId: bouturePlanteUuid,
-            produitNom: null,
-            auteurNom: a.auteurNom,
-            note: a.note,
-            texte: a.texte ?? null,
-            approuve: a.approuve,
-            masque: false,
-        });
-    }
-    // Avis non approuvé pour test de modération (livre index 3 dans le JSON)
-    const livreTestUuid = livreIdMap.get(3) ?? null;
-    await db.insert(avis).values({
-        type: 'livre',
-        livreId: livreTestUuid,
-        boutureId: null,
-        produitNom: null,
-        auteurNom: 'Marie L.',
-        note: 4,
-        texte: null,
-        approuve: false,
-        masque: false,
-    });
-    console.log(`Avis : ${avisJson.length + 1}`);
 
     // Événements
     const now = new Date();
     const evenementsData = [
         {
             titre: 'Rencontre avec Baptiste Morizot',
-            description:
-                "L'auteur de « Manières d'être vivant » dialogue avec notre équipe autour de la question du vivant et de notre rapport aux autres espèces. Entrée libre, places limitées.",
+            description: "L'auteur de « Manières d'être vivant » dialogue avec notre équipe autour de la question du vivant et de notre rapport aux autres espèces. Entrée libre, places limitées.",
             lieu: 'Lecture & Bouture — espace principal',
-            dateDebut: new Date(
-                now.getFullYear(),
-                now.getMonth() + 1,
-                15,
-                18,
-                30,
-            ),
-            dateFin: new Date(
-                now.getFullYear(),
-                now.getMonth() + 1,
-                15,
-                20,
-                30,
-            ),
+            dateDebut: new Date(now.getFullYear(), now.getMonth() + 1, 15, 18, 30),
+            dateFin: new Date(now.getFullYear(), now.getMonth() + 1, 15, 20, 30),
+            publie: true,
         },
         {
             titre: 'Atelier boutures : multiplier ses plantes',
-            description:
-                'Apportez une bouture de chez vous, repartez avec trois nouvelles. Matériel fourni. Animé par notre botaniste. Inscription obligatoire — 8 places.',
+            description: 'Apportez une bouture de chez vous, repartez avec trois nouvelles. Matériel fourni. Animé par notre botaniste. Inscription obligatoire — 8 places.',
             lieu: 'Serre de la boutique',
-            dateDebut: new Date(
-                now.getFullYear(),
-                now.getMonth() + 1,
-                22,
-                10,
-                0,
-            ),
-            dateFin: new Date(
-                now.getFullYear(),
-                now.getMonth() + 1,
-                22,
-                12,
-                30,
-            ),
+            dateDebut: new Date(now.getFullYear(), now.getMonth() + 1, 22, 10, 0),
+            dateFin: new Date(now.getFullYear(), now.getMonth() + 1, 22, 12, 30),
+            publie: true,
         },
         {
             titre: 'Lecture à voix haute — Thoreau',
-            description:
-                'Une heure de lecture partagée autour de Walden. Passages choisis, discussion ouverte. Apportez votre propre exemplaire si vous en avez un.',
+            description: 'Une heure de lecture partagée autour de Walden. Passages choisis, discussion ouverte. Apportez votre propre exemplaire si vous en avez un.',
             lieu: 'Coin lecture, fond de boutique',
-            dateDebut: new Date(
-                now.getFullYear(),
-                now.getMonth() + 2,
-                5,
-                19,
-                0,
-            ),
+            dateDebut: new Date(now.getFullYear(), now.getMonth() + 2, 5, 19, 0),
             dateFin: new Date(now.getFullYear(), now.getMonth() + 2, 5, 20, 0),
+            publie: true,
         },
         {
-            titre: 'Vernissage — « Planches botaniques »',
-            description:
-                "Exposition de planches botaniques originales. Aquarelles d'Élise Fontaine. Présente le soir du vernissage.",
+            titre: 'Vernissage — « Planches botaniques »',
+            description: "Exposition de planches botaniques originales. Aquarelles d'Élise Fontaine. Présente le soir du vernissage.",
             lieu: 'Galerie attenante',
-            dateDebut: new Date(
-                now.getFullYear(),
-                now.getMonth() - 1,
-                10,
-                18,
-                0,
-            ),
+            dateDebut: new Date(now.getFullYear(), now.getMonth() - 1, 10, 18, 0),
             dateFin: new Date(now.getFullYear(), now.getMonth() - 1, 10, 21, 0),
+            publie: true,
         },
         {
             titre: 'Dédicace — Francis Hallé',
-            description:
-                "Séance de dédicace exceptionnelle autour de l'Herbier du Monde. File d'attente dès 14h.",
+            description: "Séance de dédicace exceptionnelle autour de l'Herbier du Monde. File d'attente dès 14h.",
             lieu: 'Lecture & Bouture',
-            dateDebut: new Date(
-                now.getFullYear(),
-                now.getMonth() - 2,
-                18,
-                15,
-                0,
-            ),
+            dateDebut: new Date(now.getFullYear(), now.getMonth() - 2, 18, 15, 0),
             dateFin: new Date(now.getFullYear(), now.getMonth() - 2, 18, 18, 0),
+            publie: true,
         },
     ];
     for (const ev of evenementsData) {
         await db.insert(evenements).values(ev);
     }
     console.log(`Événements : ${evenementsData.length}`);
-
-    // Sélections
-    type SelectionJson = {
-        id: number;
-        titre: string;
-        description: string;
-        ordre: number;
-        active: boolean;
-        items: { type: string; id: number }[];
-    };
-    const sortedSelections = [...(selectionsJson as SelectionJson[])].sort(
-        (a, b) => a.id - b.id,
-    );
-    for (const sel of sortedSelections) {
-        const [insertedSel] = await db
-            .insert(selections)
-            .values({
-                titre: sel.titre,
-                description: sel.description,
-                ordre: sel.ordre,
-                active: sel.active,
-            })
-            .returning({ id: selections.id });
-
-        for (const [index, item] of sel.items.entries()) {
-            const isLivre = item.type === 'livre';
-            const livreUuid = isLivre ? livreIdMap.get(item.id) ?? null : null;
-            const planteUuid = !isLivre ? planteIdMap.get(item.id) ?? null : null;
-            await db.insert(selectionItems).values({
-                selectionId: insertedSel.id,
-                type: isLivre ? 'livre' : 'plante',
-                livreId: livreUuid,
-                planteId: planteUuid,
-                ordre: index,
-            });
-        }
-    }
-    console.log(`Sélections : ${sortedSelections.length}`);
 
     // Pages éditoriales
     const conceptContenu =
@@ -328,29 +143,17 @@ async function main() {
     const pagesInitiales = [
         { slug: 'concept', titre: 'Notre concept', contenu: conceptContenu },
         { slug: 'mentions-legales', titre: 'Mentions légales', contenu: null },
-        {
-            slug: 'cgv',
-            titre: 'Conditions Générales de Vente',
-            contenu: null,
-        },
-        {
-            slug: 'cgu',
-            titre: "Conditions Générales d'Utilisation",
-            contenu: null,
-        },
+        { slug: 'cgv', titre: 'Conditions Générales de Vente', contenu: null },
+        { slug: 'cgu', titre: "Conditions Générales d'Utilisation", contenu: null },
         { slug: 'cookies', titre: 'Politique de cookies', contenu: null },
-        {
-            slug: 'politique-de-confidentialite',
-            titre: 'Politique de confidentialité',
-            contenu: null,
-        },
+        { slug: 'politique-de-confidentialite', titre: 'Politique de confidentialité', contenu: null },
     ];
-
-    for (const pageData of pagesInitiales) {
-        await db.insert(pagesEditoriales).values(pageData);
+    for (const page of pagesInitiales) {
+        await db.insert(pagesEditoriales).values(page);
     }
     console.log(`Pages éditoriales : ${pagesInitiales.length}`);
 
+    // Paramètres
     const parametresInitiaux = [
         {
             cle: 'horaires',
@@ -364,30 +167,10 @@ async function main() {
                 dim: null,
             }),
         },
-        {
-            cle: 'fermetures',
-            valeur: JSON.stringify([]),
-        },
-        {
-            cle: 'annonce',
-            valeur: JSON.stringify({
-                active: false,
-                type: 'info',
-                message: '',
-                expire_at: null,
-            }),
-        },
-        {
-            cle: 'maintenance',
-            valeur: JSON.stringify({
-                active: false,
-                message: 'Site en maintenance. Revenez bientôt.',
-            }),
-        },
-        {
-            cle: 'reseaux_sociaux',
-            valeur: JSON.stringify([]),
-        },
+        { cle: 'fermetures', valeur: JSON.stringify([]) },
+        { cle: 'annonce', valeur: JSON.stringify({ active: false, type: 'info', message: '', expire_at: null }) },
+        { cle: 'maintenance', valeur: JSON.stringify({ active: false, message: 'Site en maintenance. Revenez bientôt.' }) },
+        { cle: 'reseaux_sociaux', valeur: JSON.stringify([]) },
     ];
     for (const p of parametresInitiaux) {
         await db.insert(parametres).values(p);

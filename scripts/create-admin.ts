@@ -27,7 +27,9 @@ async function main() {
         parallelism: 4,
     });
 
-    await db.insert(users).values({ email, passwordHash: hash, role: 'super_admin' });
+    await db
+        .insert(users)
+        .values({ email, passwordHash: hash, role: 'super_admin' });
 
     console.log(`Utilisateur créé : ${email} (super_admin)`);
     process.exit(0);

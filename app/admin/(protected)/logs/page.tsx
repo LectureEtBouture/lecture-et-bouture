@@ -81,7 +81,8 @@ export default async function AdminLogsPage() {
                     Journaux
                 </h1>
                 <p className="text-[11px] text-muted mt-0.5">
-                    {logs.length} entrée{logs.length !== 1 ? 's' : ''} — 200 dernières conservées
+                    {logs.length} entrée{logs.length !== 1 ? 's' : ''} — 200
+                    dernières conservées
                 </p>
             </div>
 
@@ -127,25 +128,36 @@ export default async function AdminLogsPage() {
                                         </td>
                                         <td className="py-2.5 pr-6">
                                             <span className="text-[10px] uppercase tracking-[0.08em] text-muted">
-                                                {log.entityType ? ENTITY_LABELS[log.entityType] ?? log.entityType : '—'}
+                                                {log.entityType
+                                                    ? (ENTITY_LABELS[
+                                                          log.entityType
+                                                      ] ?? log.entityType)
+                                                    : '—'}
                                             </span>
                                         </td>
                                         <td className="py-2.5 pr-6">
                                             <span
                                                 className={`text-[10px] uppercase tracking-[0.08em] px-1.5 py-0.5 border leading-none ${
-                                                    DELETE_ACTIONS.has(log.action)
+                                                    DELETE_ACTIONS.has(
+                                                        log.action,
+                                                    )
                                                         ? 'border-red-200 text-red-600'
-                                                        : CREATE_ACTIONS.has(log.action)
+                                                        : CREATE_ACTIONS.has(
+                                                                log.action,
+                                                            )
                                                           ? 'border-primary/30 text-primary'
                                                           : 'border-border text-muted'
                                                 }`}
                                             >
-                                                {ACTION_LABELS[log.action] ?? log.action}
+                                                {ACTION_LABELS[log.action] ??
+                                                    log.action}
                                             </span>
                                         </td>
                                         <td className="py-2.5 text-sm text-foreground">
                                             {log.entityLabel ?? (
-                                                <span className="text-muted">—</span>
+                                                <span className="text-muted">
+                                                    —
+                                                </span>
                                             )}
                                         </td>
                                     </tr>
@@ -168,7 +180,8 @@ export default async function AdminLogsPage() {
                                                   : 'border-border text-muted'
                                         }`}
                                     >
-                                        {ACTION_LABELS[log.action] ?? log.action}
+                                        {ACTION_LABELS[log.action] ??
+                                            log.action}
                                     </span>
                                     <span className="text-[11px] text-muted tabular-nums">
                                         {formatDate(log.createdAt)}
@@ -178,11 +191,14 @@ export default async function AdminLogsPage() {
                                     {log.entityLabel ?? '—'}
                                     {log.entityType && (
                                         <span className="text-muted ml-2 text-xs">
-                                            {ENTITY_LABELS[log.entityType] ?? log.entityType}
+                                            {ENTITY_LABELS[log.entityType] ??
+                                                log.entityType}
                                         </span>
                                     )}
                                 </p>
-                                <p className="text-xs text-muted">{log.userEmail}</p>
+                                <p className="text-xs text-muted">
+                                    {log.userEmail}
+                                </p>
                             </div>
                         ))}
                     </div>

@@ -54,7 +54,7 @@ services:
             LT_LOAD_ONLY: 'en,fr'
             LT_UPDATE_MODELS: 'true'
         volumes:
-            - libretranslate_data:/home/libretranslate/.local/share/argos-translate
+            - libretranslate_data:/home/libretranslate/.local
 
 volumes:
     postgres_data:

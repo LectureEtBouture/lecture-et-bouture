@@ -32,9 +32,11 @@ function ItemRow({ item }: { item: SelectionItemPublique }) {
                 <span className="text-[9px] uppercase tracking-[0.12em] text-muted/60">
                     {typeLabel}
                 </span>
-                <span className="text-[13px] text-foreground tabular-nums">
-                    {item.prix} €
-                </span>
+                {item.prix && (
+                    <span className="text-[13px] text-foreground tabular-nums">
+                        {item.prix} €
+                    </span>
+                )}
             </span>
         </Link>
     );

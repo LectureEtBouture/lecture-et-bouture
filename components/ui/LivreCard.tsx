@@ -1,19 +1,18 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { getCoverColor } from '@/lib/data';
-import type { LivrePublique } from '@/lib/queries/livres';
+import type { LivreComplet } from '@/lib/services/books/types';
 
 export function LivreCard({
     livre,
     featured = false,
     genreNom,
 }: {
-    livre: LivrePublique;
+    livre: LivreComplet;
     featured?: boolean;
     genreNom?: string;
 }) {
     const coverColor = getCoverColor(livre.genreIds?.[0]);
-    const coverImage = livre.image ?? null;
 
     return (
         <Link href={`/livres/${livre.slug}`} className="group block">
@@ -21,9 +20,9 @@ export function LivreCard({
                 className="aspect-book w-full relative overflow-hidden"
                 style={{ backgroundColor: coverColor }}
             >
-                {coverImage && (
+                {livre.imageUrl && (
                     <Image
-                        src={coverImage}
+                        src={livre.imageUrl}
                         alt={livre.titre}
                         fill
                         className="object-cover"
@@ -56,12 +55,9 @@ export function LivreCard({
                     {livre.titre}
                 </h3>
                 <p className="text-xs text-muted">{livre.auteur}</p>
-                <p className="text-sm font-medium text-primary pt-1">
-                    {livre.prix} €
-                </p>
-                {livre.stock === 0 && (
-                    <p className="text-[9px] uppercase tracking-widest text-border">
-                        Sur commande
+                {livre.prix && (
+                    <p className="text-sm font-medium text-primary pt-1">
+                        {livre.prix} € <span className="text-[10px] text-muted font-normal">indicatif</span>
                     </p>
                 )}
             </div>

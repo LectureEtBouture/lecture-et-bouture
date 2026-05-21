@@ -76,7 +76,11 @@ export async function createPlante(formData: FormData) {
         arrosage: parsed.arrosage ?? null,
     });
 
-    await createLog({ action: 'bouture.create', entityType: 'bouture', entityLabel: parsed.nom });
+    await createLog({
+        action: 'bouture.create',
+        entityType: 'bouture',
+        entityLabel: parsed.nom,
+    });
     revalidatePath('/admin/boutures');
     revalidateTag('boutures', { expire: 0 });
     redirect('/admin/boutures');
@@ -121,7 +125,12 @@ export async function updatePlante(id: string, formData: FormData) {
         })
         .where(eq(plantes.id, id));
 
-    await createLog({ action: 'bouture.update', entityType: 'bouture', entityId: id, entityLabel: parsed.nom });
+    await createLog({
+        action: 'bouture.update',
+        entityType: 'bouture',
+        entityId: id,
+        entityLabel: parsed.nom,
+    });
     revalidatePath('/admin/boutures');
     revalidateTag('boutures', { expire: 0 });
     redirect('/admin/boutures');
@@ -129,9 +138,19 @@ export async function updatePlante(id: string, formData: FormData) {
 
 export async function deletePlante(id: string) {
     await requireAdmin();
-    const row = await db.select({ nom: plantes.nom }).from(plantes).where(eq(plantes.id, id)).limit(1).then((r) => r[0]);
+    const row = await db
+        .select({ nom: plantes.nom })
+        .from(plantes)
+        .where(eq(plantes.id, id))
+        .limit(1)
+        .then((r) => r[0]);
     await db.delete(plantes).where(eq(plantes.id, id));
-    await createLog({ action: 'bouture.delete', entityType: 'bouture', entityId: id, entityLabel: row?.nom });
+    await createLog({
+        action: 'bouture.delete',
+        entityType: 'bouture',
+        entityId: id,
+        entityLabel: row?.nom,
+    });
     revalidatePath('/admin/boutures');
     revalidateTag('boutures', { expire: 0 });
 }

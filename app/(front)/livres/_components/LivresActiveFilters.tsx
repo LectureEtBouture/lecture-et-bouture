@@ -1,15 +1,16 @@
+'use client';
+
 import type { GenreFacette, RayonFacette } from '@/lib/queries/livres-facets';
 import { FilterBadge } from '@/components/ui/filter';
+import { RAYON_SLUG_FR } from '@/lib/services/books/categories-fr';
 
 export function LivresActiveFilters({
     rayons,
     genres,
     activeRayonId,
     activeGenreId,
-    activeSerie,
-    activeEditeur,
-    activeFormat,
     activeChoixLibrairie,
+    activeCat,
     push,
     onReset,
 }: {
@@ -17,20 +18,12 @@ export function LivresActiveFilters({
     genres: GenreFacette[];
     activeRayonId?: string;
     activeGenreId?: string;
-    activeSerie?: string;
-    activeEditeur?: string;
-    activeFormat?: string;
     activeChoixLibrairie?: boolean;
+    activeCat?: string;
     push: (updates: Record<string, string | undefined>) => void;
     onReset: () => void;
 }) {
-    const hasFilters =
-        activeRayonId ||
-        activeGenreId ||
-        activeSerie ||
-        activeEditeur ||
-        activeFormat ||
-        activeChoixLibrairie;
+    const hasFilters = activeRayonId || activeGenreId || activeChoixLibrairie || activeCat;
     if (!hasFilters) return null;
 
     return (
@@ -38,6 +31,12 @@ export function LivresActiveFilters({
             <span className="text-[10px] uppercase tracking-widest text-muted">
                 Filtres actifs
             </span>
+            {activeCat && (
+                <FilterBadge
+                    label={RAYON_SLUG_FR[activeCat] ?? activeCat}
+                    onRemove={() => push({ cat: undefined })}
+                />
+            )}
             {activeChoixLibrairie && (
                 <FilterBadge
                     label="Choix de la librairie"
@@ -47,7 +46,7 @@ export function LivresActiveFilters({
             {activeRayonId && (
                 <FilterBadge
                     label={
-                        rayons.find((rayon) => rayon.id === activeRayonId)
+                        rayons.find((rayon) => rayon.slug === activeRayonId)
                             ?.nom ?? 'Rayon'
                     }
                     onRemove={() => push({ rayon: undefined })}
@@ -60,27 +59,6 @@ export function LivresActiveFilters({
                             ?.nom ?? 'Genre'
                     }
                     onRemove={() => push({ genre: undefined })}
-                />
-            )}
-            {activeSerie && (
-                <FilterBadge
-                    label={activeSerie}
-                    onRemove={() => push({ serie: undefined })}
-                />
-            )}
-            {activeEditeur && (
-                <FilterBadge
-                    label={activeEditeur}
-                    onRemove={() => push({ editeur: undefined })}
-                />
-            )}
-            {activeFormat && (
-                <FilterBadge
-                    label={
-                        activeFormat.charAt(0).toUpperCase() +
-                        activeFormat.slice(1)
-                    }
-                    onRemove={() => push({ format: undefined })}
                 />
             )}
             <button

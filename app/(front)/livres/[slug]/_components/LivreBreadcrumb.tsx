@@ -50,7 +50,7 @@ export function LivreBreadcrumb({
                 <>
                     <span>·</span>
                     <Link
-                        href={`/livres?serie=${encodeURIComponent(livre.serie)}`}
+                        href={`/livres?q=${encodeURIComponent(livre.serie)}`}
                         className="hover:text-primary transition-colors"
                     >
                         {livre.serie}

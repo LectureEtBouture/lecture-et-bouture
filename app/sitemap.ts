@@ -53,7 +53,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const livreRoutes: MetadataRoute.Sitemap = livres.map((livre) => ({
         url: `${base}/livres/${livre.slug}`,
-        lastModified: livre.publishedAt ?? now,
+        lastModified: now,
         changeFrequency: 'monthly',
         priority: 0.7,
     }));

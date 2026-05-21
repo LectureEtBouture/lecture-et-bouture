@@ -1,6 +1,8 @@
 import { db } from '@/db';
 import { selections, selectionItems, livres, plantes } from '@/db/schema';
 import { eq, asc, sql } from 'drizzle-orm';
+import { bookProvider } from '@/lib/services/books';
+import { uriToSlug } from '@/lib/services/books/slug';
 
 export type SelectionItemPublique =
     | {
@@ -8,9 +10,9 @@ export type SelectionItemPublique =
           type: 'livre';
           ordre: number;
           titre: string;
-          auteur: string;
+          auteur: string | null;
           slug: string;
-          prix: string;
+          prix: string | null;
           primaryGenreId: string | null;
       }
     | {
@@ -46,9 +48,7 @@ export async function getPublicSelections(): Promise<SelectionPublique[]> {
             itemType: selectionItems.type,
             itemOrdre: selectionItems.ordre,
             livreId: selectionItems.livreId,
-            livreTitre: livres.titre,
-            livreAuteur: livres.auteur,
-            livreSlug: livres.slug,
+            livreUri: livres.inventaireUri,
             livrePrix: livres.prix,
             livreGenreId: sql<
                 string | null
@@ -71,6 +71,17 @@ export async function getPublicSelections(): Promise<SelectionPublique[]> {
             asc(selectionItems.ordre),
         );
 
+    // Collect unique livre URIs to batch-fetch metadata
+    const livreUris = [...new Set(
+        rows
+            .filter((row) => row.itemType === 'livre' && row.livreUri)
+            .map((row) => row.livreUri!)
+    )];
+
+    const livresMeta = livreUris.length > 0
+        ? await bookProvider.rechercherParUris(livreUris)
+        : new Map();
+
     const map = new Map<string, SelectionPublique>();
 
     for (const row of rows) {
@@ -87,21 +98,15 @@ export async function getPublicSelections(): Promise<SelectionPublique[]> {
 
         if (!row.itemId || !row.itemType) continue;
 
-        if (
-            row.itemType === 'livre' &&
-            row.livreId &&
-            row.livreTitre &&
-            row.livreAuteur &&
-            row.livreSlug &&
-            row.livrePrix
-        ) {
+        if (row.itemType === 'livre' && row.livreId && row.livreUri) {
+            const meta = livresMeta.get(row.livreUri);
             sel.items.push({
                 id: row.itemId,
                 type: 'livre',
                 ordre: row.itemOrdre ?? 0,
-                titre: row.livreTitre,
-                auteur: row.livreAuteur,
-                slug: row.livreSlug,
+                titre: meta?.titre ?? row.livreUri,
+                auteur: meta?.auteur ?? null,
+                slug: uriToSlug(row.livreUri),
                 prix: row.livrePrix,
                 primaryGenreId: row.livreGenreId ?? null,
             });

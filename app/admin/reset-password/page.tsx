@@ -19,8 +19,11 @@ function ResetPasswordForm() {
         setError('');
 
         const form = e.currentTarget;
-        const password = (form.elements.namedItem('password') as HTMLInputElement).value;
-        const confirm = (form.elements.namedItem('confirm') as HTMLInputElement).value;
+        const password = (
+            form.elements.namedItem('password') as HTMLInputElement
+        ).value;
+        const confirm = (form.elements.namedItem('confirm') as HTMLInputElement)
+            .value;
 
         if (password !== confirm) {
             setError('Les mots de passe ne correspondent pas.');
@@ -45,7 +48,9 @@ function ResetPasswordForm() {
     if (!token) {
         return (
             <div className="space-y-4">
-                <p className="text-sm text-red-600">Lien invalide ou manquant.</p>
+                <p className="text-sm text-red-600">
+                    Lien invalide ou manquant.
+                </p>
                 <Link
                     href="/admin/forgot-password"
                     className="text-sm text-primary hover:underline"
@@ -124,7 +129,9 @@ export default function ResetPasswordPage() {
                     <h1 className="text-xl font-semibold text-foreground">
                         Nouveau mot de passe
                     </h1>
-                    <p className="text-sm text-neutral-500">{siteConfig.name}</p>
+                    <p className="text-sm text-neutral-500">
+                        {siteConfig.name}
+                    </p>
                 </div>
                 <Suspense fallback={null}>
                     <ResetPasswordForm />

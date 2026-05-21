@@ -65,7 +65,9 @@ export function ParametresNav() {
         scrollingTimeout.current = setTimeout(() => {
             scrollingRef.current = false;
         }, 700);
-        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document
+            .getElementById(id)
+            ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     const pillCls = (id: string) =>

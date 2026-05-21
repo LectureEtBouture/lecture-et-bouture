@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { avis } from '@/db/schema';
+import { getOrCreateEnrichissement } from '@/lib/queries/enrichissements';
 
 export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => null);
@@ -26,11 +27,18 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Invalid data' }, { status: 422 });
     }
 
+    let livreId: string | null = null;
+    if (type === 'livre') {
+        // itemId is inventaireUri — auto-create enrichissement row if needed
+        const enrichissement = await getOrCreateEnrichissement(itemId);
+        livreId = enrichissement.localId;
+    }
+
     await db.insert(avis).values({
         type,
-        livreId: type === 'livre' ? (itemId as string) : null,
+        livreId,
         boutureId: type === 'bouture' ? (itemId as string) : null,
-        produitNom: null,
+        produitNom: itemId,
         auteurNom: auteurNom.trim(),
         note,
         texte: typeof texte === 'string' ? texte.trim() || null : null,
