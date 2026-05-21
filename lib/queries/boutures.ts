@@ -34,6 +34,7 @@ const boutureSelect = {
     lumiere: plantes.lumiere,
     arrosage: plantes.arrosage,
     image: plantes.image,
+    imageAlt: plantes.imageAlt,
     noteMoyenne: plantes.noteMoyenne,
     choixLibrairie: plantes.choixLibrairie,
     stock: plantes.stock,

@@ -34,12 +34,17 @@ export default async function AdminAvisPage({
 
     const data = await getAvis(sort);
 
-    const livreUris = [...new Set(
-        data.filter((a) => a.type === 'livre' && a.inventaireUri).map((a) => a.inventaireUri!)
-    )];
-    const bookMetaMap = livreUris.length > 0
-        ? await bookProvider.rechercherParUris(livreUris)
-        : new Map<string, BookMeta>();
+    const livreUris = [
+        ...new Set(
+            data
+                .filter((a) => a.type === 'livre' && a.inventaireUri)
+                .map((a) => a.inventaireUri!),
+        ),
+    ];
+    const bookMetaMap =
+        livreUris.length > 0
+            ? await bookProvider.rechercherParUris(livreUris)
+            : new Map<string, BookMeta>();
 
     const enAttente = data.filter((a) => !a.approuve && !a.masque);
     const visibles = data.filter((a) => a.approuve && !a.masque);
@@ -69,7 +74,15 @@ export default async function AdminAvisPage({
                 vide="Aucun avis en attente."
             >
                 {enAttente.map((a) => (
-                    <AvisRow key={a.id} avis={a} bookMeta={a.inventaireUri ? bookMetaMap.get(a.inventaireUri) : undefined}>
+                    <AvisRow
+                        key={a.id}
+                        avis={a}
+                        bookMeta={
+                            a.inventaireUri
+                                ? bookMetaMap.get(a.inventaireUri)
+                                : undefined
+                        }
+                    >
                         <ActionBtn
                             action={async () => {
                                 'use server';
@@ -95,7 +108,15 @@ export default async function AdminAvisPage({
                 vide="Aucun avis publié."
             >
                 {visibles.map((a) => (
-                    <AvisRow key={a.id} avis={a} bookMeta={a.inventaireUri ? bookMetaMap.get(a.inventaireUri) : undefined}>
+                    <AvisRow
+                        key={a.id}
+                        avis={a}
+                        bookMeta={
+                            a.inventaireUri
+                                ? bookMetaMap.get(a.inventaireUri)
+                                : undefined
+                        }
+                    >
                         <ActionBtn
                             action={async () => {
                                 'use server';
@@ -121,7 +142,15 @@ export default async function AdminAvisPage({
                 vide="Aucun avis masqué."
             >
                 {masques.map((a) => (
-                    <AvisRow key={a.id} avis={a} bookMeta={a.inventaireUri ? bookMetaMap.get(a.inventaireUri) : undefined}>
+                    <AvisRow
+                        key={a.id}
+                        avis={a}
+                        bookMeta={
+                            a.inventaireUri
+                                ? bookMetaMap.get(a.inventaireUri)
+                                : undefined
+                        }
+                    >
                         <ActionBtn
                             action={async () => {
                                 'use server';

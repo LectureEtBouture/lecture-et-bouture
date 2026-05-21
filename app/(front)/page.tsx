@@ -36,13 +36,16 @@ const GENRE_SECTIONS = [
 ] as const;
 
 export default async function HomePage() {
-    const [choix, nouveautes, tendances, evenementMisEnAvant, ...genreLivres] = await Promise.all([
-        getLivresMisEnAvant(),
-        getLivresNouveautes(0),
-        getLivresTendances(0),
-        getEvenementMisEnAvant(),
-        ...GENRE_SECTIONS.map((section) => getLivresParSujet(section.query)),
-    ]);
+    const [choix, nouveautes, tendances, evenementMisEnAvant, ...genreLivres] =
+        await Promise.all([
+            getLivresMisEnAvant(),
+            getLivresNouveautes(0),
+            getLivresTendances(0),
+            getEvenementMisEnAvant(),
+            ...GENRE_SECTIONS.map((section) =>
+                getLivresParSujet(section.query),
+            ),
+        ]);
 
     return (
         <>

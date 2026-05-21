@@ -1,7 +1,10 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
-import type { LivreMetadata, LivreSearchResult } from '@/lib/services/books/types';
+import type {
+    LivreMetadata,
+    LivreSearchResult,
+} from '@/lib/services/books/types';
 import { inputClass, labelClass } from './formStyles';
 
 interface Props {
@@ -43,8 +46,13 @@ export function TitreAuteurSearch({ onImport }: Props) {
         }
         setLoading(true);
         try {
-            const res = await fetch(`/api/books/search?q=${encodeURIComponent(value)}`);
-            if (!res.ok) { setResults([]); return; }
+            const res = await fetch(
+                `/api/books/search?q=${encodeURIComponent(value)}`,
+            );
+            if (!res.ok) {
+                setResults([]);
+                return;
+            }
             const data: LivreSearchResult[] = await res.json();
             setResults(data);
             setOpen(data.length > 0);
@@ -68,7 +76,9 @@ export function TitreAuteurSearch({ onImport }: Props) {
         setOpen(false);
     }
 
-    const visibleResults = showEbook ? results : results.filter((result) => !result.isEbook);
+    const visibleResults = showEbook
+        ? results
+        : results.filter((result) => !result.isEbook);
 
     return (
         <div className="relative">

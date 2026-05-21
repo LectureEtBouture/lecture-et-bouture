@@ -44,6 +44,16 @@ export function addVisit(visit: Omit<Visit, 'visitedAt'>) {
     writeHistory(next);
 }
 
+export function removeVisit(type: Visit['type'], slug: string) {
+    writeHistory(readHistory().filter(
+        (v) => !(v.type === type && v.slug === slug),
+    ));
+}
+
+export function clearHistory() {
+    writeHistory([]);
+}
+
 export function useVisitHistory() {
     const [visits, setVisits] = useState<Visit[] | null>(null);
 
@@ -53,5 +63,15 @@ export function useVisitHistory() {
         setVisits(readHistory());
     }, []);
 
-    return { visits: visits ?? [], mounted: visits !== null };
+    function remove(type: Visit['type'], slug: string) {
+        removeVisit(type, slug);
+        setVisits(readHistory());
+    }
+
+    function clear() {
+        clearHistory();
+        setVisits([]);
+    }
+
+    return { visits: visits ?? [], mounted: visits !== null, remove, clear };
 }

@@ -8,7 +8,14 @@ export type VolumeInfo = {
     publishedDate?: string;
     description?: string;
     industryIdentifiers?: { type: string; identifier: string }[];
-    imageLinks?: { thumbnail?: string; smallThumbnail?: string; small?: string; medium?: string; large?: string; extraLarge?: string };
+    imageLinks?: {
+        thumbnail?: string;
+        smallThumbnail?: string;
+        small?: string;
+        medium?: string;
+        large?: string;
+        extraLarge?: string;
+    };
     language?: string;
     categories?: string[];
     previewLink?: string;
@@ -34,7 +41,10 @@ export type GoogleBooksResponse = {
 
 const GOOGLE_BOOKS_BASE = 'https://www.googleapis.com/books/v1/volumes';
 
-export function buildUrl(params: Record<string, string>, langRestrict = true): string {
+export function buildUrl(
+    params: Record<string, string>,
+    langRestrict = true,
+): string {
     const key = process.env.GOOGLE_BOOKS_API_KEY;
     const base: Record<string, string> = { hl: 'fr' };
     if (langRestrict) base.langRestrict = 'fr';
@@ -51,8 +61,10 @@ export function volumeToMeta(volume: GoogleBooksVolume): LivreMetadata {
     const info = volume.volumeInfo;
 
     const identifiers = info.industryIdentifiers ?? [];
-    const isbn13 = identifiers.find((id) => id.type === 'ISBN_13')?.identifier ?? null;
-    const isbn10 = identifiers.find((id) => id.type === 'ISBN_10')?.identifier ?? null;
+    const isbn13 =
+        identifiers.find((id) => id.type === 'ISBN_13')?.identifier ?? null;
+    const isbn10 =
+        identifiers.find((id) => id.type === 'ISBN_10')?.identifier ?? null;
     const isbn = isbn13 ?? isbn10 ?? null;
 
     const rawThumb = info.imageLinks?.thumbnail ?? null;
@@ -62,7 +74,7 @@ export function volumeToMeta(volume: GoogleBooksVolume): LivreMetadata {
               .replace('zoom=1', 'zoom=0')
               .replace('&edge=curl', '')
         : isbn
-          ? `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`
+          ? `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false`
           : null;
 
     const publishedDateRaw = info.publishedDate ?? null;

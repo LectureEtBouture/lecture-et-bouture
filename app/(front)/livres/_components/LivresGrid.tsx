@@ -42,7 +42,8 @@ export function LivresGrid({
         setLoading(true);
         const next = await loadMoreLivres(filters, offsetRef.current);
         offsetRef.current += isCat ? API_PAGE_SIZE : next.length;
-        if (next.length === 0 || (!isCat && next.length < pageSize)) setHasMore(false);
+        if (next.length === 0 || (!isCat && next.length < pageSize))
+            setHasMore(false);
         setItems((prev) => [...prev, ...next]);
         setLoading(false);
         loadingRef.current = false;
@@ -76,11 +77,7 @@ export function LivresGrid({
                     />
                 ))}
             </div>
-            <div
-                ref={sentinelRef}
-                aria-hidden="true"
-                className="h-4"
-            />
+            <div ref={sentinelRef} aria-hidden="true" className="h-4" />
             {hasMore && (
                 <div className="flex justify-center pt-2">
                     <button

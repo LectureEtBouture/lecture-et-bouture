@@ -14,7 +14,8 @@ if (!isbn) {
 console.log(`Recherche ISBN : ${isbn} …`);
 
 const provider = new WikidataProvider();
-provider.rechercherParISBN(isbn)
+provider
+    .rechercherParISBN(isbn)
     .then((result: unknown) => {
         if (!result) {
             console.log('ISBN non trouvé dans Wikidata.');

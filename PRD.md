@@ -20,31 +20,31 @@ Concept hybride : livres académiques + boutures végétales. Expérience d'acha
 
 ## Pages
 
-| Route                           | Description                                                                                                               |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Route                           | Description                                                                                                                                                                                                                                                         |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `/`                             | Accueil — hero boutique physique, sections livres dans l'ordre : Choix de la librairie → Nouveautés → Tendances → sections par genre (2–3), CTA "Me faire surprendre". Chaque section a un lien "Voir plus" pointant vers `/livres` avec les filtres pré-appliqués. |
-| `/surprendre`                   | Livre aléatoire parmi `choixLibrairie` + note éditoriale + lien leslibraires.fr                                           |
-| `/concept`                      | Philosophie éditoriale — contenu réel (3 sections : concept, conservateur, lenteur)                                       |
-| `/livres`                       | Catalogue livres avec FilterBar (rayon, genre, sort, choix de la librairie) + recherche live via Google Books             |
-| `/livres/[slug]`                | Fiche livre — détails, avis (avant recos), même auteur, même univers, même genre                                         |
-| `/boutures`                     | Vitrine bento — section explicative + grille shift (grande/petite carte alternées). Pas de filterbar.                     |
-| `/boutures/[slug]`              | Fiche bouture — détails, avis                                                                                             |
-| `/contact`                      | Formulaire → Resend, feedback succès/erreur via redirect                                                                  |
-| `/mentions-legales`             | Mentions légales                                                                                                          |
-| `/politique-de-confidentialite` | Politique de confidentialité                                                                                              |
-| `/cgv`                          | Conditions Générales de Vente                                                                                             |
-| `/cgu`                          | Conditions Générales d'Utilisation                                                                                        |
-| `/cookies`                      | Politique cookies + bandeau                                                                                               |
-| `/admin`                        | Back-office — gestion livres, boutures, avis, sélections, événements                                                      |
-| `/admin/livres`                 | CRUD livres (incl. choix de la librairie)                                                                                 |
-| `/admin/boutures`               | CRUD boutures                                                                                                             |
-| `/admin/genres`                 | CRUD genres littéraires                                                                                                   |
-| `/admin/rayons`                 | CRUD rayons (classification commerciale)                                                                                  |
-| `/admin/avis`                   | Modération avis                                                                                                           |
-| `/admin/selections`             | Gestion sélections du conservateur                                                                                        |
-| `/admin/evenements`             | CRUD événements                                                                                                           |
-| `/admin/pages`                  | Éditeur RTE pages éditoriales (concept, mentions légales, CGV, CGU, cookies, politique)                                   |
-| `/admin/parametres`             | Paramètres boutique : horaires, fermetures exceptionnelles, annonce globale, mode maintenance, réseaux sociaux            |
+| `/surprendre`                   | Livre aléatoire parmi `choixLibrairie` + note éditoriale + lien leslibraires.fr                                                                                                                                                                                     |
+| `/concept`                      | Philosophie éditoriale — contenu réel (3 sections : concept, conservateur, lenteur)                                                                                                                                                                                 |
+| `/livres`                       | Catalogue livres avec FilterBar (rayon, genre, sort, choix de la librairie) + recherche live via Google Books                                                                                                                                                       |
+| `/livres/[slug]`                | Fiche livre — détails, avis (avant recos), même auteur, même univers, même genre                                                                                                                                                                                    |
+| `/boutures`                     | Vitrine bento — section explicative + grille shift (grande/petite carte alternées). Pas de filterbar.                                                                                                                                                               |
+| `/boutures/[slug]`              | Fiche bouture — détails, avis                                                                                                                                                                                                                                       |
+| `/contact`                      | Formulaire → Resend, feedback succès/erreur via redirect                                                                                                                                                                                                            |
+| `/mentions-legales`             | Mentions légales                                                                                                                                                                                                                                                    |
+| `/politique-de-confidentialite` | Politique de confidentialité                                                                                                                                                                                                                                        |
+| `/cgv`                          | Conditions Générales de Vente                                                                                                                                                                                                                                       |
+| `/cgu`                          | Conditions Générales d'Utilisation                                                                                                                                                                                                                                  |
+| `/cookies`                      | Politique cookies + bandeau                                                                                                                                                                                                                                         |
+| `/admin`                        | Back-office — gestion livres, boutures, avis, sélections, événements                                                                                                                                                                                                |
+| `/admin/livres`                 | CRUD livres (incl. choix de la librairie)                                                                                                                                                                                                                           |
+| `/admin/boutures`               | CRUD boutures                                                                                                                                                                                                                                                       |
+| `/admin/genres`                 | CRUD genres littéraires                                                                                                                                                                                                                                             |
+| `/admin/rayons`                 | CRUD rayons (classification commerciale)                                                                                                                                                                                                                            |
+| `/admin/avis`                   | Modération avis                                                                                                                                                                                                                                                     |
+| `/admin/selections`             | Gestion sélections du conservateur                                                                                                                                                                                                                                  |
+| `/admin/evenements`             | CRUD événements                                                                                                                                                                                                                                                     |
+| `/admin/pages`                  | Éditeur RTE pages éditoriales (concept, mentions légales, CGV, CGU, cookies, politique)                                                                                                                                                                             |
+| `/admin/parametres`             | Paramètres boutique : horaires, fermetures exceptionnelles, annonce globale, mode maintenance, réseaux sociaux                                                                                                                                                      |
 
 ---
 
@@ -76,24 +76,23 @@ Concept hybride : livres académiques + boutures végétales. Expérience d'acha
 
 ## Stack
 
-| Couche | Choix |
-|---|---|
-| Framework | Next.js 16 App Router — front + back-office + API Routes |
-| BDD | PostgreSQL 16 + Drizzle ORM (PKs uuid, migrations SQL idempotentes) |
-| Auth | NextAuth v5 — credentials, JWT, rôles (5 niveaux) |
-| **Catalogue public** | **Google Books API** — browse, search, discovery (tendances/nouveautés/genres BISAC) |
-| **Import BO** | **inventaire.io + Open Library** — ISBN → métadonnées FR (titre, auteur, description) |
-| Traduction import | LibreTranslate — descriptions EN→FR (import BO uniquement) |
-| Images | MinIO self-hosted — `next/image` + remotePatterns |
-| Image fallback | Open Library Covers API (`-L.jpg`) quand Google Books n'a pas de couverture |
-| Email | Resend — reset password |
-| Newsletter | Loops |
-| Analytics | Umami (privacy-first) |
-| Surveys | Formbricks |
-| Rich text | Tiptap — pages éditoriales BO |
-| Sanitisation HTML | sanitize-html — descriptions livres + pages éditoriales |
-| Langue | `hl=fr` systématique. `langRestrict=fr` uniquement sur les recherches ISBN/URI/titre (user-initiated). Désactivé sur discovery (tendances/nouveautés/catégories) pour maximiser les résultats — les requêtes françaises assurent la pertinence. |
-| Dark mode | Non |
+| Couche               | Choix                                                                                                                                                                                                                                           |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Framework            | Next.js 16 App Router — front + back-office + API Routes                                                                                                                                                                                        |
+| BDD                  | PostgreSQL 16 + Drizzle ORM (PKs uuid, migrations SQL idempotentes)                                                                                                                                                                             |
+| Auth                 | NextAuth v5 — credentials, JWT, rôles (5 niveaux)                                                                                                                                                                                               |
+| **Catalogue public** | **Google Books API** — browse, search, discovery (tendances/nouveautés/genres BISAC)                                                                                                                                                            |
+| **Import BO**        | **inventaire.io + Open Library** — ISBN → métadonnées FR (titre, auteur, description)                                                                                                                                                           |
+| Images               | MinIO self-hosted — `next/image` + remotePatterns                                                                                                                                                                                               |
+| Image fallback       | Open Library Covers API (`-L.jpg`) quand Google Books n'a pas de couverture                                                                                                                                                                     |
+| Email                | Resend — reset password                                                                                                                                                                                                                         |
+| Newsletter           | Loops                                                                                                                                                                                                                                           |
+| Analytics            | Umami (privacy-first)                                                                                                                                                                                                                           |
+| Surveys              | Formbricks                                                                                                                                                                                                                                      |
+| Rich text            | Tiptap — pages éditoriales BO                                                                                                                                                                                                                   |
+| Sanitisation HTML    | sanitize-html — descriptions livres + pages éditoriales                                                                                                                                                                                         |
+| Langue               | `hl=fr` systématique. `langRestrict=fr` uniquement sur les recherches ISBN/URI/titre (user-initiated). Désactivé sur discovery (tendances/nouveautés/catégories) pour maximiser les résultats — les requêtes françaises assurent la pertinence. |
+| Dark mode            | Non                                                                                                                                                                                                                                             |
 
 ---
 

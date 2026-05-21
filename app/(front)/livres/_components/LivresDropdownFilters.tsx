@@ -41,7 +41,10 @@ export function LivresDropdownFilters({
                 label="Trier par"
                 value={activeSort ?? ''}
                 onChange={(val) => push({ sort: val || undefined })}
-                options={sorts.map((sort) => ({ value: sort.value, label: sort.label }))}
+                options={sorts.map((sort) => ({
+                    value: sort.value,
+                    label: sort.label,
+                }))}
                 placeholder="Par défaut"
             />
             <div className="flex flex-col gap-1">
@@ -50,7 +53,9 @@ export function LivresDropdownFilters({
                 </span>
                 <button
                     type="button"
-                    onClick={() => push({ ebook: activeEbook ? undefined : '1' })}
+                    onClick={() =>
+                        push({ ebook: activeEbook ? undefined : '1' })
+                    }
                     className={toggleClass(!!activeEbook)}
                 >
                     Ebooks

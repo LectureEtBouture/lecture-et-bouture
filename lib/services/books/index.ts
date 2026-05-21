@@ -16,6 +16,12 @@ export const importProvider: BookProvider =
           ? new WikidataProvider()
           : new GoogleBooksProvider();
 
-export type { BookProvider, LivreMetadata, LivreComplet, LivreSearchResult, EnrichissementLocal } from './types';
+export type {
+    BookProvider,
+    LivreMetadata,
+    LivreComplet,
+    LivreSearchResult,
+    EnrichissementLocal,
+} from './types';
 export { uriToSlug, slugToUri, uriToISBN } from './slug';
 export { fusionner, fusionnerListe } from './merge';

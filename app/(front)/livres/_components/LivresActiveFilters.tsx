@@ -23,7 +23,8 @@ export function LivresActiveFilters({
     push: (updates: Record<string, string | undefined>) => void;
     onReset: () => void;
 }) {
-    const hasFilters = activeRayonId || activeGenreId || activeChoixLibrairie || activeCat;
+    const hasFilters =
+        activeRayonId || activeGenreId || activeChoixLibrairie || activeCat;
     if (!hasFilters) return null;
 
     return (

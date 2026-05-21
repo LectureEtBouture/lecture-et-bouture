@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { CoverImage } from '@/components/ui/CoverImage';
 import type { LivreComplet } from '@/lib/queries/livres';
 import { uriToISBN } from '@/lib/services/books/slug';
 
@@ -34,20 +34,36 @@ export function CoverPanel({
         ...(rayon ? [{ label: 'Rayon', value: rayon.nom }] : []),
         { label: 'Éditeur', value: livre.editeur },
         ...(livre.publishedDateRaw
-            ? [{ label: 'Publication', value: formatDate(livre.publishedDateRaw) }]
+            ? [
+                  {
+                      label: 'Publication',
+                      value: formatDate(livre.publishedDateRaw),
+                  },
+              ]
             : livre.anneePublication
-              ? [{ label: 'Publication', value: String(livre.anneePublication) }]
+              ? [
+                    {
+                        label: 'Publication',
+                        value: String(livre.anneePublication),
+                    },
+                ]
               : []),
         ...(livre.nombrePages
             ? [{ label: 'Pages', value: String(livre.nombrePages) }]
             : []),
         { label: 'ISBN', value: isbn },
         ...(livre.serie
-            ? [{ label: 'Série', value: `${livre.serie} · Tome ${livre.numeroSerie}` }]
+            ? [
+                  {
+                      label: 'Série',
+                      value: `${livre.serie} · Tome ${livre.numeroSerie}`,
+                  },
+              ]
             : []),
     ];
     const fields = rawFields.filter(
-        (field): field is { label: string; value: string } => field.value != null,
+        (field): field is { label: string; value: string } =>
+            field.value != null,
     );
 
     return (
@@ -57,11 +73,9 @@ export function CoverPanel({
                 style={{ backgroundColor: coverColor }}
             >
                 {livre.imageUrl ? (
-                    <Image
+                    <CoverImage
                         src={livre.imageUrl}
-                        alt={livre.titre}
-                        fill
-                        className="object-cover"
+                        alt={livre.imageAlt ?? livre.titre}
                         sizes="280px"
                         priority
                     />

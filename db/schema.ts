@@ -72,6 +72,8 @@ export const livres = pgTable('livres', {
     noteDeLaLibrairie: text('note_de_la_librairie'),
     numeroSerie: integer('numero_serie'),
     noteMoyenne: decimal('note_moyenne', { precision: 3, scale: 2 }),
+    image: text('image'),
+    imageAlt: text('image_alt'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

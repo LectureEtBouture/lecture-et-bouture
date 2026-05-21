@@ -8,11 +8,11 @@ PostgreSQL 16. ORM : Drizzle. Fichier source : `db/schema.ts`.
 
 Genres littéraires (Philosophie, Botanique, etc.).
 
-| Colonne | Type         | Contraintes      |
-| ------- | ------------ | ---------------- |
+| Colonne | Type         | Contraintes                   |
+| ------- | ------------ | ----------------------------- |
 | id      | uuid         | PK, DEFAULT gen_random_uuid() |
-| nom     | varchar(100) | NOT NULL         |
-| slug    | varchar(100) | NOT NULL, UNIQUE |
+| nom     | varchar(100) | NOT NULL                      |
+| slug    | varchar(100) | NOT NULL, UNIQUE              |
 
 ### `rayons`
 
@@ -49,11 +49,11 @@ Table d'**enrichissements** principalement. Les métadonnées catalogue (auteur,
 
 Relation N-N livres ↔ genres.
 
-| Colonne  | Type | Contraintes                              |
-| -------- | ---- | ---------------------------------------- |
+| Colonne  | Type | Contraintes                               |
+| -------- | ---- | ----------------------------------------- |
 | livre_id | uuid | NOT NULL, FK → livres.id (CASCADE DELETE) |
 | genre_id | uuid | NOT NULL, FK → genres.id (CASCADE DELETE) |
-| PK       | —    | (livre_id, genre_id)                     |
+| PK       | —    | (livre_id, genre_id)                      |
 
 ### `plantes`
 
@@ -85,19 +85,19 @@ Catalogue boutures / plantes.
 
 Avis clients — livres et boutures.
 
-| Colonne     | Type         | Contraintes                            |
-| ----------- | ------------ | -------------------------------------- |
-| id          | uuid         | PK                                     |
-| type        | text         | NOT NULL — `'livre'` ou `'bouture'`    |
+| Colonne     | Type         | Contraintes                              |
+| ----------- | ------------ | ---------------------------------------- |
+| id          | uuid         | PK                                       |
+| type        | text         | NOT NULL — `'livre'` ou `'bouture'`      |
 | livre_id    | uuid         | nullable (pas de FK — avis orphelins OK) |
-| bouture_id  | uuid         | nullable                               |
-| produit_nom | varchar(300) | nullable (snapshot au dépôt)           |
-| auteur_nom  | varchar(100) | NOT NULL                               |
-| note        | integer      | NOT NULL (1–5)                         |
-| texte       | text         | nullable                               |
-| approuve    | boolean      | NOT NULL, DEFAULT false                |
-| masque      | boolean      | NOT NULL, DEFAULT false                |
-| created_at  | timestamp    | NOT NULL, DEFAULT now()                |
+| bouture_id  | uuid         | nullable                                 |
+| produit_nom | varchar(300) | nullable (snapshot au dépôt)             |
+| auteur_nom  | varchar(100) | NOT NULL                                 |
+| note        | integer      | NOT NULL (1–5)                           |
+| texte       | text         | nullable                                 |
+| approuve    | boolean      | NOT NULL, DEFAULT false                  |
+| masque      | boolean      | NOT NULL, DEFAULT false                  |
+| created_at  | timestamp    | NOT NULL, DEFAULT now()                  |
 
 > `livre_id` FK → `livres.id`. Lors d'un dépôt d'avis public, si aucune ligne `livres` n'existe pour cet `inventaire_uri`, `getOrCreateEnrichissement()` en crée une minimale automatiquement. `bouture_id` sans FK — permet des avis orphelins si la bouture est retirée.
 
@@ -137,14 +137,14 @@ Sélections du conservateur — listes curatées mixant livres et boutures.
 
 Items d'une sélection (livre ou plante).
 
-| Colonne      | Type                | Contraintes                                    |
-| ------------ | ------------------- | ---------------------------------------------- |
-| id           | uuid                | PK                                             |
-| selection_id | uuid                | NOT NULL, FK → selections.id (CASCADE DELETE)  |
-| type         | enum(livre, plante) | NOT NULL                                       |
-| livre_id     | uuid                | nullable, FK → livres.id (CASCADE DELETE)      |
-| plante_id    | uuid                | nullable, FK → plantes.id (CASCADE DELETE)     |
-| ordre        | integer             | NOT NULL, DEFAULT 0                            |
+| Colonne      | Type                | Contraintes                                   |
+| ------------ | ------------------- | --------------------------------------------- |
+| id           | uuid                | PK                                            |
+| selection_id | uuid                | NOT NULL, FK → selections.id (CASCADE DELETE) |
+| type         | enum(livre, plante) | NOT NULL                                      |
+| livre_id     | uuid                | nullable, FK → livres.id (CASCADE DELETE)     |
+| plante_id    | uuid                | nullable, FK → plantes.id (CASCADE DELETE)    |
+| ordre        | integer             | NOT NULL, DEFAULT 0                           |
 
 ### `pages_editoriales`
 
@@ -172,43 +172,43 @@ Table clé-valeur pour la configuration librairie (horaires, annonce, réseaux s
 
 Comptes back-office.
 
-| Colonne               | Type                | Contraintes                          |
-| --------------------- | ------------------- | ------------------------------------ |
-| id                    | uuid                | PK                                   |
-| email                 | varchar(200)        | NOT NULL, UNIQUE                     |
-| password_hash         | varchar(255)        | NOT NULL (Argon2id)                  |
-| role                  | enum(role_utilisateur) | NOT NULL, DEFAULT 'admin'         |
-| reset_token           | varchar(255)        | nullable                             |
-| reset_token_expires_at| timestamp           | nullable                             |
-| created_at            | timestamp           | NOT NULL, DEFAULT now()              |
-| updated_at            | timestamp           | NOT NULL, DEFAULT now()              |
+| Colonne                | Type                   | Contraintes               |
+| ---------------------- | ---------------------- | ------------------------- |
+| id                     | uuid                   | PK                        |
+| email                  | varchar(200)           | NOT NULL, UNIQUE          |
+| password_hash          | varchar(255)           | NOT NULL (Argon2id)       |
+| role                   | enum(role_utilisateur) | NOT NULL, DEFAULT 'admin' |
+| reset_token            | varchar(255)           | nullable                  |
+| reset_token_expires_at | timestamp              | nullable                  |
+| created_at             | timestamp              | NOT NULL, DEFAULT now()   |
+| updated_at             | timestamp              | NOT NULL, DEFAULT now()   |
 
 ### `admin_logs`
 
 Journal d'actions back-office — FIFO 200 entrées.
 
-| Colonne      | Type         | Contraintes                              |
-| ------------ | ------------ | ---------------------------------------- |
-| id           | uuid         | PK                                       |
+| Colonne      | Type         | Contraintes                                  |
+| ------------ | ------------ | -------------------------------------------- |
+| id           | uuid         | PK                                           |
 | user_id      | uuid         | nullable, FK → users.id (ON DELETE SET NULL) |
-| user_email   | varchar(200) | NOT NULL (dénormalisé pour traçabilité)  |
-| action       | varchar(100) | NOT NULL (ex: `livre.create`)            |
-| entity_type  | varchar(50)  | nullable                                 |
-| entity_id    | varchar(36)  | nullable                                 |
-| entity_label | varchar(300) | nullable                                 |
-| created_at   | timestamp    | NOT NULL, DEFAULT now()                  |
+| user_email   | varchar(200) | NOT NULL (dénormalisé pour traçabilité)      |
+| action       | varchar(100) | NOT NULL (ex: `livre.create`)                |
+| entity_type  | varchar(50)  | nullable                                     |
+| entity_id    | varchar(36)  | nullable                                     |
+| entity_label | varchar(300) | nullable                                     |
+| created_at   | timestamp    | NOT NULL, DEFAULT now()                      |
 
 > FIFO : `createLog` supprime les entrées au-delà des 200 plus récentes après chaque insertion.
 
 ## Enums PostgreSQL
 
-| Nom                 | Valeurs                                                           |
-| ------------------- | ----------------------------------------------------------------- |
-| `difficulte_plante` | facile, moyen, difficile                                          |
-| `lumiere_plante`    | ombre, mi-ombre, lumiere-vive, plein-soleil                       |
-| `arrosage_plante`   | rare, modere, regulier, abondant                                  |
-| `avis_type`         | livre, plante — utilisé dans `selection_items.type` uniquement    |
-| `role_utilisateur`  | super_admin, admin, editor, moderator, contributor                |
+| Nom                 | Valeurs                                                        |
+| ------------------- | -------------------------------------------------------------- |
+| `difficulte_plante` | facile, moyen, difficile                                       |
+| `lumiere_plante`    | ombre, mi-ombre, lumiere-vive, plein-soleil                    |
+| `arrosage_plante`   | rare, modere, regulier, abondant                               |
+| `avis_type`         | livre, plante — utilisé dans `selection_items.type` uniquement |
+| `role_utilisateur`  | super_admin, admin, editor, moderator, contributor             |
 
 ## Commandes
 

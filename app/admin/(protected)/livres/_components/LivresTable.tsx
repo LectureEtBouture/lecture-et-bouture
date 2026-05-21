@@ -86,7 +86,10 @@ export function LivresTable({
             <div className="sm:hidden divide-y divide-border/50">
                 {data.map((livre) => (
                     <div key={livre.id} className="py-3 space-y-2">
-                        <LivreIdentite livre={livre} meta={bookMetas.get(livre.inventaireUri)} />
+                        <LivreIdentite
+                            livre={livre}
+                            meta={bookMetas.get(livre.inventaireUri)}
+                        />
                         <div className="flex items-center justify-between">
                             <span className="text-sm tabular-nums text-muted">
                                 {livre.prix ? `${livre.prix} €` : '—'}
@@ -129,7 +132,12 @@ export function LivresTable({
                                 className="border-b border-border/50 hover:bg-white transition-colors"
                             >
                                 <td className="py-3 pr-4">
-                                    <LivreIdentite livre={livre} meta={bookMetas.get(livre.inventaireUri)} />
+                                    <LivreIdentite
+                                        livre={livre}
+                                        meta={bookMetas.get(
+                                            livre.inventaireUri,
+                                        )}
+                                    />
                                 </td>
                                 <td className="py-3 pr-4 text-muted tabular-nums">
                                     {livre.prix ? `${livre.prix} €` : '—'}

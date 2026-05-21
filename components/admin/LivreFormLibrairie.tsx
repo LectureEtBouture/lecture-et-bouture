@@ -3,6 +3,7 @@
 import type { InferSelectModel } from 'drizzle-orm';
 import type { livres } from '@/db/schema';
 import { inputClass, labelClass, fieldsetClass } from './formStyles';
+import { ImageUpload } from './ImageUpload';
 
 type Livre = InferSelectModel<typeof livres>;
 
@@ -10,7 +11,7 @@ export function LivreFormLibrairie({ livre }: { livre?: Livre }) {
     return (
         <details
             className={fieldsetClass}
-            open={!!(livre?.choixLibrairie || livre?.noteDeLaLibrairie)}
+            open={!!(livre?.choixLibrairie || livre?.noteDeLaLibrairie || livre?.image)}
         >
             <summary className="list-none cursor-pointer flex items-center gap-2 select-none text-xs font-medium text-foreground uppercase tracking-widest [&::-webkit-details-marker]:hidden">
                 <span className="text-[8px] text-muted [[open]_&]:rotate-90 transition-transform duration-150">
@@ -49,6 +50,13 @@ export function LivreFormLibrairie({ livre }: { livre?: Livre }) {
                         placeholder="Pourquoi on aime ce livre…"
                     />
                 </div>
+
+                <ImageUpload
+                    folder="livres"
+                    label="Couverture personnalisée"
+                    defaultValue={livre?.image ?? null}
+                    defaultAltValue={livre?.imageAlt ?? null}
+                />
             </div>
         </details>
     );

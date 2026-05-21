@@ -39,7 +39,10 @@ export function CategorieFilter({
                         key={cat.slug}
                         onClick={() =>
                             push({
-                                cat: activeCat === cat.slug ? undefined : cat.slug,
+                                cat:
+                                    activeCat === cat.slug
+                                        ? undefined
+                                        : cat.slug,
                                 rayon: undefined,
                                 genre: undefined,
                                 sort: undefined,

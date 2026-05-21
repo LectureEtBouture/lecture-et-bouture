@@ -32,7 +32,10 @@ export function LivresSection({ titre, description, livres, href }: Props) {
 
                 <div className="flex gap-5 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     {livres.map((livre) => (
-                        <div key={livre.inventaireUri} className="flex-none w-40 sm:w-44">
+                        <div
+                            key={livre.inventaireUri}
+                            className="flex-none w-40 sm:w-44"
+                        >
                             <LivreCard livre={livre} />
                         </div>
                     ))}

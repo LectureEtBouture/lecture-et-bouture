@@ -5,6 +5,24 @@ import {
     type GoogleBooksResponse,
 } from './google-books-helpers';
 
+// Google serves a ~9KB "image not available" PNG for books without scans
+const COVER_MIN_BYTES = 10_000;
+
+async function validateCoverUrl(url: string): Promise<boolean> {
+    try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 3000);
+        const res = await fetch(url, { method: 'HEAD', signal: controller.signal });
+        clearTimeout(timer);
+        if (!res.ok) return false;
+        const len = res.headers.get('content-length');
+        if (len && parseInt(len, 10) < COVER_MIN_BYTES) return false;
+        return true;
+    } catch {
+        return true;
+    }
+}
+
 export class GoogleBooksProvider implements BookProvider {
     async rechercherParISBN(isbn: string): Promise<LivreMetadata | null> {
         const clean = isbn.replace(/[-\s]/g, '');
@@ -14,11 +32,17 @@ export class GoogleBooksProvider implements BookProvider {
         const data: GoogleBooksResponse = await res.json();
         const volume = data.items?.[0];
         if (!volume) return null;
-        return volumeToMeta(volume);
+        const meta = volumeToMeta(volume);
+        if (meta.imageUrl) {
+            const valid = await validateCoverUrl(meta.imageUrl);
+            if (!valid) return { ...meta, imageUrl: null };
+        }
+        return meta;
     }
 
     async rechercherParUri(uri: string): Promise<LivreMetadata | null> {
-        if (uri.startsWith('isbn:')) return this.rechercherParISBN(uri.slice(5));
+        if (uri.startsWith('isbn:'))
+            return this.rechercherParISBN(uri.slice(5));
         if (uri.startsWith('gbid:')) {
             const id = uri.slice(5);
             const key = process.env.GOOGLE_BOOKS_API_KEY;
@@ -31,7 +55,9 @@ export class GoogleBooksProvider implements BookProvider {
         return null;
     }
 
-    async rechercherParUris(uris: string[]): Promise<Map<string, LivreMetadata>> {
+    async rechercherParUris(
+        uris: string[],
+    ): Promise<Map<string, LivreMetadata>> {
         if (uris.length === 0) return new Map();
         const entries = await Promise.all(
             uris.map(async (uri) => {
@@ -46,7 +72,14 @@ export class GoogleBooksProvider implements BookProvider {
         return result;
     }
 
-    async rechercherParTitre(query: string, options?: { orderBy?: 'relevance' | 'newest'; startIndex?: number; maxResults?: number }): Promise<LivreSearchResult[]> {
+    async rechercherParTitre(
+        query: string,
+        options?: {
+            orderBy?: 'relevance' | 'newest';
+            startIndex?: number;
+            maxResults?: number;
+        },
+    ): Promise<LivreSearchResult[]> {
         const url = buildUrl({
             q: query,
             maxResults: String(options?.maxResults ?? 8),
@@ -76,13 +109,16 @@ export class GoogleBooksProvider implements BookProvider {
     }
 
     async rechercherTendances(startIndex = 0): Promise<LivreMetadata[]> {
-        const url = buildUrl({
-            q: 'roman',
-            printType: 'books',
-            orderBy: 'relevance',
-            maxResults: '40',
-            startIndex: String(startIndex),
-        }, false);
+        const url = buildUrl(
+            {
+                q: 'roman',
+                printType: 'books',
+                orderBy: 'relevance',
+                maxResults: '40',
+                startIndex: String(startIndex),
+            },
+            false,
+        );
         const res = await fetch(url, { next: { revalidate: 3600 } });
         if (!res.ok) return [];
         const data: GoogleBooksResponse = await res.json();
@@ -90,27 +126,36 @@ export class GoogleBooksProvider implements BookProvider {
     }
 
     async rechercherNouveautes(startIndex = 0): Promise<LivreMetadata[]> {
-        const url = buildUrl({
-            q: 'roman',
-            printType: 'books',
-            orderBy: 'newest',
-            maxResults: '40',
-            startIndex: String(startIndex),
-        }, false);
+        const url = buildUrl(
+            {
+                q: 'roman',
+                printType: 'books',
+                orderBy: 'newest',
+                maxResults: '40',
+                startIndex: String(startIndex),
+            },
+            false,
+        );
         const res = await fetch(url, { next: { revalidate: 3600 } });
         if (!res.ok) return [];
         const data: GoogleBooksResponse = await res.json();
         return (data.items ?? []).map(volumeToMeta);
     }
 
-    async rechercherParSujet(query: string, startIndex = 0): Promise<LivreMetadata[]> {
-        const url = buildUrl({
-            q: query,
-            printType: 'books',
-            orderBy: 'relevance',
-            maxResults: '40',
-            startIndex: String(startIndex),
-        }, false);
+    async rechercherParSujet(
+        query: string,
+        startIndex = 0,
+    ): Promise<LivreMetadata[]> {
+        const url = buildUrl(
+            {
+                q: query,
+                printType: 'books',
+                orderBy: 'relevance',
+                maxResults: '40',
+                startIndex: String(startIndex),
+            },
+            false,
+        );
         const res = await fetch(url, { next: { revalidate: 3600 } });
         if (!res.ok) return [];
         const data: GoogleBooksResponse = await res.json();

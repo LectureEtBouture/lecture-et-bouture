@@ -2,7 +2,12 @@
 
 import type { InferSelectModel } from 'drizzle-orm';
 import type { livres } from '@/db/schema';
-import { inputClass, labelClass, fieldsetClass, legendClass } from './formStyles';
+import {
+    inputClass,
+    labelClass,
+    fieldsetClass,
+    legendClass,
+} from './formStyles';
 import { ISBNImportRow } from './ISBNImportRow';
 import type { LivreMetadata } from '@/lib/services/books/types';
 
@@ -15,7 +20,12 @@ interface Props {
     onInventaireUriChange?: (val: string) => void;
 }
 
-export function LivreFormIdentite({ livre, onImport, inventaireUri, onInventaireUriChange }: Props) {
+export function LivreFormIdentite({
+    livre,
+    onImport,
+    inventaireUri,
+    onInventaireUriChange,
+}: Props) {
     return (
         <fieldset className={fieldsetClass}>
             <legend className={legendClass}>Identité</legend>
@@ -33,16 +43,25 @@ export function LivreFormIdentite({ livre, onImport, inventaireUri, onInventaire
                 />
                 {livre && (
                     <p className="text-[11px] text-muted mt-1">
-                        L&apos;URI inventaire ne peut pas être modifiée après création.
+                        L&apos;URI inventaire ne peut pas être modifiée après
+                        création.
                     </p>
                 )}
             </div>
 
             {!livre && (
                 <ISBNImportRow
-                    key={inventaireUri?.startsWith('isbn:') ? inventaireUri.slice(5) : ''}
+                    key={
+                        inventaireUri?.startsWith('isbn:')
+                            ? inventaireUri.slice(5)
+                            : ''
+                    }
                     defaultValue=""
-                    isbnExterne={inventaireUri?.startsWith('isbn:') ? inventaireUri.slice(5) : ''}
+                    isbnExterne={
+                        inventaireUri?.startsWith('isbn:')
+                            ? inventaireUri.slice(5)
+                            : ''
+                    }
                     onImport={onImport ?? (() => {})}
                 />
             )}

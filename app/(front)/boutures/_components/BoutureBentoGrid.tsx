@@ -18,13 +18,75 @@ const BENTO_PATTERN: { span: 1 | 2; colStartClass?: string }[] = [
     { span: 2, colStartClass: 'lg:col-start-2' },
 ];
 
-function BentoCard({
-    bouture,
-    large,
+const CARD_BASE =
+    'group flex flex-col lg:flex-row bg-surface h-full min-h-[240px] hover:shadow-[0_2px_12px_rgba(26,26,26,0.06)] transition-shadow duration-200';
+
+const NOISE_OVERLAY = (
+    <div
+        className="absolute inset-0 opacity-[0.035] mix-blend-multiply pointer-events-none"
+        style={{
+            backgroundImage:
+                "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+        }}
+    />
+);
+
+function ColorBlock({
+    coverColor,
+    coverImage,
+    nom,
+    imageAlt,
 }: {
-    bouture: BouturePublique;
-    large: boolean;
+    coverColor: string;
+    coverImage: string | null;
+    nom: string;
+    imageAlt?: string | null;
 }) {
+    return (
+        <div
+            className="aspect-[4/3] lg:aspect-auto lg:w-[48%] flex-shrink-0 relative overflow-hidden"
+            style={{ backgroundColor: coverColor }}
+        >
+            {coverImage ? (
+                <Image
+                    src={coverImage}
+                    alt={imageAlt ?? nom}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 30vw"
+                />
+            ) : (
+                NOISE_OVERLAY
+            )}
+        </div>
+    );
+}
+
+function MetaTags({
+    lumiere,
+    difficulte,
+}: {
+    lumiere?: string;
+    difficulte?: string;
+}) {
+    if (!lumiere && !difficulte) return null;
+    return (
+        <div className="flex items-center gap-3">
+            {lumiere && (
+                <span className="text-[10px] uppercase tracking-widest text-muted">
+                    {lumiere}
+                </span>
+            )}
+            {difficulte && (
+                <span className="text-[10px] uppercase tracking-widest text-muted">
+                    {difficulte}
+                </span>
+            )}
+        </div>
+    );
+}
+
+function LargeCard({ bouture }: { bouture: BouturePublique }) {
     const coverColor = getBoutureCoverColor(bouture.lumiere ?? '');
     const coverImage = bouture.image ?? null;
     const difficulte = bouture.difficulte
@@ -34,57 +96,247 @@ function BentoCard({
         ? LUMIERE_LABELS[bouture.lumiere]
         : undefined;
 
-    if (large) {
+    const meta = <MetaTags lumiere={lumiere} difficulte={difficulte} />;
+
+    const nameBlock = (
+        <div>
+            <h3 className="font-serif text-xl font-bold text-foreground leading-snug group-hover:text-primary transition-colors">
+                {bouture.nom}
+            </h3>
+            {bouture.espece && (
+                <p className="text-sm text-muted italic mt-0.5">
+                    {bouture.espece}
+                </p>
+            )}
+        </div>
+    );
+
+    const priceRow = (
+        <div className="flex items-center justify-between pt-1">
+            {bouture.stock === 0 ? (
+                <span className="text-[9px] uppercase tracking-widest text-border">
+                    Sur commande
+                </span>
+            ) : (
+                <span />
+            )}
+            <span className="text-sm font-medium text-primary">
+                {bouture.prix} €
+            </span>
+        </div>
+    );
+
+    // Cas 1 — image + note conservateur
+    if (coverImage && bouture.noteDeLaLibrairie) {
         return (
-            <Link
-                href={`/boutures/${bouture.slug}`}
-                className="group flex flex-col lg:flex-row bg-surface h-full min-h-[240px] hover:shadow-[0_2px_12px_rgba(26,26,26,0.06)] transition-shadow duration-200"
-            >
-                <div
-                    className="aspect-[4/3] lg:aspect-auto lg:w-[48%] flex-shrink-0 relative overflow-hidden"
-                    style={{ backgroundColor: coverColor }}
-                >
-                    {coverImage && (
-                        <Image
-                            src={coverImage}
-                            alt={bouture.nom}
-                            fill
-                            className="object-cover"
-                            sizes="(max-width: 1024px) 100vw, 30vw"
-                        />
-                    )}
-                </div>
-                <div className="flex flex-col justify-between p-6 flex-1">
-                    <div className="space-y-1.5">
-                        <p className="text-[10px] uppercase tracking-widest text-muted">
-                            {lumiere}
-                        </p>
-                        <h3 className="font-serif text-xl font-bold text-foreground leading-snug group-hover:text-primary transition-colors">
-                            {bouture.nom}
-                        </h3>
-                        <p className="text-sm text-muted italic">
-                            {bouture.espece}
-                        </p>
-                    </div>
-                    <div className="mt-6 space-y-3">
-                        {bouture.description && (
-                            <p className="text-sm text-foreground leading-[1.7] line-clamp-3 max-w-[40ch]">
-                                {bouture.description}
-                            </p>
-                        )}
-                        <div className="flex items-center justify-between pt-1">
-                            <p className="text-[10px] uppercase tracking-widest text-muted">
-                                {difficulte}
-                            </p>
-                            <p className="text-sm font-medium text-primary">
-                                {bouture.prix} €
+            <Link href={`/boutures/${bouture.slug}`} className={CARD_BASE}>
+                <ColorBlock
+                    coverColor={coverColor}
+                    coverImage={coverImage}
+                    nom={bouture.nom}
+                    imageAlt={bouture.imageAlt}
+                />
+                <div className="flex flex-col justify-between p-6 flex-1 overflow-hidden">
+                    <div className="space-y-3">
+                        {meta}
+                        {nameBlock}
+                        <div className="relative pt-2">
+                            <span
+                                className="absolute -top-1 left-0 font-serif text-4xl leading-none text-primary/15 select-none"
+                                aria-hidden
+                            >
+                                &laquo;
+                            </span>
+                            <p className="font-manuscript text-[0.9375rem] text-foreground leading-[1.75] line-clamp-4 pl-5">
+                                {bouture.noteDeLaLibrairie}
                             </p>
                         </div>
+                    </div>
+                    <div className="flex items-center justify-between pt-4 border-t border-border mt-4">
+                        <span className="text-[9px] uppercase tracking-[0.12em] text-primary">
+                            Note du conservateur
+                        </span>
+                        <span className="text-sm font-medium text-primary">
+                            {bouture.prix} €
+                        </span>
                     </div>
                 </div>
             </Link>
         );
     }
+
+    // Cas 2 — image + description
+    if (coverImage && bouture.description) {
+        return (
+            <Link href={`/boutures/${bouture.slug}`} className={CARD_BASE}>
+                <ColorBlock
+                    coverColor={coverColor}
+                    coverImage={coverImage}
+                    nom={bouture.nom}
+                    imageAlt={bouture.imageAlt}
+                />
+                <div className="flex flex-col justify-between p-6 flex-1">
+                    <div className="space-y-1.5">
+                        {meta}
+                        {nameBlock}
+                    </div>
+                    <div className="mt-6 space-y-3">
+                        <p className="text-sm text-foreground leading-[1.7] line-clamp-3 max-w-[40ch]">
+                            {bouture.description}
+                        </p>
+                        {priceRow}
+                    </div>
+                </div>
+            </Link>
+        );
+    }
+
+    // Cas 3 — image seule (pas de note, pas de description)
+    if (coverImage) {
+        return (
+            <Link href={`/boutures/${bouture.slug}`} className={CARD_BASE}>
+                <ColorBlock
+                    coverColor={coverColor}
+                    coverImage={coverImage}
+                    nom={bouture.nom}
+                    imageAlt={bouture.imageAlt}
+                />
+                <div className="flex flex-col justify-between p-6 flex-1">
+                    <div className="space-y-2">
+                        {meta}
+                        {nameBlock}
+                        {bouture.famille && (
+                            <p className="text-xs text-muted">
+                                Famille {bouture.famille}
+                            </p>
+                        )}
+                    </div>
+                    {priceRow}
+                </div>
+            </Link>
+        );
+    }
+
+    // Cas 4 — pas d'image, note conservateur
+    if (bouture.noteDeLaLibrairie) {
+        return (
+            <Link href={`/boutures/${bouture.slug}`} className={CARD_BASE}>
+                <ColorBlock
+                    coverColor={coverColor}
+                    coverImage={null}
+                    nom={bouture.nom}
+                />
+                <div className="flex flex-col justify-between p-6 flex-1">
+                    <div className="space-y-3">
+                        {meta}
+                        {nameBlock}
+                    </div>
+                    <div className="space-y-3">
+                        <p className="text-[9px] uppercase tracking-[0.12em] text-primary">
+                            Note du conservateur
+                        </p>
+                        <div className="relative">
+                            <span
+                                className="absolute -top-1 left-0 font-serif text-4xl leading-none text-primary/15 select-none"
+                                aria-hidden
+                            >
+                                &laquo;
+                            </span>
+                            <p className="font-manuscript text-[0.9375rem] text-foreground leading-[1.75] line-clamp-3 pl-5">
+                                {bouture.noteDeLaLibrairie}
+                            </p>
+                        </div>
+                        {priceRow}
+                    </div>
+                </div>
+            </Link>
+        );
+    }
+
+    // Cas 5 — pas d'image, description
+    if (bouture.description) {
+        return (
+            <Link href={`/boutures/${bouture.slug}`} className={CARD_BASE}>
+                <ColorBlock
+                    coverColor={coverColor}
+                    coverImage={null}
+                    nom={bouture.nom}
+                />
+                <div className="flex flex-col justify-between p-6 flex-1">
+                    <div className="space-y-1.5">
+                        {meta}
+                        {nameBlock}
+                    </div>
+                    <div className="space-y-3 mt-6">
+                        <p className="text-sm text-foreground leading-[1.7] line-clamp-3 max-w-[40ch]">
+                            {bouture.description}
+                        </p>
+                        {priceRow}
+                    </div>
+                </div>
+            </Link>
+        );
+    }
+
+    // Cas 6 — specimen label (rien, seulement les champs obligatoires)
+    return (
+        <Link href={`/boutures/${bouture.slug}`} className={CARD_BASE}>
+            <ColorBlock
+                coverColor={coverColor}
+                coverImage={null}
+                nom={bouture.nom}
+            />
+            <div className="flex flex-col justify-between p-6 flex-1">
+                <div className="space-y-4">
+                    {nameBlock}
+                    <dl className="space-y-1.5 border-t border-border pt-3">
+                        {lumiere && (
+                            <div className="flex justify-between gap-4">
+                                <dt className="text-[9px] uppercase tracking-[0.1em] text-muted shrink-0">
+                                    Lumière
+                                </dt>
+                                <dd className="text-xs text-foreground text-right">
+                                    {lumiere}
+                                </dd>
+                            </div>
+                        )}
+                        {difficulte && (
+                            <div className="flex justify-between gap-4">
+                                <dt className="text-[9px] uppercase tracking-[0.1em] text-muted shrink-0">
+                                    Difficulté
+                                </dt>
+                                <dd className="text-xs text-foreground text-right">
+                                    {difficulte}
+                                </dd>
+                            </div>
+                        )}
+                        {bouture.famille && (
+                            <div className="flex justify-between gap-4">
+                                <dt className="text-[9px] uppercase tracking-[0.1em] text-muted shrink-0">
+                                    Famille
+                                </dt>
+                                <dd className="text-xs text-foreground text-right">
+                                    {bouture.famille}
+                                </dd>
+                            </div>
+                        )}
+                    </dl>
+                </div>
+                {priceRow}
+            </div>
+        </Link>
+    );
+}
+
+function SmallCard({ bouture }: { bouture: BouturePublique }) {
+    const coverColor = getBoutureCoverColor(bouture.lumiere ?? '');
+    const coverImage = bouture.image ?? null;
+    const difficulte = bouture.difficulte
+        ? DIFFICULTE_LABELS[bouture.difficulte]
+        : undefined;
+    const lumiere = bouture.lumiere
+        ? LUMIERE_LABELS[bouture.lumiere]
+        : undefined;
 
     return (
         <Link
@@ -95,29 +347,35 @@ function BentoCard({
                 className="aspect-[3/4] w-full relative overflow-hidden"
                 style={{ backgroundColor: coverColor }}
             >
-                {coverImage && (
+                {coverImage ? (
                     <Image
                         src={coverImage}
-                        alt={bouture.nom}
+                        alt={bouture.imageAlt ?? bouture.nom}
                         fill
                         className="object-cover"
                         sizes="(max-width: 1024px) 50vw, 20vw"
                     />
+                ) : (
+                    NOISE_OVERLAY
                 )}
             </div>
             <div className="p-4 space-y-1">
-                <p className="text-[10px] uppercase tracking-widest text-muted">
-                    {lumiere}
-                </p>
+                {lumiere && (
+                    <p className="text-[10px] uppercase tracking-widest text-muted">
+                        {lumiere}
+                    </p>
+                )}
                 <h3 className="font-serif text-base font-bold text-foreground leading-snug group-hover:text-primary transition-colors line-clamp-2">
                     {bouture.nom}
                 </h3>
                 <p className="text-xs text-muted italic">{bouture.espece}</p>
                 <div className="flex items-center justify-between pt-2">
-                    <p className="text-[10px] uppercase tracking-widest text-muted">
-                        {difficulte}
-                    </p>
-                    <p className="text-sm font-medium text-primary">
+                    {difficulte && (
+                        <p className="text-[10px] uppercase tracking-widest text-muted">
+                            {difficulte}
+                        </p>
+                    )}
+                    <p className="text-sm font-medium text-primary ml-auto">
                         {bouture.prix} €
                     </p>
                 </div>
@@ -155,7 +413,11 @@ export function BoutureBentoGrid({
                             .filter(Boolean)
                             .join(' ')}
                     >
-                        <BentoCard bouture={bouture} large={large} />
+                        {large ? (
+                            <LargeCard bouture={bouture} />
+                        ) : (
+                            <SmallCard bouture={bouture} />
+                        )}
                     </div>
                 );
             })}

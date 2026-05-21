@@ -1,7 +1,11 @@
 import { notFound } from 'next/navigation';
 import { LivreForm } from '@/components/admin/LivreForm';
 import { getLivre, updateLivre } from '@/lib/actions/livres';
-import { getGenres, getRayons, getLivreGenreIds } from '@/lib/actions/livres-meta';
+import {
+    getGenres,
+    getRayons,
+    getLivreGenreIds,
+} from '@/lib/actions/livres-meta';
 
 export default async function ModifierLivrePage({
     params,

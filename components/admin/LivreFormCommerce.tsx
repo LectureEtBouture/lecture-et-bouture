@@ -1,6 +1,11 @@
 'use client';
 
-import { inputClass, labelClass, fieldsetClass, legendClass } from './formStyles';
+import {
+    inputClass,
+    labelClass,
+    fieldsetClass,
+    legendClass,
+} from './formStyles';
 
 interface Props {
     prixValue: string;

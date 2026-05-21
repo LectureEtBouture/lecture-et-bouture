@@ -2,30 +2,49 @@ import { unstable_cache } from 'next/cache';
 import { db } from '@/db';
 import { livres, livresGenres } from '@/db/schema';
 import { and, ne, notInArray, sql, eq, type SQL } from 'drizzle-orm';
-import type { LivreComplet, EnrichissementLocal } from '@/lib/services/books/types';
+import type {
+    LivreComplet,
+    EnrichissementLocal,
+} from '@/lib/services/books/types';
 import { bookProvider } from '@/lib/services/books';
 import { fusionnerListe } from '@/lib/services/books/merge';
 import { getEnrichissementByUri } from './enrichissements';
 
-async function getEnrichissementsByIds(ids: string[]): Promise<EnrichissementLocal[]> {
+async function getEnrichissementsByIds(
+    ids: string[],
+): Promise<EnrichissementLocal[]> {
     if (ids.length === 0) return [];
     const { livresGenres: lg } = await import('@/db/schema');
-    const rows = await db.select({
-        id: livres.id,
-        inventaireUri: livres.inventaireUri,
-        prix: livres.prix,
-        choixLibrairie: livres.choixLibrairie,
-        noteDeLaLibrairie: livres.noteDeLaLibrairie,
-        rayonId: livres.rayonId,
-        numeroSerie: livres.numeroSerie,
-        noteMoyenne: livres.noteMoyenne,
-    }).from(livres).where(
-        ids.length === 1 ? eq(livres.id, ids[0]) : sql`${livres.id} = ANY(${ids})`,
+    const rows = await db
+        .select({
+            id: livres.id,
+            inventaireUri: livres.inventaireUri,
+            prix: livres.prix,
+            choixLibrairie: livres.choixLibrairie,
+            noteDeLaLibrairie: livres.noteDeLaLibrairie,
+            rayonId: livres.rayonId,
+            numeroSerie: livres.numeroSerie,
+            noteMoyenne: livres.noteMoyenne,
+        })
+        .from(livres)
+        .where(
+            ids.length === 1
+                ? eq(livres.id, ids[0])
+                : sql`${livres.id} = ANY(${ids})`,
+        );
+    return Promise.all(
+        rows.map(async (row) => {
+            const genreRows = await db
+                .select({ genreId: lg.genreId })
+                .from(lg)
+                .where(eq(lg.livreId, row.id));
+            return {
+                localId: row.id,
+                ...row,
+                genreIds: genreRows.map((g) => g.genreId),
+            };
+        }),
     );
-    return Promise.all(rows.map(async (row) => {
-        const genreRows = await db.select({ genreId: lg.genreId }).from(lg).where(eq(lg.livreId, row.id));
-        return { localId: row.id, ...row, genreIds: genreRows.map((g) => g.genreId) };
-    }));
 }
 
 export type Recommendations = {
@@ -33,7 +52,11 @@ export type Recommendations = {
 };
 
 export const getRecommendations = unstable_cache(
-    async (localId: string, genreId: string | null, limit = 4): Promise<Recommendations> => {
+    async (
+        localId: string,
+        genreId: string | null,
+        limit = 4,
+    ): Promise<Recommendations> => {
         if (!genreId) return { memeGenre: [] };
 
         const conditions: SQL[] = [ne(livres.id, localId)];
@@ -60,7 +83,10 @@ export const getRecommendations = unstable_cache(
         const enrichMap = new Map<string, EnrichissementLocal>(
             uris
                 .map((uri, i) => [uri, enrichissements[i]] as const)
-                .filter((pair): pair is [string, EnrichissementLocal] => pair[1] !== null),
+                .filter(
+                    (pair): pair is [string, EnrichissementLocal] =>
+                        pair[1] !== null,
+                ),
         );
 
         return { memeGenre: fusionnerListe(metas, enrichMap, uris) };

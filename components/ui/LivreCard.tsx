@@ -1,7 +1,7 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { getCoverColor } from '@/lib/data';
 import type { LivreComplet } from '@/lib/services/books/types';
+import { CoverImage } from '@/components/ui/CoverImage';
 
 export function LivreCard({
     livre,
@@ -21,11 +21,9 @@ export function LivreCard({
                 style={{ backgroundColor: coverColor }}
             >
                 {livre.imageUrl && (
-                    <Image
+                    <CoverImage
                         src={livre.imageUrl}
-                        alt={livre.titre}
-                        fill
-                        className="object-cover"
+                        alt={livre.imageAlt ?? livre.titre}
                         sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     />
                 )}
@@ -57,7 +55,10 @@ export function LivreCard({
                 <p className="text-xs text-muted">{livre.auteur}</p>
                 {livre.prix && (
                     <p className="text-sm font-medium text-primary pt-1">
-                        {livre.prix} € <span className="text-[10px] text-muted font-normal">indicatif</span>
+                        {livre.prix} €{' '}
+                        <span className="text-[10px] text-muted font-normal">
+                            indicatif
+                        </span>
                     </p>
                 )}
             </div>

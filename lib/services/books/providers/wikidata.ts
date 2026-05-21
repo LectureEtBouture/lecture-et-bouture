@@ -39,11 +39,14 @@ export class WikidataProvider implements BookProvider {
         });
 
         if (!response.ok) {
-            throw new Error(`Wikidata SPARQL error: ${response.status} ${response.statusText}`);
+            throw new Error(
+                `Wikidata SPARQL error: ${response.status} ${response.statusText}`,
+            );
         }
 
         const data = await response.json();
-        const bindings: Record<string, { value: string }>[] = data.results?.bindings ?? [];
+        const bindings: Record<string, { value: string }>[] =
+            data.results?.bindings ?? [];
         if (bindings.length === 0) return null;
 
         const row = bindings[0];
@@ -65,7 +68,15 @@ export class WikidataProvider implements BookProvider {
         };
     }
 
-    async rechercherParUri(_uri: string): Promise<LivreMetadata | null> { return null; }
-    async rechercherParUris(_uris: string[]): Promise<Map<string, LivreMetadata>> { return new Map(); }
-    async rechercherParTitre(_query: string): Promise<LivreSearchResult[]> { return []; }
+    async rechercherParUri(_uri: string): Promise<LivreMetadata | null> {
+        return null;
+    }
+    async rechercherParUris(
+        _uris: string[],
+    ): Promise<Map<string, LivreMetadata>> {
+        return new Map();
+    }
+    async rechercherParTitre(_query: string): Promise<LivreSearchResult[]> {
+        return [];
+    }
 }

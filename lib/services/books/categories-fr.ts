@@ -2,7 +2,7 @@
 
 const MAP: Record<string, string> = {
     // Fiction
-    'Fiction': 'Fiction',
+    Fiction: 'Fiction',
     'Fiction / Action & Adventure': 'Fiction / Action & Aventure',
     'Fiction / Fantasy': 'Fantasy',
     'Fiction / Fantasy / General': 'Fantasy',
@@ -29,7 +29,8 @@ const MAP: Record<string, string> = {
     // Jeunesse
     'Young Adult Fiction': 'Jeunesse / Ado',
     'Young Adult Fiction / Fantasy / General': 'Fantasy jeunesse',
-    'Young Adult Fiction / Science Fiction / General': 'Science-fiction jeunesse',
+    'Young Adult Fiction / Science Fiction / General':
+        'Science-fiction jeunesse',
     'Young Adult Fiction / Romance / General': 'Romance jeunesse',
     'Young Adult Nonfiction': 'Documentaire ado',
     'Juvenile Fiction': 'Jeunesse',
@@ -45,54 +46,54 @@ const MAP: Record<string, string> = {
     'Biography & Autobiography': 'Biographie & mémoires',
     'Biography & Autobiography / General': 'Biographie & mémoires',
     'Biography & Autobiography / Literary': 'Biographie littéraire',
-    'History': 'Histoire',
+    History: 'Histoire',
     'History / General': 'Histoire',
     'History / Europe / France': 'Histoire / France',
-    'Philosophy': 'Philosophie',
-    'Science': 'Sciences',
-    'Nature': 'Nature',
-    'Animals': 'Animaux',
-    'Mythology': 'Mythologie',
-    'Folklore': 'Folklores & légendes',
+    Philosophy: 'Philosophie',
+    Science: 'Sciences',
+    Nature: 'Nature',
+    Animals: 'Animaux',
+    Mythology: 'Mythologie',
+    Folklore: 'Folklores & légendes',
     'Technology & Engineering': 'Technologie',
-    'Travel': 'Voyages',
+    Travel: 'Voyages',
     'Self-Help': 'Développement personnel',
     'Self-Help / General': 'Développement personnel',
-    'Psychology': 'Psychologie',
+    Psychology: 'Psychologie',
     'Political Science': 'Sciences politiques',
     'Social Science': 'Sciences sociales',
-    'Religion': 'Religion',
-    'Cooking': 'Cuisine',
+    Religion: 'Religion',
+    Cooking: 'Cuisine',
     'Cooking / General': 'Cuisine',
-    'Art': 'Art',
+    Art: 'Art',
     'Art / General': 'Art',
-    'Photography': 'Photographie',
-    'Music': 'Musique',
+    Photography: 'Photographie',
+    Music: 'Musique',
     'Performing Arts': 'Arts du spectacle',
-    'Poetry': 'Poésie',
-    'Drama': 'Théâtre',
+    Poetry: 'Poésie',
+    Drama: 'Théâtre',
     'Literary Criticism': 'Critique littéraire',
     'Language Arts & Disciplines': 'Langue & lettres',
     'Business & Economics': 'Économie & business',
     'True Crime': 'Faits divers',
     'Health & Fitness': 'Santé & bien-être',
-    'Gardening': 'Jardinage',
+    Gardening: 'Jardinage',
     'Crafts & Hobbies': 'Loisirs créatifs',
     'Sports & Recreation': 'Sport',
-    'Mathematics': 'Mathématiques',
-    'Medical': 'Médecine',
-    'Humor': 'Humour',
+    Mathematics: 'Mathématiques',
+    Medical: 'Médecine',
+    Humor: 'Humour',
     'Games & Activities': 'Jeux & activités',
     'Body, Mind & Spirit': 'Bien-être',
     'Family & Relationships': 'Famille & relations',
     'Antiques & Collectibles': 'Antiquités & collections',
-    'Architecture': 'Architecture',
+    Architecture: 'Architecture',
     'Comics & Graphic Novels / Fantasy': 'BD / Fantasy',
     'Marvelous, The': 'Merveilleux',
-    'Supernatural': 'Surnaturel',
-    'Paranormal': 'Paranormal',
+    Supernatural: 'Surnaturel',
+    Paranormal: 'Paranormal',
     'Occult & Supernatural': 'Occulte & Surnaturel',
-    'Magic': 'Magie',
+    Magic: 'Magie',
     'Fairy Tales, Folk Tales, Legends & Mythology': 'Contes & mythes',
 };
 
@@ -109,37 +110,61 @@ export function translateCategories(categories: string[]): string[] {
 // Noms affichables par slug — utilisé dans le BO (hint suggestion) et le front (CategorieFilter)
 export const RAYON_SLUG_FR: Record<string, string> = {
     'sciences-nature': 'Sciences & Nature',
-    'litterature': 'Littérature',
+    litterature: 'Littérature',
     'philosophie-essai': 'Philosophie & Essai',
-    'histoire': 'Histoire',
-    'imaginaire': 'Imaginaire',
+    histoire: 'Histoire',
+    imaginaire: 'Imaginaire',
     'bande-dessinee': 'Bande dessinée',
-    'manga': 'Manga',
-    'jeunesse': 'Jeunesse',
+    manga: 'Manga',
+    jeunesse: 'Jeunesse',
     'policier-thriller': 'Policier / Thriller',
-    'biographie': 'Biographie',
+    biographie: 'Biographie',
     'art-beaux-livres': 'Art & Beaux livres',
     'cuisine-gastronomie': 'Cuisine & Gastronomie',
-    'voyage': 'Voyage',
+    voyage: 'Voyage',
     'developpement-personnel': 'Développement personnel',
     'poesie-theatre': 'Poésie & Théâtre',
 };
 
 // Mots-clés de fallback pour matcher par nom de rayon si le slug exact est absent
 const RAYON_SLUG_KEYWORDS: Record<string, string[]> = {
-    'sciences-nature': ['science', 'nature', 'animal', 'botani', 'écol', 'jardinage', 'naturel'],
-    'litterature': ['littérat', 'roman', 'fiction', 'novel'],
+    'sciences-nature': [
+        'science',
+        'nature',
+        'animal',
+        'botani',
+        'écol',
+        'jardinage',
+        'naturel',
+    ],
+    litterature: ['littérat', 'roman', 'fiction', 'novel'],
     'philosophie-essai': ['philo', 'essai', 'social', 'politi'],
-    'histoire': ['histoir'],
-    'imaginaire': ['imaginaire', 'fantast', 'fantasy', 'sf ', 'sci-fi', 'mythe', 'mythol', 'légende'],
+    histoire: ['histoir'],
+    imaginaire: [
+        'imaginaire',
+        'fantast',
+        'fantasy',
+        'sf ',
+        'sci-fi',
+        'mythe',
+        'mythol',
+        'légende',
+    ],
     'bande-dessinee': ['bande dessinée', 'bd', 'comic', 'graphic'],
-    'manga': ['manga'],
-    'jeunesse': ['jeune', 'enfant', 'junior', 'kids'],
-    'policier-thriller': ['policier', 'polar', 'thriller', 'crime', 'mystère', 'suspense'],
-    'biographie': ['biograph', 'mémoir', 'autobiograph'],
+    manga: ['manga'],
+    jeunesse: ['jeune', 'enfant', 'junior', 'kids'],
+    'policier-thriller': [
+        'policier',
+        'polar',
+        'thriller',
+        'crime',
+        'mystère',
+        'suspense',
+    ],
+    biographie: ['biograph', 'mémoir', 'autobiograph'],
     'art-beaux-livres': ['art', 'beaux', 'photo'],
     'cuisine-gastronomie': ['cuisin', 'gastronom', 'recett'],
-    'voyage': ['voyage', 'travel'],
+    voyage: ['voyage', 'travel'],
     'developpement-personnel': ['développement', 'perso', 'bien-être'],
     'poesie-theatre': ['poési', 'théâtre', 'poème', 'dram'],
 };
@@ -148,24 +173,101 @@ export function suggestRayonSlug(categories: string[]): string | null {
     for (const cat of categories) {
         const lower = cat.toLowerCase();
         if (lower.includes('manga')) return 'manga';
-        if (lower.includes('comic') || lower.includes('graphic novel')) return 'bande-dessinee';
+        if (lower.includes('comic') || lower.includes('graphic novel'))
+            return 'bande-dessinee';
         if (lower.startsWith('juvenile')) return 'jeunesse';
         if (lower.includes('young adult')) {
-            if (lower.includes('fantasy') || lower.includes('science fiction') || lower.includes('horror') || lower.includes('paranormal')) return 'imaginaire';
+            if (
+                lower.includes('fantasy') ||
+                lower.includes('science fiction') ||
+                lower.includes('horror') ||
+                lower.includes('paranormal')
+            )
+                return 'imaginaire';
             return 'jeunesse';
         }
-        if (lower.includes('fantasy') || lower.includes('science fiction') || lower.includes('horror') || lower.includes('myth') || lower.includes('legend') || lower.includes('folklor') || lower.includes('marvelous') || lower.includes('merveilleux') || lower.includes('supernatural') || lower.includes('paranormal') || lower.includes('occult') || lower.includes('magic') || lower.includes('fairy') || lower.includes('dragon') || lower.includes('vampire') || lower.includes('sorcier')) return 'imaginaire';
-        if (lower.includes('thriller') || lower.includes('crime') || lower.includes('mystery') || lower.includes('detective') || lower.includes('true crime')) return 'policier-thriller';
-        if (lower.includes('biography') || lower.includes('autobiography') || lower.includes('memoir')) return 'biographie';
-        if (lower.startsWith('history') || lower === 'history') return 'histoire';
-        if (lower.includes('philosophy') || lower.includes('essay') || lower.includes('political science') || lower.includes('social science')) return 'philosophie-essai';
-        if (lower.includes('poetry') || lower.startsWith('drama') || lower.includes('theater')) return 'poesie-theatre';
-        if (lower.includes('cooking') || lower.includes('gastronomy') || lower.includes('culinary')) return 'cuisine-gastronomie';
+        if (
+            lower.includes('fantasy') ||
+            lower.includes('science fiction') ||
+            lower.includes('horror') ||
+            lower.includes('myth') ||
+            lower.includes('legend') ||
+            lower.includes('folklor') ||
+            lower.includes('marvelous') ||
+            lower.includes('merveilleux') ||
+            lower.includes('supernatural') ||
+            lower.includes('paranormal') ||
+            lower.includes('occult') ||
+            lower.includes('magic') ||
+            lower.includes('fairy') ||
+            lower.includes('dragon') ||
+            lower.includes('vampire') ||
+            lower.includes('sorcier')
+        )
+            return 'imaginaire';
+        if (
+            lower.includes('thriller') ||
+            lower.includes('crime') ||
+            lower.includes('mystery') ||
+            lower.includes('detective') ||
+            lower.includes('true crime')
+        )
+            return 'policier-thriller';
+        if (
+            lower.includes('biography') ||
+            lower.includes('autobiography') ||
+            lower.includes('memoir')
+        )
+            return 'biographie';
+        if (lower.startsWith('history') || lower === 'history')
+            return 'histoire';
+        if (
+            lower.includes('philosophy') ||
+            lower.includes('essay') ||
+            lower.includes('political science') ||
+            lower.includes('social science')
+        )
+            return 'philosophie-essai';
+        if (
+            lower.includes('poetry') ||
+            lower.startsWith('drama') ||
+            lower.includes('theater')
+        )
+            return 'poesie-theatre';
+        if (
+            lower.includes('cooking') ||
+            lower.includes('gastronomy') ||
+            lower.includes('culinary')
+        )
+            return 'cuisine-gastronomie';
         if (lower.startsWith('travel')) return 'voyage';
-        if (lower.includes('self-help') || lower.includes('personal development') || lower.includes('body, mind')) return 'developpement-personnel';
-        if (lower.startsWith('art') || lower.startsWith('photography') || lower.startsWith('architecture')) return 'art-beaux-livres';
-        if (lower.includes('animal') || lower.includes('nature') || lower.includes('gardening') || lower.includes('ecology') || lower.includes('botany') || lower.startsWith('science')) return 'sciences-nature';
-        if (lower.startsWith('fiction') || lower.includes('literary') || lower.includes('literature')) return 'litterature';
+        if (
+            lower.includes('self-help') ||
+            lower.includes('personal development') ||
+            lower.includes('body, mind')
+        )
+            return 'developpement-personnel';
+        if (
+            lower.startsWith('art') ||
+            lower.startsWith('photography') ||
+            lower.startsWith('architecture')
+        )
+            return 'art-beaux-livres';
+        if (
+            lower.includes('animal') ||
+            lower.includes('nature') ||
+            lower.includes('gardening') ||
+            lower.includes('ecology') ||
+            lower.includes('botany') ||
+            lower.startsWith('science')
+        )
+            return 'sciences-nature';
+        if (
+            lower.startsWith('fiction') ||
+            lower.includes('literary') ||
+            lower.includes('literature')
+        )
+            return 'litterature';
     }
     return null;
 }
@@ -181,7 +283,10 @@ export function suggestGenreIds(
         const catLower = cat.toLowerCase();
         for (const genre of genresList) {
             const genreLower = genre.nom.toLowerCase();
-            if (catLower.includes(genreLower) || genreLower.includes(catLower)) {
+            if (
+                catLower.includes(genreLower) ||
+                genreLower.includes(catLower)
+            ) {
                 ids.add(genre.id);
             }
         }

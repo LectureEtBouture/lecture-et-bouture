@@ -22,6 +22,8 @@ const enrichissementSchema = z.object({
     choixLibrairie: z.boolean().default(false),
     noteDeLaLibrairie: z.string().optional(),
     numeroSerie: z.coerce.number().int().optional(),
+    image: z.string().optional(),
+    imageAlt: z.string().optional(),
 });
 
 function parseFormData(formData: FormData) {
@@ -33,6 +35,8 @@ function parseFormData(formData: FormData) {
         choixLibrairie: formData.get('choixLibrairie') === 'on',
         noteDeLaLibrairie: formData.get('noteDeLaLibrairie') || undefined,
         numeroSerie: formData.get('numeroSerie') || undefined,
+        image: formData.get('image') || undefined,
+        imageAlt: formData.get('imageAlt') || undefined,
     });
     const genreIds = (formData.getAll('genreIds') as string[]).filter(
         (id) => id.length > 0,
@@ -54,13 +58,17 @@ export async function createLivre(formData: FormData) {
             choixLibrairie: parsed.choixLibrairie,
             noteDeLaLibrairie: parsed.noteDeLaLibrairie ?? null,
             numeroSerie: parsed.numeroSerie ?? null,
+            image: parsed.image ?? null,
+            imageAlt: parsed.imageAlt ?? null,
         })
         .returning({ id: livres.id });
 
     if (parsed.genreIds.length > 0) {
         await db
             .insert(livresGenres)
-            .values(parsed.genreIds.map((genreId) => ({ livreId: id, genreId })));
+            .values(
+                parsed.genreIds.map((genreId) => ({ livreId: id, genreId })),
+            );
     }
 
     await createLog({
@@ -88,6 +96,8 @@ export async function updateLivre(id: string, formData: FormData) {
             choixLibrairie: parsed.choixLibrairie,
             noteDeLaLibrairie: parsed.noteDeLaLibrairie ?? null,
             numeroSerie: parsed.numeroSerie ?? null,
+            image: parsed.image ?? null,
+            imageAlt: parsed.imageAlt ?? null,
             updatedAt: new Date(),
         })
         .where(eq(livres.id, id));
@@ -96,10 +106,17 @@ export async function updateLivre(id: string, formData: FormData) {
     if (parsed.genreIds.length > 0) {
         await db
             .insert(livresGenres)
-            .values(parsed.genreIds.map((genreId) => ({ livreId: id, genreId })));
+            .values(
+                parsed.genreIds.map((genreId) => ({ livreId: id, genreId })),
+            );
     }
 
-    await createLog({ action: 'livre.update', entityType: 'livre', entityId: id, entityLabel: parsed.inventaireUri });
+    await createLog({
+        action: 'livre.update',
+        entityType: 'livre',
+        entityId: id,
+        entityLabel: parsed.inventaireUri,
+    });
     revalidatePath('/admin/livres');
     revalidateTag('livres', { expire: 0 });
     redirect('/admin/livres');
@@ -148,7 +165,11 @@ export async function getLivres(
         })
         .from(livres)
         .where(conditions.length > 0 ? and(...conditions) : undefined)
-        .orderBy(sort === 'choix' ? eq(livres.choixLibrairie, true) : desc(livres.createdAt));
+        .orderBy(
+            sort === 'choix'
+                ? eq(livres.choixLibrairie, true)
+                : desc(livres.createdAt),
+        );
 }
 
 export async function getLivre(id: string) {
@@ -159,4 +180,3 @@ export async function getLivre(id: string) {
         .limit(1)
         .then((r) => r[0]);
 }
-

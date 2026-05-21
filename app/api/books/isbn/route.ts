@@ -19,7 +19,9 @@ export async function GET(request: NextRequest) {
     const needsGbCategories = importProvider !== bookProvider;
     const [result, gbMeta] = await Promise.all([
         importProvider.rechercherParISBN(isbn),
-        needsGbCategories ? bookProvider.rechercherParISBN(isbn) : Promise.resolve(null),
+        needsGbCategories
+            ? bookProvider.rechercherParISBN(isbn)
+            : Promise.resolve(null),
     ]);
 
     if (!result) {

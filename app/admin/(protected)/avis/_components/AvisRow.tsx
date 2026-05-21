@@ -18,7 +18,10 @@ export function AvisRow({
     const stars = '★'.repeat(a.note) + '☆'.repeat(5 - a.note);
     const typeLabel = a.type === 'livre' ? 'Livre' : 'Bouture';
     const uri = a.inventaireUri;
-    const titre = bookMeta?.titre ?? a.produitNom ?? (uri ? uri.replace('isbn:', 'ISBN ') : null);
+    const titre =
+        bookMeta?.titre ??
+        a.produitNom ??
+        (uri ? uri.replace('isbn:', 'ISBN ') : null);
     const imageUrl = bookMeta?.imageUrl ?? null;
 
     return (
@@ -45,10 +48,18 @@ export function AvisRow({
                                     target="_blank"
                                     className="underline hover:text-primary"
                                 >
-                                    {titre ?? <span className="italic">Produit inconnu</span>}
+                                    {titre ?? (
+                                        <span className="italic">
+                                            Produit inconnu
+                                        </span>
+                                    )}
                                 </Link>
                             ) : (
-                                titre ?? <span className="italic">Produit inconnu</span>
+                                (titre ?? (
+                                    <span className="italic">
+                                        Produit inconnu
+                                    </span>
+                                ))
                             )}
                         </p>
                         <p className="text-xs text-muted/70 tracking-wide">

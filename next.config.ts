@@ -19,6 +19,7 @@ const minioPattern = getMinioRemotePattern();
 
 const nextConfig: NextConfig = {
     images: {
+        unoptimized: process.env.NODE_ENV === 'development',
         remotePatterns: [
             ...(minioPattern ? [minioPattern] : []),
             {

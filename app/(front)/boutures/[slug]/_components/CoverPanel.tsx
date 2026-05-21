@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { DIFFICULTE_LABELS, LUMIERE_LABELS, ARROSAGE_LABELS } from '@/lib/data';
 import type { BouturePublique } from '@/lib/queries/boutures';
 
@@ -42,6 +43,16 @@ export function CoverPanel({
                 className="aspect-2/3 w-full relative overflow-hidden"
                 style={{ backgroundColor: coverColor }}
             >
+                {bouture.image && (
+                    <Image
+                        src={bouture.image}
+                        alt={bouture.imageAlt ?? bouture.nom}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 280px"
+                        priority
+                    />
+                )}
                 <div
                     className="absolute inset-0 opacity-[0.04] mix-blend-multiply"
                     style={{

@@ -15,6 +15,8 @@ async function rowToEnrichissement(row: {
     rayonId: string | null;
     numeroSerie: number | null;
     noteMoyenne: string | null;
+    image: string | null;
+    imageAlt: string | null;
 }): Promise<EnrichissementLocal> {
     const genreRows = await db
         .select({ genreId: livresGenres.genreId })
@@ -30,6 +32,8 @@ async function rowToEnrichissement(row: {
         genreIds: genreRows.map((g) => g.genreId),
         numeroSerie: row.numeroSerie,
         noteMoyenne: row.noteMoyenne,
+        image: row.image,
+        imageAlt: row.imageAlt,
     };
 }
 
@@ -52,11 +56,16 @@ const enrichissementSelect = {
     rayonId: livres.rayonId,
     numeroSerie: livres.numeroSerie,
     noteMoyenne: livres.noteMoyenne,
+    image: livres.image,
+    imageAlt: livres.imageAlt,
 } as const;
 
-function buildConditions(filters: Omit<EnrichissementsFilters, 'sort' | 'limit' | 'offset'>): SQL[] {
+function buildConditions(
+    filters: Omit<EnrichissementsFilters, 'sort' | 'limit' | 'offset'>,
+): SQL[] {
     const conditions: SQL[] = [];
-    if (filters.choixLibrairie) conditions.push(eq(livres.choixLibrairie, true));
+    if (filters.choixLibrairie)
+        conditions.push(eq(livres.choixLibrairie, true));
     if (filters.rayonId) conditions.push(eq(livres.rayonId, filters.rayonId));
     if (filters.rayonSlug) {
         conditions.push(
@@ -76,10 +85,13 @@ export const getEnrichissements = unstable_cache(
         const conditions = buildConditions(filters);
 
         const orderBy =
-            filters.sort === 'note' ? desc(livres.noteMoyenne)
-            : filters.sort === 'prix-asc' ? asc(livres.prix)
-            : filters.sort === 'prix-desc' ? desc(livres.prix)
-            : desc(livres.createdAt);
+            filters.sort === 'note'
+                ? desc(livres.noteMoyenne)
+                : filters.sort === 'prix-asc'
+                  ? asc(livres.prix)
+                  : filters.sort === 'prix-desc'
+                    ? desc(livres.prix)
+                    : desc(livres.createdAt);
 
         const base = db
             .select(enrichissementSelect)
@@ -87,9 +99,10 @@ export const getEnrichissements = unstable_cache(
             .where(conditions.length > 0 ? and(...conditions) : undefined)
             .orderBy(orderBy);
 
-        const rows = filters.limit !== undefined
-            ? await base.limit(filters.limit).offset(filters.offset ?? 0)
-            : await base;
+        const rows =
+            filters.limit !== undefined
+                ? await base.limit(filters.limit).offset(filters.offset ?? 0)
+                : await base;
 
         return Promise.all(rows.map(rowToEnrichissement));
     },
@@ -151,7 +164,9 @@ export const getEnrichissementById = unstable_cache(
     { tags: ['livres'] },
 );
 
-export async function getOrCreateEnrichissement(inventaireUri: string): Promise<EnrichissementLocal> {
+export async function getOrCreateEnrichissement(
+    inventaireUri: string,
+): Promise<EnrichissementLocal> {
     const existing = await getEnrichissementByUri(inventaireUri);
     if (existing) return existing;
     const [row] = await db
@@ -164,7 +179,11 @@ export async function getOrCreateEnrichissement(inventaireUri: string): Promise<
 export const getEnrichissementsRayons = unstable_cache(
     async () =>
         db
-            .selectDistinct({ id: rayons.id, nom: rayons.nom, slug: rayons.slug })
+            .selectDistinct({
+                id: rayons.id,
+                nom: rayons.nom,
+                slug: rayons.slug,
+            })
             .from(rayons)
             .innerJoin(livres, eq(livres.rayonId, rayons.id))
             .orderBy(rayons.nom),

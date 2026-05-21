@@ -8,10 +8,7 @@ import {
     getLivresParCategorie,
     type SortLivres,
 } from '@/lib/queries/livres';
-import {
-    getLivresRayons,
-    getGenresActifs,
-} from '@/lib/queries/livres-facets';
+import { getLivresRayons, getGenresActifs } from '@/lib/queries/livres-facets';
 import { FilterBar } from './_components/FilterBar';
 import { SearchBar } from './_components/SearchBar';
 import { LivreCard } from '@/components/ui/LivreCard';
@@ -46,7 +43,11 @@ export default async function LivresPage({ searchParams }: Props) {
     const isCatBrowse = !!cat && !isFiltered && !q;
     const isGoogleSort = sort === 'relevance' || sort === 'newest';
     const isDiscovery = !isFiltered && !isCatBrowse && (!sort || isGoogleSort);
-    const discoveryView = !sort ? 'both' : sort === 'newest' ? 'nouveautes' : 'tendances';
+    const discoveryView = !sort
+        ? 'both'
+        : sort === 'newest'
+          ? 'nouveautes'
+          : 'tendances';
 
     const activeFilters = {
         rayonSlug,
@@ -63,18 +64,41 @@ export default async function LivresPage({ searchParams }: Props) {
     const filterEbooks = <T extends { isEbook: boolean }>(list: T[]) =>
         showEbook ? list : list.filter((item) => !item.isEbook);
 
-    const [livresListRaw, livresTotal, misEnAvantRaw, tendancesRaw, nouveautesRaw, rayons, genresList] =
-        await Promise.all([
-            isCatBrowse ? getLivresParCategorie(cat!) : isDiscovery ? Promise.resolve([]) : getLivresPubliques({ ...activeFilters, limit: pageSize, offset: 0 }),
-            // Pour les recherches texte (q), on ne fait pas un 2e appel API juste pour le count —
-            // livresList.length est utilisé après le filtre ebook (null → fallback sur .length).
-            isCatBrowse || q ? Promise.resolve(null) : isDiscovery ? Promise.resolve(0) : getLivresCount({ rayonSlug, genreId, q, choixLibrairie }),
-            isDiscovery ? getLivresMisEnAvant() : Promise.resolve([]),
-            isDiscovery && discoveryView !== 'nouveautes' ? getLivresTendances() : Promise.resolve([]),
-            isDiscovery && discoveryView !== 'tendances' ? getLivresNouveautes() : Promise.resolve([]),
-            getLivresRayons(),
-            getGenresActifs(),
-        ]);
+    const [
+        livresListRaw,
+        livresTotal,
+        misEnAvantRaw,
+        tendancesRaw,
+        nouveautesRaw,
+        rayons,
+        genresList,
+    ] = await Promise.all([
+        isCatBrowse
+            ? getLivresParCategorie(cat!)
+            : isDiscovery
+              ? Promise.resolve([])
+              : getLivresPubliques({
+                    ...activeFilters,
+                    limit: pageSize,
+                    offset: 0,
+                }),
+        // Pour les recherches texte (q), on ne fait pas un 2e appel API juste pour le count —
+        // livresList.length est utilisé après le filtre ebook (null → fallback sur .length).
+        isCatBrowse || q
+            ? Promise.resolve(null)
+            : isDiscovery
+              ? Promise.resolve(0)
+              : getLivresCount({ rayonSlug, genreId, q, choixLibrairie }),
+        isDiscovery ? getLivresMisEnAvant() : Promise.resolve([]),
+        isDiscovery && discoveryView !== 'nouveautes'
+            ? getLivresTendances()
+            : Promise.resolve([]),
+        isDiscovery && discoveryView !== 'tendances'
+            ? getLivresNouveautes()
+            : Promise.resolve([]),
+        getLivresRayons(),
+        getGenresActifs(),
+    ]);
 
     const livresList = filterEbooks(livresListRaw);
     const misEnAvant = filterEbooks(misEnAvantRaw);
@@ -194,7 +218,9 @@ export default async function LivresPage({ searchParams }: Props) {
                             </h2>
                             <span className="text-xs uppercase tracking-widest text-muted">
                                 {livresTotal ?? livresList.length} titre
-                                {(livresTotal ?? livresList.length) !== 1 ? 's' : ''}
+                                {(livresTotal ?? livresList.length) !== 1
+                                    ? 's'
+                                    : ''}
                             </span>
                             <div className="flex-1 h-px bg-border" />
                         </div>

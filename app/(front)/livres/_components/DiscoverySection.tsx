@@ -37,7 +37,11 @@ export function DiscoverySection({
         if (loadingRef.current || !hasMore) return;
         loadingRef.current = true;
         setLoading(true);
-        const next = await loadMoreDiscovery(type, startIndexRef.current, showEbook);
+        const next = await loadMoreDiscovery(
+            type,
+            startIndexRef.current,
+            showEbook,
+        );
         startIndexRef.current += API_PAGE_SIZE;
         if (next.length === 0) setHasMore(false);
         setItems((prev) => [...prev, ...next]);
@@ -49,7 +53,9 @@ export function DiscoverySection({
         const sentinel = sentinelRef.current;
         if (!sentinel || !hasMore) return;
         const observer = new IntersectionObserver(
-            ([entry]) => { if (entry.isIntersecting) loadMore(); },
+            ([entry]) => {
+                if (entry.isIntersecting) loadMore();
+            },
             { rootMargin: '400px' },
         );
         observer.observe(sentinel);
@@ -61,7 +67,9 @@ export function DiscoverySection({
     return (
         <section className="space-y-6">
             <div className="flex items-baseline gap-4">
-                <h2 className="font-serif text-xl font-bold text-foreground">{titre}</h2>
+                <h2 className="font-serif text-xl font-bold text-foreground">
+                    {titre}
+                </h2>
                 <div className="flex-1 h-px bg-border" />
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -70,15 +78,15 @@ export function DiscoverySection({
                         key={`${livre.inventaireUri}-${i}`}
                         livre={livre}
                         featured={livre.choixLibrairie}
-                        genreNom={genresList.find((genre) => genre.id === livre.genreIds?.[0])?.nom}
+                        genreNom={
+                            genresList.find(
+                                (genre) => genre.id === livre.genreIds?.[0],
+                            )?.nom
+                        }
                     />
                 ))}
             </div>
-            <div
-                ref={sentinelRef}
-                aria-hidden="true"
-                className="h-4"
-            />
+            <div ref={sentinelRef} aria-hidden="true" className="h-4" />
             {hasMore && (
                 <div className="flex justify-center pt-2">
                     <button

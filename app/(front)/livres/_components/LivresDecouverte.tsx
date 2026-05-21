@@ -10,7 +10,13 @@ interface Props {
     showEbook?: boolean;
 }
 
-export function LivresDecouverte({ tendances, nouveautes, genresList, view, showEbook = false }: Props) {
+export function LivresDecouverte({
+    tendances,
+    nouveautes,
+    genresList,
+    view,
+    showEbook = false,
+}: Props) {
     return (
         <div className="space-y-14">
             {(view === 'both' || view === 'tendances') && (

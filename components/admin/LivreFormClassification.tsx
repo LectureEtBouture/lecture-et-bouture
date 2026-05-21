@@ -52,8 +52,13 @@ export function LivreFormClassification({
                 {suggestedRayonLabel && !rayonIdValue && (
                     <p className="mt-1 text-[11px] text-muted">
                         Suggestion Google Books : {suggestedRayonLabel}
-                        {rayonsList.every((r) => r.nom !== suggestedRayonLabel) && (
-                            <span className="text-amber-600"> (rayon à créer)</span>
+                        {rayonsList.every(
+                            (r) => r.nom !== suggestedRayonLabel,
+                        ) && (
+                            <span className="text-amber-600">
+                                {' '}
+                                (rayon à créer)
+                            </span>
                         )}
                     </p>
                 )}
@@ -71,7 +76,9 @@ export function LivreFormClassification({
                                 name="genreIds"
                                 value={genre.id}
                                 checked={checkedGenreIds.includes(genre.id)}
-                                onChange={(e) => onGenreChange(genre.id, e.target.checked)}
+                                onChange={(e) =>
+                                    onGenreChange(genre.id, e.target.checked)
+                                }
                                 className="accent-primary"
                             />
                             <span className="text-[12px] text-foreground">

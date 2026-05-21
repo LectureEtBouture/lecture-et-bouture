@@ -43,6 +43,8 @@ export type EnrichissementLocal = {
     genreIds: string[];
     numeroSerie: number | null;
     noteMoyenne: string | null;
+    image: string | null;
+    imageAlt: string | null;
 };
 
 export type LivreComplet = {
@@ -56,6 +58,7 @@ export type LivreComplet = {
     publishedDateRaw: string | null;
     serie: string | null;
     imageUrl: string | null;
+    imageAlt: string | null;
     description: string | null;
     language: string | null;
     categories: string[];
@@ -76,7 +79,14 @@ export type LivreComplet = {
 
 export interface BookProvider {
     rechercherParISBN(isbn: string): Promise<LivreMetadata | null>;
-    rechercherParTitre(query: string, options?: { orderBy?: 'relevance' | 'newest'; startIndex?: number; maxResults?: number }): Promise<LivreSearchResult[]>;
+    rechercherParTitre(
+        query: string,
+        options?: {
+            orderBy?: 'relevance' | 'newest';
+            startIndex?: number;
+            maxResults?: number;
+        },
+    ): Promise<LivreSearchResult[]>;
     rechercherParUri(uri: string): Promise<LivreMetadata | null>;
     rechercherParUris(uris: string[]): Promise<Map<string, LivreMetadata>>;
 }

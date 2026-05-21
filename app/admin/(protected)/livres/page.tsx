@@ -40,9 +40,13 @@ export default async function AdminLivresPage({
     ]);
 
     const uris = data.map((livre) => livre.inventaireUri);
-    const bookMetas = uris.length > 0
-        ? await bookProvider.rechercherParUris(uris)
-        : new Map<string, { titre: string | null; imageUrl: string | null }>();
+    const bookMetas =
+        uris.length > 0
+            ? await bookProvider.rechercherParUris(uris)
+            : new Map<
+                  string,
+                  { titre: string | null; imageUrl: string | null }
+              >();
 
     return (
         <div className="space-y-6">

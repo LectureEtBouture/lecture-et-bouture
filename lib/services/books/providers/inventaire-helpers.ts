@@ -85,10 +85,15 @@ export async function fetchOLDescription(olId: string): Promise<string | null> {
     return null;
 }
 
-export async function fetchOLDescriptionByISBN(isbn: string): Promise<string | null> {
+export async function fetchOLDescriptionByISBN(
+    isbn: string,
+): Promise<string | null> {
     const res = await fetch(
         `${OL_BASE}/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`,
-        { headers: { 'User-Agent': USER_AGENT }, next: { revalidate: 86400 } } as RequestInit,
+        {
+            headers: { 'User-Agent': USER_AGENT },
+            next: { revalidate: 86400 },
+        } as RequestInit,
     );
     if (!res.ok) return null;
     const data = await res.json();

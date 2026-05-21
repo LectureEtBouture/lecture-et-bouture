@@ -39,6 +39,8 @@ const statements = [
     )`,
 
     `ALTER TABLE livres ADD COLUMN IF NOT EXISTS titre text`,
+    `ALTER TABLE livres ADD COLUMN IF NOT EXISTS image text`,
+    `ALTER TABLE livres ADD COLUMN IF NOT EXISTS image_alt text`,
 
     `CREATE TABLE IF NOT EXISTS livres_genres (
         livre_id uuid NOT NULL REFERENCES livres(id) ON DELETE CASCADE,

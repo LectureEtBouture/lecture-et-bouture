@@ -10,7 +10,10 @@ export async function GET(request: NextRequest) {
 
     const query = request.nextUrl.searchParams.get('q');
     if (!query || query.trim().length < 2) {
-        return NextResponse.json({ error: 'Paramètre q trop court' }, { status: 400 });
+        return NextResponse.json(
+            { error: 'Paramètre q trop court' },
+            { status: 400 },
+        );
     }
 
     const results = await bookProvider.rechercherParTitre(query.trim());

@@ -4,22 +4,21 @@ Boutique hybride livres + boutures végétales. Catalogue livres via Google Book
 
 ## Stack
 
-| Couche | Choix |
-|---|---|
-| Framework | Next.js 16 App Router — front + back-office + API Routes |
-| Base de données | PostgreSQL 16 + Drizzle ORM (PKs uuid, migrations SQL idempotentes) |
-| Auth | NextAuth v5 — JWT, httpOnly cookies, 5 rôles |
-| **Catalogue public** | **Google Books API** — browse, search, discovery (tendances/nouveautés/genres) |
-| **Import BO** | **inventaire.io + Open Library** — enrichissement métadonnées FR lors de l'import ISBN |
-| Traduction | LibreTranslate — descriptions EN→FR importées depuis Open Library |
-| Stockage images | MinIO self-hosted (livres, boutures, événements) |
-| Rich text | Tiptap — pages éditoriales |
-| Email | Resend — reset password + notifications |
-| Newsletter | Loops |
-| Analytics | Umami (privacy-first) |
-| Fonts | Raleway (principal) + Dancing Script (note librairie) |
-| Proxy | Caddy (HTTPS local) |
-| Outils dev | Adminer, Portainer, Drizzle Studio |
+| Couche               | Choix                                                                                  |
+| -------------------- | -------------------------------------------------------------------------------------- |
+| Framework            | Next.js 16 App Router — front + back-office + API Routes                               |
+| Base de données      | PostgreSQL 16 + Drizzle ORM (PKs uuid, migrations SQL idempotentes)                    |
+| Auth                 | NextAuth v5 — JWT, httpOnly cookies, 5 rôles                                           |
+| **Catalogue public** | **Google Books API** — browse, search, discovery (tendances/nouveautés/genres)         |
+| **Import BO**        | **inventaire.io + Open Library** — enrichissement métadonnées FR lors de l'import ISBN |
+| Stockage images      | MinIO self-hosted (livres, boutures, événements)                                       |
+| Rich text            | Tiptap — pages éditoriales                                                             |
+| Email                | Resend — reset password + notifications                                                |
+| Newsletter           | Loops                                                                                  |
+| Analytics            | Umami (privacy-first)                                                                  |
+| Fonts                | Raleway (principal) + Dancing Script (note librairie)                                  |
+| Proxy                | Caddy (HTTPS local)                                                                    |
+| Outils dev           | Adminer, Portainer, Drizzle Studio                                                     |
 
 ---
 
@@ -41,6 +40,7 @@ nombrePages
 ```
 
 **Modes d'affichage `/livres` :**
+
 - **Découverte** (défaut, pas de filtre) : Choix librairie (DB) → Tendances (GB `orderBy=relevance`) → Nouveautés (GB `orderBy=newest`). Infinite scroll via `startIndex` (step 40). Pas de `langRestrict` — requêtes françaises assurent la pertinence.
 - **Catalogue** (filtres DB : rayon/genre/choix) : enrichissements + overlay métadonnées GB. Tri : alpha, date, note, prix (toujours visible).
 - **Recherche** (`?q=...`) : live Google Books, 40 par batch, enrichis en overlay, infinite scroll. Si rayon actif : termes BISAC français injectés dans la query. Expansion auteur si < 4 résultats physiques d'un même auteur.
@@ -71,7 +71,7 @@ cp .env.example .env.local
 ## Démarrage
 
 ```bash
-# 1. Services Docker (PostgreSQL, MinIO, LibreTranslate, Adminer, Portainer)
+# 1. Services Docker (PostgreSQL, MinIO, Adminer, Portainer)
 docker compose up -d
 
 # 2. Migrations + seed
@@ -86,15 +86,14 @@ npm run dev
 
 ## URLs
 
-| Service | URL |
-|---|---|
-| App | https://localhost:3000 |
-| Back-office | https://localhost:3000/admin |
-| Adminer | http://localhost:8080 |
-| Portainer | http://localhost:9000 |
-| MinIO console | http://localhost:9101 |
-| MinIO API | http://localhost:9100 |
-| LibreTranslate | http://localhost:5000 |
+| Service        | URL                          |
+| -------------- | ---------------------------- |
+| App            | https://localhost:3000       |
+| Back-office    | https://localhost:3000/admin |
+| Adminer        | http://localhost:8080        |
+| Portainer      | http://localhost:9000        |
+| MinIO console  | http://localhost:9101        |
+| MinIO API      | http://localhost:9100        |
 
 **Adminer** : serveur `leb-db` · user `leb` · password `leb` · db `leb`
 
@@ -163,7 +162,6 @@ NEXT_PUBLIC_FORMBRICKS_HOST=
 
 # Import livres BO (inventaire.io/wikidata)
 BOOK_IMPORT_PROVIDER=inventaire     # inventaire (défaut) | wikidata
-LIBRETRANSLATE_URL=http://localhost:5000
 ```
 
 ---
@@ -208,7 +206,6 @@ npm run admin:create <email> <mot-de-passe>
 
 - PostgreSQL + Drizzle — PKs uuid, migrations idempotentes
 - MinIO — images livres, boutures, événements
-- LibreTranslate — traduction EN→FR (import BO uniquement)
 - inventaire.io + Open Library — import BO : ISBN → préremplissage formulaire enrichissement
 
 ---

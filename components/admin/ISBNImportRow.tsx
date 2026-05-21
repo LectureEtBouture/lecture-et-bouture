@@ -10,7 +10,11 @@ interface Props {
     onImport: (data: LivreMetadata) => void;
 }
 
-export function ISBNImportRow({ defaultValue = '', isbnExterne, onImport }: Props) {
+export function ISBNImportRow({
+    defaultValue = '',
+    isbnExterne,
+    onImport,
+}: Props) {
     const [isbn, setIsbn] = useState(isbnExterne || defaultValue);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -23,7 +27,9 @@ export function ISBNImportRow({ defaultValue = '', isbnExterne, onImport }: Prop
         setError(null);
         setImported(false);
         try {
-            const res = await fetch(`/api/books/isbn?q=${encodeURIComponent(query)}`);
+            const res = await fetch(
+                `/api/books/isbn?q=${encodeURIComponent(query)}`,
+            );
             if (res.status === 404) {
                 setError('ISBN introuvable');
                 return;

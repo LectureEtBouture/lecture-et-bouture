@@ -2,12 +2,7 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { sql } from 'drizzle-orm';
 import { config } from 'dotenv';
-import {
-    plantes,
-    evenements,
-    pagesEditoriales,
-    parametres,
-} from './schema';
+import { plantes, evenements, pagesEditoriales, parametres } from './schema';
 import bouturesJson from '../data/boutures.json';
 import avisJson from '../data/avis.json';
 
@@ -54,7 +49,9 @@ async function main() {
 
     // Boutures / plantes
     const planteIdMap = new Map<number, string>();
-    const sortedBoutures = [...(bouturesJson as BoutureJson[])].sort((a, b) => a.id - b.id);
+    const sortedBoutures = [...(bouturesJson as BoutureJson[])].sort(
+        (a, b) => a.id - b.id,
+    );
     for (const bouture of sortedBoutures) {
         const [row] = await db
             .insert(plantes)
@@ -84,41 +81,88 @@ async function main() {
     const evenementsData = [
         {
             titre: 'Rencontre avec Baptiste Morizot',
-            description: "L'auteur de « Manières d'être vivant » dialogue avec notre équipe autour de la question du vivant et de notre rapport aux autres espèces. Entrée libre, places limitées.",
+            description:
+                "L'auteur de « Manières d'être vivant » dialogue avec notre équipe autour de la question du vivant et de notre rapport aux autres espèces. Entrée libre, places limitées.",
             lieu: 'Lecture & Bouture — espace principal',
-            dateDebut: new Date(now.getFullYear(), now.getMonth() + 1, 15, 18, 30),
-            dateFin: new Date(now.getFullYear(), now.getMonth() + 1, 15, 20, 30),
+            dateDebut: new Date(
+                now.getFullYear(),
+                now.getMonth() + 1,
+                15,
+                18,
+                30,
+            ),
+            dateFin: new Date(
+                now.getFullYear(),
+                now.getMonth() + 1,
+                15,
+                20,
+                30,
+            ),
             publie: true,
         },
         {
             titre: 'Atelier boutures : multiplier ses plantes',
-            description: 'Apportez une bouture de chez vous, repartez avec trois nouvelles. Matériel fourni. Animé par notre botaniste. Inscription obligatoire — 8 places.',
+            description:
+                'Apportez une bouture de chez vous, repartez avec trois nouvelles. Matériel fourni. Animé par notre botaniste. Inscription obligatoire — 8 places.',
             lieu: 'Serre de la boutique',
-            dateDebut: new Date(now.getFullYear(), now.getMonth() + 1, 22, 10, 0),
-            dateFin: new Date(now.getFullYear(), now.getMonth() + 1, 22, 12, 30),
+            dateDebut: new Date(
+                now.getFullYear(),
+                now.getMonth() + 1,
+                22,
+                10,
+                0,
+            ),
+            dateFin: new Date(
+                now.getFullYear(),
+                now.getMonth() + 1,
+                22,
+                12,
+                30,
+            ),
             publie: true,
         },
         {
             titre: 'Lecture à voix haute — Thoreau',
-            description: 'Une heure de lecture partagée autour de Walden. Passages choisis, discussion ouverte. Apportez votre propre exemplaire si vous en avez un.',
+            description:
+                'Une heure de lecture partagée autour de Walden. Passages choisis, discussion ouverte. Apportez votre propre exemplaire si vous en avez un.',
             lieu: 'Coin lecture, fond de boutique',
-            dateDebut: new Date(now.getFullYear(), now.getMonth() + 2, 5, 19, 0),
+            dateDebut: new Date(
+                now.getFullYear(),
+                now.getMonth() + 2,
+                5,
+                19,
+                0,
+            ),
             dateFin: new Date(now.getFullYear(), now.getMonth() + 2, 5, 20, 0),
             publie: true,
         },
         {
             titre: 'Vernissage — « Planches botaniques »',
-            description: "Exposition de planches botaniques originales. Aquarelles d'Élise Fontaine. Présente le soir du vernissage.",
+            description:
+                "Exposition de planches botaniques originales. Aquarelles d'Élise Fontaine. Présente le soir du vernissage.",
             lieu: 'Galerie attenante',
-            dateDebut: new Date(now.getFullYear(), now.getMonth() - 1, 10, 18, 0),
+            dateDebut: new Date(
+                now.getFullYear(),
+                now.getMonth() - 1,
+                10,
+                18,
+                0,
+            ),
             dateFin: new Date(now.getFullYear(), now.getMonth() - 1, 10, 21, 0),
             publie: true,
         },
         {
             titre: 'Dédicace — Francis Hallé',
-            description: "Séance de dédicace exceptionnelle autour de l'Herbier du Monde. File d'attente dès 14h.",
+            description:
+                "Séance de dédicace exceptionnelle autour de l'Herbier du Monde. File d'attente dès 14h.",
             lieu: 'Lecture & Bouture',
-            dateDebut: new Date(now.getFullYear(), now.getMonth() - 2, 18, 15, 0),
+            dateDebut: new Date(
+                now.getFullYear(),
+                now.getMonth() - 2,
+                18,
+                15,
+                0,
+            ),
             dateFin: new Date(now.getFullYear(), now.getMonth() - 2, 18, 18, 0),
             publie: true,
         },
@@ -144,9 +188,17 @@ async function main() {
         { slug: 'concept', titre: 'Notre concept', contenu: conceptContenu },
         { slug: 'mentions-legales', titre: 'Mentions légales', contenu: null },
         { slug: 'cgv', titre: 'Conditions Générales de Vente', contenu: null },
-        { slug: 'cgu', titre: "Conditions Générales d'Utilisation", contenu: null },
+        {
+            slug: 'cgu',
+            titre: "Conditions Générales d'Utilisation",
+            contenu: null,
+        },
         { slug: 'cookies', titre: 'Politique de cookies', contenu: null },
-        { slug: 'politique-de-confidentialite', titre: 'Politique de confidentialité', contenu: null },
+        {
+            slug: 'politique-de-confidentialite',
+            titre: 'Politique de confidentialité',
+            contenu: null,
+        },
     ];
     for (const page of pagesInitiales) {
         await db.insert(pagesEditoriales).values(page);
@@ -168,8 +220,22 @@ async function main() {
             }),
         },
         { cle: 'fermetures', valeur: JSON.stringify([]) },
-        { cle: 'annonce', valeur: JSON.stringify({ active: false, type: 'info', message: '', expire_at: null }) },
-        { cle: 'maintenance', valeur: JSON.stringify({ active: false, message: 'Site en maintenance. Revenez bientôt.' }) },
+        {
+            cle: 'annonce',
+            valeur: JSON.stringify({
+                active: false,
+                type: 'info',
+                message: '',
+                expire_at: null,
+            }),
+        },
+        {
+            cle: 'maintenance',
+            valeur: JSON.stringify({
+                active: false,
+                message: 'Site en maintenance. Revenez bientôt.',
+            }),
+        },
         { cle: 'reseaux_sociaux', valeur: JSON.stringify([]) },
     ];
     for (const p of parametresInitiaux) {

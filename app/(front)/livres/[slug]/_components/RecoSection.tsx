@@ -30,7 +30,10 @@ export function RecoSection({
                 {label && (
                     <>
                         {' '}
-                        <Link href={href} className="hover:text-primary transition-colors">
+                        <Link
+                            href={href}
+                            className="hover:text-primary transition-colors"
+                        >
                             {label}
                         </Link>
                     </>

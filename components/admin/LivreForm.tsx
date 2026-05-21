@@ -4,7 +4,11 @@ import { useState } from 'react';
 import type { InferSelectModel } from 'drizzle-orm';
 import type { livres, genres, rayons } from '@/db/schema';
 import type { LivreMetadata } from '@/lib/services/books/types';
-import { translateCategories, suggestRayonFromList, suggestGenreIds } from '@/lib/services/books/categories-fr';
+import {
+    translateCategories,
+    suggestRayonFromList,
+    suggestGenreIds,
+} from '@/lib/services/books/categories-fr';
 import { LivreFormIdentite } from './LivreFormIdentite';
 import { LivreFormClassification } from './LivreFormClassification';
 import { LivreFormCommerce } from './LivreFormCommerce';
@@ -34,25 +38,40 @@ export function LivreForm({
     const [titre, setTitre] = useState(livre?.titre ?? '');
     const [rayonId, setRayonId] = useState(livre?.rayonId ?? '');
     const [prixValue, setPrixValue] = useState(livre?.prix ?? '');
-    const [suggestedCategories, setSuggestedCategories] = useState<string[]>([]);
+    const [suggestedCategories, setSuggestedCategories] = useState<string[]>(
+        [],
+    );
     const [suggestedRayonLabel, setSuggestedRayonLabel] = useState('');
-    const [checkedGenreIds, setCheckedGenreIds] = useState<string[]>(selectedGenreIds);
-    const [selectedBook, setSelectedBook] = useState<Pick<LivreMetadata, 'titre' | 'auteur' | 'imageUrl'> | null>(null);
+    const [checkedGenreIds, setCheckedGenreIds] =
+        useState<string[]>(selectedGenreIds);
+    const [selectedBook, setSelectedBook] = useState<Pick<
+        LivreMetadata,
+        'titre' | 'auteur' | 'imageUrl'
+    > | null>(null);
 
     function handleImport(data: LivreMetadata) {
         if (data.sourceId) setSourceId(data.sourceId);
         if (data.titre) setTitre(data.titre);
-        setSelectedBook({ titre: data.titre, auteur: data.auteur, imageUrl: data.imageUrl });
+        setSelectedBook({
+            titre: data.titre,
+            auteur: data.auteur,
+            imageUrl: data.imageUrl,
+        });
         if (data.categories?.length) {
             setSuggestedCategories(translateCategories(data.categories));
-            const suggestion = suggestRayonFromList(data.categories, rayonsList);
+            const suggestion = suggestRayonFromList(
+                data.categories,
+                rayonsList,
+            );
             if (suggestion) {
                 setSuggestedRayonLabel(suggestion.label);
                 if (suggestion.id && !rayonId) setRayonId(suggestion.id);
             }
             const suggested = suggestGenreIds(data.categories, genresList);
             if (suggested.length > 0) {
-                setCheckedGenreIds((prev) => [...new Set([...prev, ...suggested])]);
+                setCheckedGenreIds((prev) => [
+                    ...new Set([...prev, ...suggested]),
+                ]);
             }
         }
         if (data.prixNumerique && !prixValue) {
@@ -80,9 +99,13 @@ export function LivreForm({
                         />
                     )}
                     <div className="min-w-0">
-                        <p className="font-medium text-sm text-foreground truncate">{selectedBook.titre}</p>
+                        <p className="font-medium text-sm text-foreground truncate">
+                            {selectedBook.titre}
+                        </p>
                         {selectedBook.auteur && (
-                            <p className="text-[11px] text-muted">{selectedBook.auteur}</p>
+                            <p className="text-[11px] text-muted">
+                                {selectedBook.auteur}
+                            </p>
                         )}
                     </div>
                 </div>
@@ -104,7 +127,10 @@ export function LivreForm({
                 suggestedCategories={suggestedCategories}
                 suggestedRayonLabel={suggestedRayonLabel}
             />
-            <LivreFormCommerce prixValue={prixValue} onPrixChange={setPrixValue} />
+            <LivreFormCommerce
+                prixValue={prixValue}
+                onPrixChange={setPrixValue}
+            />
             <LivreFormLibrairie livre={livre} />
             <div className="flex items-center gap-4 pt-2">
                 <button

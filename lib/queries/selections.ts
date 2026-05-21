@@ -72,15 +72,18 @@ export async function getPublicSelections(): Promise<SelectionPublique[]> {
         );
 
     // Collect unique livre URIs to batch-fetch metadata
-    const livreUris = [...new Set(
-        rows
-            .filter((row) => row.itemType === 'livre' && row.livreUri)
-            .map((row) => row.livreUri!)
-    )];
+    const livreUris = [
+        ...new Set(
+            rows
+                .filter((row) => row.itemType === 'livre' && row.livreUri)
+                .map((row) => row.livreUri!),
+        ),
+    ];
 
-    const livresMeta = livreUris.length > 0
-        ? await bookProvider.rechercherParUris(livreUris)
-        : new Map();
+    const livresMeta =
+        livreUris.length > 0
+            ? await bookProvider.rechercherParUris(livreUris)
+            : new Map();
 
     const map = new Map<string, SelectionPublique>();
 

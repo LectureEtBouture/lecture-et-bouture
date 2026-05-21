@@ -5,9 +5,9 @@ import { getBoutureBySlug, getBouturesPubliques } from '@/lib/queries/boutures';
 import { getBoutureCoverColor, DIFFICULTE_LABELS } from '@/lib/data';
 import { getAvisForBouture } from '@/lib/db/avis';
 import { CoverPanel } from './_components/CoverPanel';
+import { NoteLibrairie } from '@/app/(front)/livres/[slug]/_components/NoteLibrairie';
 import { Stars } from '@/components/ui/Stars';
 import { AvisSection } from '@/components/ui/AvisSection';
-import { VisitTracker } from '@/components/ui/VisitTracker';
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -39,13 +39,6 @@ export default async function BouturePage({ params }: Props) {
 
     return (
         <div className="max-w-6xl mx-auto px-6 py-16">
-            <VisitTracker
-                type="bouture"
-                slug={bouture.slug}
-                titre={bouture.nom}
-                coverColor={coverColor}
-                image={bouture.image ?? undefined}
-            />
             <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-16">
                 <CoverPanel bouture={bouture} coverColor={coverColor} />
 
@@ -115,6 +108,10 @@ export default async function BouturePage({ params }: Props) {
                                 {bouture.conseilsEntretien}
                             </p>
                         </div>
+                    )}
+
+                    {bouture.noteDeLaLibrairie && (
+                        <NoteLibrairie note={bouture.noteDeLaLibrairie} />
                     )}
 
                     <AvisSection
