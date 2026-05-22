@@ -3,7 +3,7 @@ import Link from 'next/link';
 type AvisRow = {
     id: string;
     auteurNom: string;
-    note: number;
+    note: number | null;
     type: string;
     produitNom: string | null;
     approuve: boolean;
@@ -37,7 +37,9 @@ export function DerniersAvis({ avis }: { avis: AvisRow[] }) {
                                   ? 'text-muted'
                                   : 'text-primary';
                         const stars =
-                            '★'.repeat(a.note) + '☆'.repeat(5 - a.note);
+                            a.note != null
+                                ? '★'.repeat(a.note) + '☆'.repeat(5 - a.note)
+                                : null;
                         return (
                             <div
                                 key={a.id}

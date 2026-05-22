@@ -14,6 +14,7 @@ const baseNavItems = [
     { href: '/admin/avis', label: 'Avis' },
     { href: '/admin/evenements', label: 'Événements' },
     { href: '/admin/selections', label: 'Sélections' },
+    { href: '/admin/blog', label: 'Blog' },
     { href: '/admin/pages', label: 'Pages' },
 ];
 

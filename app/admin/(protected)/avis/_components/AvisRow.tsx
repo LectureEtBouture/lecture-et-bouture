@@ -15,7 +15,8 @@ export function AvisRow({
     bookMeta?: BookMeta;
     children: React.ReactNode;
 }) {
-    const stars = '★'.repeat(a.note) + '☆'.repeat(5 - a.note);
+    const stars =
+        a.note != null ? '★'.repeat(a.note) + '☆'.repeat(5 - a.note) : null;
     const typeLabel = a.type === 'livre' ? 'Livre' : 'Bouture';
     const uri = a.inventaireUri;
     const titre =

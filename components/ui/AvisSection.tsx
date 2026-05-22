@@ -23,7 +23,9 @@ export function AvisSection({ avis, itemId, type }: Props) {
                                     <span className="text-sm font-medium text-foreground">
                                         {avisItem.auteurNom}
                                     </span>
-                                    <Stars note={avisItem.note} size="sm" />
+                                    {avisItem.note != null && (
+                                        <Stars note={avisItem.note} size="sm" />
+                                    )}
                                 </div>
                                 {avisItem.texte && (
                                     <p className="text-sm text-foreground/80 leading-relaxed max-w-[60ch]">

@@ -2,7 +2,12 @@ import { notFound } from 'next/navigation';
 import { ArticleForm } from '@/components/admin/ArticleForm';
 import { ArticlesLiesManager } from './_components/ArticlesLiesManager';
 import { updateArticle } from '@/lib/actions/articles';
-import { getArticleById, getArticlesAdmin, getArticlesLies, getCategoriesArticle } from '@/lib/queries/articles';
+import {
+    getArticleById,
+    getArticlesAdmin,
+    getArticlesLies,
+    getCategoriesArticle,
+} from '@/lib/queries/articles';
 import { getCategoriesBlog } from '@/lib/queries/categories-blog';
 import { getAuteursBlog } from '@/lib/queries/auteurs-blog';
 
@@ -13,15 +18,21 @@ export default async function ModifierArticlePage({
 }) {
     const { id } = await params;
 
-    const [article, categories, auteurs, lies, tousArticles, categoriesArticle] =
-        await Promise.all([
-            getArticleById(id),
-            getCategoriesBlog(),
-            getAuteursBlog(),
-            getArticlesLies(id),
-            getArticlesAdmin(),
-            getCategoriesArticle(id),
-        ]);
+    const [
+        article,
+        categories,
+        auteurs,
+        lies,
+        tousArticles,
+        categoriesArticle,
+    ] = await Promise.all([
+        getArticleById(id),
+        getCategoriesBlog(),
+        getAuteursBlog(),
+        getArticlesLies(id),
+        getArticlesAdmin(),
+        getCategoriesArticle(id),
+    ]);
 
     if (!article) notFound();
 
@@ -45,7 +56,9 @@ export default async function ModifierArticlePage({
                     imageAlt: article.imageAlt,
                     publie: article.publie,
                     enAvant: article.enAvant,
-                    categorieIds: categoriesArticle.map((categorie) => categorie.id),
+                    categorieIds: categoriesArticle.map(
+                        (categorie) => categorie.id,
+                    ),
                 }}
             />
             <ArticlesLiesManager
