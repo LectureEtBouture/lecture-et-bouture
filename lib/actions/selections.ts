@@ -4,7 +4,8 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { db } from '@/db';
 import { selections, selectionItems, livres, plantes } from '@/db/schema';
-import { eq, asc, count, sql, getTableColumns } from 'drizzle-orm';
+import { eq, asc, count, sql, getTableColumns, and } from 'drizzle-orm';
+import { getOrCreateEnrichissement } from '@/lib/queries/enrichissements';
 import { auth } from '@/auth';
 import { z } from 'zod';
 import { createLog } from './admin-logs';
@@ -130,6 +131,41 @@ export async function addSelectionItem(
     revalidatePath('/admin/selections');
     revalidatePath(`/admin/selections/${selectionId}`);
     revalidatePath('/selections');
+}
+
+export async function addSelectionLivreByUri(
+    selectionId: string,
+    uri: string,
+): Promise<{ ok: true } | { error: 'doublon' | 'invalid' }> {
+    await requireAdmin();
+    if (!uri) return { error: 'invalid' };
+    const enrichissement = await getOrCreateEnrichissement(uri);
+    const existing = await db
+        .select({ id: selectionItems.id })
+        .from(selectionItems)
+        .where(
+            and(
+                eq(selectionItems.selectionId, selectionId),
+                eq(selectionItems.livreId, enrichissement.localId),
+            ),
+        )
+        .limit(1);
+    if (existing.length > 0) return { error: 'doublon' };
+    const [{ count: existingCount }] = await db
+        .select({ count: count() })
+        .from(selectionItems)
+        .where(eq(selectionItems.selectionId, selectionId));
+    await db.insert(selectionItems).values({
+        selectionId,
+        type: 'livre',
+        livreId: enrichissement.localId,
+        planteId: null,
+        ordre: existingCount,
+    });
+    revalidatePath('/admin/selections');
+    revalidatePath(`/admin/selections/${selectionId}`);
+    revalidatePath('/selections');
+    return { ok: true };
 }
 
 export async function removeSelectionItem(selectionId: string, itemId: string) {

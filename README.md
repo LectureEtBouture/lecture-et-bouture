@@ -4,21 +4,21 @@ Boutique hybride livres + boutures végétales. Catalogue livres via Google Book
 
 ## Stack
 
-| Couche               | Choix                                                                                  |
-| -------------------- | -------------------------------------------------------------------------------------- |
-| Framework            | Next.js 16 App Router — front + back-office + API Routes                               |
-| Base de données      | PostgreSQL 16 + Drizzle ORM (PKs uuid, migrations SQL idempotentes)                    |
-| Auth                 | NextAuth v5 — JWT, httpOnly cookies, 5 rôles                                           |
-| **Catalogue public** | **Google Books API** — browse, search, discovery (tendances/nouveautés/genres)         |
-| **Import BO**        | **inventaire.io + Open Library** — enrichissement métadonnées FR lors de l'import ISBN |
-| Stockage images      | MinIO self-hosted (livres, boutures, événements)                                       |
-| Rich text            | Tiptap — pages éditoriales                                                             |
-| Email                | Resend — reset password + notifications                                                |
-| Newsletter           | Loops                                                                                  |
-| Analytics            | Umami (privacy-first)                                                                  |
-| Fonts                | Raleway (principal) + Dancing Script (note librairie)                                  |
-| Proxy                | Caddy (HTTPS local)                                                                    |
-| Outils dev           | Adminer, Portainer, Drizzle Studio                                                     |
+| Couche               | Choix                                                                                       |
+| -------------------- | ------------------------------------------------------------------------------------------- |
+| Framework            | Next.js 16 App Router — front + back-office + API Routes                                    |
+| Base de données      | PostgreSQL 16 + Drizzle ORM (PKs uuid, migrations SQL idempotentes)                         |
+| Auth                 | NextAuth v5 — JWT, httpOnly cookies, 5 rôles                                                |
+| **Catalogue public** | **Google Books API** — browse, search, discovery (tendances/nouveautés/genres)              |
+| **Import BO**        | **Google Books API** (défaut) — `BOOK_IMPORT_PROVIDER=inventaire` ou `wikidata` pour forcer |
+| Stockage images      | MinIO self-hosted (livres, boutures, événements)                                            |
+| Rich text            | Tiptap — pages éditoriales                                                                  |
+| Email                | Resend — reset password + notifications                                                     |
+| Newsletter           | Loops                                                                                       |
+| Analytics            | Umami (privacy-first)                                                                       |
+| Fonts                | Raleway (sans) + Noto Serif + Dancing Script (`--font-manuscript`, note librairie)          |
+| Proxy                | Caddy (HTTPS local)                                                                         |
+| Outils dev           | Adminer, Portainer, Drizzle Studio                                                          |
 
 ---
 
@@ -35,8 +35,9 @@ description (HTML)        rayon, genres
 image (zoom=0)            prix indicatif
 catégories BISAC          note librairie
 previewLink               choix librairie
-isEbook, prixNum.         avis
-nombrePages
+isEbook, prixNum.         image custom (prioritaire sur GB/OL)
+nombrePages               imageAlt custom
+                          avis
 ```
 
 **Modes d'affichage `/livres` :**
@@ -161,7 +162,7 @@ NEXT_PUBLIC_FORMBRICKS_ENV_ID=
 NEXT_PUBLIC_FORMBRICKS_HOST=
 
 # Import livres BO (inventaire.io/wikidata)
-BOOK_IMPORT_PROVIDER=inventaire     # inventaire (défaut) | wikidata
+BOOK_IMPORT_PROVIDER=               # vide = Google Books (défaut) | inventaire | wikidata
 ```
 
 ---
@@ -179,23 +180,26 @@ npm run admin:create <email> <mot-de-passe>
 
 ### Front public
 
-- `/` — Hero + Choix librairie + Nouveautés + Tendances + sections genre (Google Books)
+- `/` — Hero + Choix librairie + Nouveautés + Tendances + sections genre (Google Books) + bento blog en avant
 - `/livres` — 3 modes : découverte (infinite scroll GB), catalogue (filtres DB), recherche (live GB + BISAC)
 - `/livres/[slug]` — fiche complète : description HTML (masquée si non-FR ou < 20 chars), catégories BISAC traduites, date dd/mm/yyyy, pages, ebook, aperçu. Avis avant recos. Recos : même genre (DB) + même auteur (`inauthor:`) + même univers (BISAC rayon)
+- `/blog` — listing (lede + rows, filtres catégorie + tri recents/anciens/A-Z), extrait toujours présent, layouts image / sans image
+- `/blog/[slug]` — article complet : contenu HTML sanitisé, catégories, articles liés + même catégorie en pied, avis sans note
 - `/boutures` — vitrine bento
 - `/boutures/[slug]` — fiche avec avis
 - `/surprendre` — livre aléatoire parmi les choix librairie
 - `/evenements` — agenda (en cours / à venir / passé)
-- `/selections` — sélections actives du conservateur
+- `/selections` — sélections actives de la libraire
 - `/contact` — formulaire + carte Leaflet
 - Pages éditoriales — concept, mentions légales, CGV, CGU, cookies, politique
 
 ### Back-office (`/admin`)
 
 - Dashboard — stats, alertes, agenda
-- Livres — CRUD + import ISBN (inventaire.io) + recherche titre/auteur + liste avec titre & couverture (batch Google Books)
+- Livres — CRUD + import ISBN (Google Books, inventaire.io via env) + recherche titre/auteur + liste avec titre & couverture (batch Google Books)
+- Blog — CRUD articles (Tiptap, image, catégories, en avant, articles liés optimistic), CRUD catégories & auteurs
 - Boutures, Genres, Rayons — CRUD
-- Avis — modération 3 états, titre + couverture du livre affichés (batch fetch Google Books), lien vers fiche front
+- Avis — modération 3 états (livres, boutures, articles), titre + couverture du livre affichés, lien fiche front
 - Sélections, Événements — CRUD + ordre/toggle
 - Pages éditoriales — Tiptap + prévisualisation Draft Mode
 - Paramètres — horaires, fermetures, annonce, maintenance, réseaux sociaux, QR code
@@ -206,7 +210,7 @@ npm run admin:create <email> <mot-de-passe>
 
 - PostgreSQL + Drizzle — PKs uuid, migrations idempotentes
 - MinIO — images livres, boutures, événements
-- inventaire.io + Open Library — import BO : ISBN → préremplissage formulaire enrichissement
+- Google Books API — import BO : ISBN → préremplissage formulaire enrichissement (inventaire.io/wikidata via `BOOK_IMPORT_PROVIDER`)
 
 ---
 

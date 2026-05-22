@@ -8,7 +8,7 @@ export function SurprendreSection() {
                     Vous hésitez encore
                 </p>
                 <h2 className="font-serif text-[clamp(1.75rem,3vw,2.5rem)] font-bold text-foreground leading-[1.15] tracking-[-0.01em]">
-                    Laissez le conservateur
+                    Laissez la libraire
                     <br />
                     choisir pour vous.
                 </h2>

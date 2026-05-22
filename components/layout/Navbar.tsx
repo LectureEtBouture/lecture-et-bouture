@@ -9,6 +9,7 @@ const ALL_NAV_LINKS = [
     { href: '/livres', label: 'Livres', editorialSlug: null },
     { href: '/boutures', label: 'Boutures', editorialSlug: null },
     { href: '/selections', label: 'Sélections', editorialSlug: null },
+    { href: '/blog', label: 'Blog', editorialSlug: null },
     { href: '/evenements', label: 'Événements', editorialSlug: null },
     { href: '/concept', label: 'Concept', editorialSlug: 'concept' },
     { href: '/contact', label: 'Contact', editorialSlug: null },

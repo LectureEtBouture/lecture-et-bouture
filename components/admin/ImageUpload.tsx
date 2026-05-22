@@ -8,7 +8,7 @@ type Mode = 'fichier' | 'url';
 interface Props {
     defaultValue?: string | null;
     defaultAltValue?: string | null;
-    folder: 'boutures' | 'evenements' | 'livres';
+    folder: 'boutures' | 'evenements' | 'livres' | 'blog';
     label?: string;
 }
 

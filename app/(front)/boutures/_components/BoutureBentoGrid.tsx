@@ -126,47 +126,8 @@ function LargeCard({ bouture }: { bouture: BouturePublique }) {
         </div>
     );
 
-    // Cas 1 — image + note conservateur
-    if (coverImage && bouture.noteDeLaLibrairie) {
-        return (
-            <Link href={`/boutures/${bouture.slug}`} className={CARD_BASE}>
-                <ColorBlock
-                    coverColor={coverColor}
-                    coverImage={coverImage}
-                    nom={bouture.nom}
-                    imageAlt={bouture.imageAlt}
-                />
-                <div className="flex flex-col justify-between p-6 flex-1 overflow-hidden">
-                    <div className="space-y-3">
-                        {meta}
-                        {nameBlock}
-                        <div className="relative pt-2">
-                            <span
-                                className="absolute -top-1 left-0 font-serif text-4xl leading-none text-primary/15 select-none"
-                                aria-hidden
-                            >
-                                &laquo;
-                            </span>
-                            <p className="font-manuscript text-[0.9375rem] text-foreground leading-[1.75] line-clamp-4 pl-5">
-                                {bouture.noteDeLaLibrairie}
-                            </p>
-                        </div>
-                    </div>
-                    <div className="flex items-center justify-between pt-4 border-t border-border mt-4">
-                        <span className="text-[9px] uppercase tracking-[0.12em] text-primary">
-                            Note du conservateur
-                        </span>
-                        <span className="text-sm font-medium text-primary">
-                            {bouture.prix} €
-                        </span>
-                    </div>
-                </div>
-            </Link>
-        );
-    }
-
-    // Cas 2 — image + description
-    if (coverImage && bouture.description) {
+    // Cas A — description présente (prioritaire), note en signal si elle existe
+    if (bouture.description) {
         return (
             <Link href={`/boutures/${bouture.slug}`} className={CARD_BASE}>
                 <ColorBlock
@@ -184,6 +145,16 @@ function LargeCard({ bouture }: { bouture: BouturePublique }) {
                         <p className="text-sm text-foreground leading-[1.7] line-clamp-3 max-w-[40ch]">
                             {bouture.description}
                         </p>
+                        {bouture.noteDeLaLibrairie && (
+                            <div className="flex items-baseline gap-2 pt-1 border-t border-border">
+                                <span className="text-[9px] uppercase tracking-[0.12em] text-primary shrink-0">
+                                    Note de la libraire
+                                </span>
+                                <p className="font-manuscript text-xs text-muted italic line-clamp-1 min-w-0">
+                                    {bouture.noteDeLaLibrairie}
+                                </p>
+                            </div>
+                        )}
                         {priceRow}
                     </div>
                 </div>
@@ -191,8 +162,8 @@ function LargeCard({ bouture }: { bouture: BouturePublique }) {
         );
     }
 
-    // Cas 3 — image seule (pas de note, pas de description)
-    if (coverImage) {
+    // Cas B — note uniquement (pas de description)
+    if (bouture.noteDeLaLibrairie) {
         return (
             <Link href={`/boutures/${bouture.slug}`} className={CARD_BASE}>
                 <ColorBlock
@@ -202,94 +173,58 @@ function LargeCard({ bouture }: { bouture: BouturePublique }) {
                     imageAlt={bouture.imageAlt}
                 />
                 <div className="flex flex-col justify-between p-6 flex-1">
-                    <div className="space-y-2">
-                        {meta}
-                        {nameBlock}
-                        {bouture.famille && (
-                            <p className="text-xs text-muted">
-                                Famille {bouture.famille}
-                            </p>
-                        )}
-                    </div>
-                    {priceRow}
-                </div>
-            </Link>
-        );
-    }
-
-    // Cas 4 — pas d'image, note conservateur
-    if (bouture.noteDeLaLibrairie) {
-        return (
-            <Link href={`/boutures/${bouture.slug}`} className={CARD_BASE}>
-                <ColorBlock
-                    coverColor={coverColor}
-                    coverImage={null}
-                    nom={bouture.nom}
-                />
-                <div className="flex flex-col justify-between p-6 flex-1">
                     <div className="space-y-3">
                         {meta}
                         {nameBlock}
-                    </div>
-                    <div className="space-y-3">
-                        <p className="text-[9px] uppercase tracking-[0.12em] text-primary">
-                            Note du conservateur
-                        </p>
-                        <div className="relative">
+                        <div className="relative pt-2">
                             <span
                                 className="absolute -top-1 left-0 font-serif text-4xl leading-none text-primary/15 select-none"
                                 aria-hidden
                             >
                                 &laquo;
                             </span>
-                            <p className="font-manuscript text-[0.9375rem] text-foreground leading-[1.75] line-clamp-3 pl-5">
+                            <p className="font-manuscript text-[0.9375rem] text-foreground leading-[1.75] line-clamp-4 pl-5">
                                 {bouture.noteDeLaLibrairie}
                             </p>
                         </div>
-                        {priceRow}
+                    </div>
+                    <div className="flex items-center justify-between pt-4 border-t border-border mt-4">
+                        <span className="text-[9px] uppercase tracking-[0.12em] text-primary">
+                            Note de la libraire
+                        </span>
+                        <span className="text-sm font-medium text-primary">
+                            {bouture.prix} €
+                        </span>
                     </div>
                 </div>
             </Link>
         );
     }
 
-    // Cas 5 — pas d'image, description
-    if (bouture.description) {
-        return (
-            <Link href={`/boutures/${bouture.slug}`} className={CARD_BASE}>
-                <ColorBlock
-                    coverColor={coverColor}
-                    coverImage={null}
-                    nom={bouture.nom}
-                />
-                <div className="flex flex-col justify-between p-6 flex-1">
-                    <div className="space-y-1.5">
-                        {meta}
-                        {nameBlock}
-                    </div>
-                    <div className="space-y-3 mt-6">
-                        <p className="text-sm text-foreground leading-[1.7] line-clamp-3 max-w-[40ch]">
-                            {bouture.description}
-                        </p>
-                        {priceRow}
-                    </div>
-                </div>
-            </Link>
-        );
-    }
-
-    // Cas 6 — specimen label (rien, seulement les champs obligatoires)
+    // Cas C — spécimen sans texte (image et/ou champs techniques uniquement)
     return (
         <Link href={`/boutures/${bouture.slug}`} className={CARD_BASE}>
             <ColorBlock
                 coverColor={coverColor}
-                coverImage={null}
+                coverImage={coverImage}
                 nom={bouture.nom}
+                imageAlt={bouture.imageAlt}
             />
             <div className="flex flex-col justify-between p-6 flex-1">
                 <div className="space-y-4">
+                    {meta}
                     {nameBlock}
                     <dl className="space-y-1.5 border-t border-border pt-3">
+                        {bouture.famille && (
+                            <div className="flex justify-between gap-4">
+                                <dt className="text-[9px] uppercase tracking-[0.1em] text-muted shrink-0">
+                                    Famille
+                                </dt>
+                                <dd className="text-xs text-foreground text-right">
+                                    {bouture.famille}
+                                </dd>
+                            </div>
+                        )}
                         {lumiere && (
                             <div className="flex justify-between gap-4">
                                 <dt className="text-[9px] uppercase tracking-[0.1em] text-muted shrink-0">
@@ -307,16 +242,6 @@ function LargeCard({ bouture }: { bouture: BouturePublique }) {
                                 </dt>
                                 <dd className="text-xs text-foreground text-right">
                                     {difficulte}
-                                </dd>
-                            </div>
-                        )}
-                        {bouture.famille && (
-                            <div className="flex justify-between gap-4">
-                                <dt className="text-[9px] uppercase tracking-[0.1em] text-muted shrink-0">
-                                    Famille
-                                </dt>
-                                <dd className="text-xs text-foreground text-right">
-                                    {bouture.famille}
                                 </dd>
                             </div>
                         )}

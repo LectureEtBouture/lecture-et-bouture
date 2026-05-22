@@ -20,7 +20,7 @@ Boutique hybride livres académiques + boutures végétales. L'achat est une red
 
 North Star : _"Cultiver l'esprit, nourrir la terre."_
 
-Le succès ressemble à : un visiteur qui s'attarde, qui revient, qui fait confiance à la sélection du conservateur.
+Le succès ressemble à : un visiteur qui s'attarde, qui revient, qui fait confiance à la sélection du libraire.
 
 ## Brand Personality
 

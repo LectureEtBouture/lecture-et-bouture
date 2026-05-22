@@ -5,7 +5,7 @@ export function NewsletterSection() {
         <div className="py-12 border-b border-border flex flex-col md:flex-row md:items-end gap-8 md:gap-16">
             <div className="space-y-2 md:max-w-[36ch]">
                 <p className="text-[11px] uppercase tracking-[0.1em] text-muted">
-                    Lettres du conservateur
+                    Lettres de la libraire
                 </p>
                 <p className="font-serif text-xl text-foreground leading-snug">
                     Une lettre chaque mois.

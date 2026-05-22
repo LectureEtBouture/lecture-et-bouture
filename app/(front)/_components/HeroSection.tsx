@@ -23,8 +23,8 @@ export function HeroSection() {
                         {siteConfig.tagline}
                     </h1>
                     <p className="text-base text-muted leading-[1.75] max-w-[42ch]">
-                        Une librairie indépendante. Des boutures rares. Un
-                        conservateur qui choisit pour vous.
+                        Une librairie indépendante. Des boutures rares. La
+                        libraire qui choisit pour vous.
                     </p>
                 </div>
             </div>

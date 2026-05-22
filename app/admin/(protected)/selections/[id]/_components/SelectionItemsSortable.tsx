@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useRef } from 'react';
 import {
     DndContext,
     closestCenter,
@@ -12,108 +13,27 @@ import {
 import {
     SortableContext,
     sortableKeyboardCoordinates,
-    useSortable,
     verticalListSortingStrategy,
     arrayMove,
 } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { useState, useTransition } from 'react';
-import {
-    reorderSelectionItems,
-    removeSelectionItem,
-} from '@/lib/actions/selections';
-
-type Item = {
-    id: string;
-    type: string;
-    livreUri: string | null;
-    planteNom: string | null;
-};
-
-function DragHandle() {
-    return (
-        <svg
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            aria-hidden="true"
-        >
-            <path
-                d="M3 4.5h10M3 8h10M3 11.5h10"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-            />
-        </svg>
-    );
-}
-
-function SortableItem({
-    item,
-    selectionId,
-}: {
-    item: Item;
-    selectionId: string;
-}) {
-    const {
-        attributes,
-        listeners,
-        setNodeRef,
-        transform,
-        transition,
-        isDragging,
-    } = useSortable({ id: item.id });
-    const label = item.type === 'livre' ? item.livreUri : item.planteNom;
-
-    return (
-        <div
-            ref={setNodeRef}
-            style={{
-                transform: CSS.Transform.toString(transform),
-                transition,
-                opacity: isDragging ? 0.4 : 1,
-            }}
-            className={`bg-white border border-border px-4 py-3 flex items-center gap-3 ${isDragging ? 'shadow-md z-10 relative' : ''}`}
-        >
-            <button
-                {...attributes}
-                {...listeners}
-                className="text-muted hover:text-foreground cursor-grab active:cursor-grabbing touch-none shrink-0"
-                aria-label="Réordonner"
-            >
-                <DragHandle />
-            </button>
-            <p className="text-sm text-foreground flex-1 min-w-0 truncate">
-                <span className="text-[10px] uppercase tracking-[0.08em] text-muted mr-2">
-                    {item.type}
-                </span>
-                {label}
-            </p>
-            <form
-                action={removeSelectionItem.bind(null, selectionId, item.id)}
-                className="contents"
-            >
-                <button
-                    type="submit"
-                    className="text-xs text-muted hover:text-red-600 transition-colors shrink-0"
-                >
-                    Retirer
-                </button>
-            </form>
-        </div>
-    );
-}
+import { reorderSelectionItems } from '@/lib/actions/selections';
+import { SelectionSortableItem } from './SelectionSortableItem';
+import type { SelectionItem, LivreMeta } from './types';
 
 export function SelectionItemsSortable({
     selectionId,
     initial,
+    livresMeta,
 }: {
     selectionId: string;
-    initial: Item[];
+    initial: SelectionItem[];
+    livresMeta: Map<string, LivreMeta>;
 }) {
     const [items, setItems] = useState(initial);
-    const [, startTransition] = useTransition();
+    const [dirty, setDirty] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [saved, setSaved] = useState(false);
+    const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const sensors = useSensors(
         useSensor(PointerSensor),
@@ -127,14 +47,22 @@ export function SelectionItemsSortable({
         if (!over || active.id === over.id) return;
         const oldIndex = items.findIndex((item) => item.id === active.id);
         const newIndex = items.findIndex((item) => item.id === over.id);
-        const reordered = arrayMove(items, oldIndex, newIndex);
-        setItems(reordered);
-        startTransition(() => {
-            reorderSelectionItems(
-                selectionId,
-                reordered.map((item) => item.id),
-            );
-        });
+        setItems(arrayMove(items, oldIndex, newIndex));
+        setDirty(true);
+        setSaved(false);
+    }
+
+    async function handleSave() {
+        setSaving(true);
+        await reorderSelectionItems(
+            selectionId,
+            items.map((item) => item.id),
+        );
+        setSaving(false);
+        setDirty(false);
+        setSaved(true);
+        if (timerRef.current) clearTimeout(timerRef.current);
+        timerRef.current = setTimeout(() => setSaved(false), 2500);
     }
 
     if (items.length === 0) {
@@ -146,25 +74,56 @@ export function SelectionItemsSortable({
     }
 
     return (
-        <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-        >
-            <SortableContext
-                items={items}
-                strategy={verticalListSortingStrategy}
+        <div className="space-y-3">
+            <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
             >
-                <div className="space-y-2">
-                    {items.map((item) => (
-                        <SortableItem
-                            key={item.id}
-                            item={item}
-                            selectionId={selectionId}
-                        />
-                    ))}
+                <SortableContext
+                    items={items}
+                    strategy={verticalListSortingStrategy}
+                >
+                    <div className="space-y-2">
+                        {items.map((item) => (
+                            <SelectionSortableItem
+                                key={item.id}
+                                item={item}
+                                selectionId={selectionId}
+                                livreMeta={
+                                    item.livreUri
+                                        ? livresMeta.get(item.livreUri)
+                                        : undefined
+                                }
+                            />
+                        ))}
+                    </div>
+                </SortableContext>
+            </DndContext>
+
+            {(dirty || saved) && (
+                <div className="flex items-center gap-3 pt-3 border-t border-border">
+                    {saved && !dirty && (
+                        <span className="text-[11px] text-primary">
+                            Enregistré ✓
+                        </span>
+                    )}
+                    {dirty && (
+                        <>
+                            <span className="text-[11px] text-amber-600">
+                                · Ordre modifié, non enregistré
+                            </span>
+                            <button
+                                onClick={handleSave}
+                                disabled={saving}
+                                className="px-4 py-1.5 bg-primary text-background text-[11px] uppercase tracking-widest hover:bg-primary-light transition-colors disabled:opacity-50 shrink-0"
+                            >
+                                {saving ? '…' : "Enregistrer l'ordre"}
+                            </button>
+                        </>
+                    )}
                 </div>
-            </SortableContext>
-        </DndContext>
+            )}
+        </div>
     );
 }

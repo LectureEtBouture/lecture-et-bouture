@@ -3,9 +3,10 @@ import {
     getSelectionWithItems,
     addSelectionItem,
 } from '@/lib/actions/selections';
-import { getLivres } from '@/lib/actions/livres';
 import { getPlantes } from '@/lib/actions/plantes';
+import { bookProvider } from '@/lib/services/books';
 import { SelectionItemsSortable } from './_components/SelectionItemsSortable';
+import { SelectionAddLivre } from './_components/SelectionAddLivre';
 import { inputClass, labelClass } from '@/components/admin/formStyles';
 
 export default async function SelectionItemsPage({
@@ -14,12 +15,26 @@ export default async function SelectionItemsPage({
     params: Promise<{ id: string }>;
 }) {
     const { id } = await params;
-    const { selection, items } = await getSelectionWithItems(id);
-    if (!selection) notFound();
-    const [livresList, plantesList] = await Promise.all([
-        getLivres(),
+    const [{ selection, items }, plantesList] = await Promise.all([
+        getSelectionWithItems(id),
         getPlantes(),
     ]);
+    if (!selection) notFound();
+
+    const livreUris = items
+        .filter((item) => item.type === 'livre' && item.livreUri)
+        .map((item) => item.livreUri as string);
+    const livresMeta =
+        livreUris.length > 0
+            ? await bookProvider.rechercherParUris(livreUris)
+            : new Map<
+                  string,
+                  {
+                      titre: string | null;
+                      auteur: string | null;
+                      imageUrl: string | null;
+                  }
+              >();
 
     return (
         <div className="space-y-8">
@@ -50,62 +65,66 @@ export default async function SelectionItemsPage({
                         .join(',')}
                     selectionId={id}
                     initial={items}
+                    livresMeta={livresMeta}
                 />
             </section>
 
-            <section className="space-y-4">
+            <section className="space-y-6">
                 <h2 className="text-[11px] uppercase tracking-[0.1em] font-medium text-muted border-b border-border pb-2">
-                    Ajouter un item
+                    Ajouter
                 </h2>
-                <form
-                    action={async (formData: FormData) => {
-                        'use server';
-                        const type = formData.get('type') as 'livre' | 'plante';
-                        const itemId = formData.get('itemId') as string;
-                        if (!type || !itemId) return;
-                        await addSelectionItem(id, type, itemId);
-                    }}
-                    className="space-y-4 max-w-sm"
-                >
-                    <div className="space-y-1">
-                        <label className={labelClass}>Type</label>
-                        <select name="type" className={inputClass}>
-                            <option value="livre">Livre</option>
-                            <option value="plante">Bouture</option>
-                        </select>
-                    </div>
-                    <div className="space-y-1">
-                        <label className={labelClass}>Choisir</label>
-                        <select name="itemId" className={inputClass}>
-                            <optgroup label="Livres">
-                                {livresList.map((livre) => (
-                                    <option
-                                        key={`l-${livre.id}`}
-                                        value={livre.id}
-                                    >
-                                        {livre.inventaireUri}
-                                    </option>
-                                ))}
-                            </optgroup>
-                            <optgroup label="Boutures">
-                                {plantesList.map((plante) => (
-                                    <option
-                                        key={`p-${plante.id}`}
-                                        value={plante.id}
-                                    >
-                                        {plante.nom}
-                                    </option>
-                                ))}
-                            </optgroup>
-                        </select>
-                    </div>
-                    <button
-                        type="submit"
-                        className="px-6 py-2 bg-primary text-background text-xs uppercase tracking-widest hover:bg-primary-light transition-colors"
-                    >
-                        Ajouter
-                    </button>
-                </form>
+
+                <div className="space-y-2 max-w-md">
+                    <p className="text-[11px] uppercase tracking-[0.08em] font-medium text-foreground">
+                        Livre
+                    </p>
+                    <p className="text-[11px] text-muted">
+                        Recherche par titre ou auteur — cliquer sur un résultat
+                        pour l&apos;ajouter directement.
+                    </p>
+                    <SelectionAddLivre selectionId={id} />
+                </div>
+
+                <div className="space-y-3 pt-2 border-t border-border max-w-sm">
+                    <p className="text-[11px] uppercase tracking-[0.08em] font-medium text-foreground pt-2">
+                        Bouture
+                    </p>
+                    {plantesList.length === 0 ? (
+                        <p className="text-[11px] text-muted">
+                            Aucune bouture disponible.
+                        </p>
+                    ) : (
+                        <form
+                            action={async (formData: FormData) => {
+                                'use server';
+                                const itemId = formData.get('itemId') as string;
+                                if (!itemId) return;
+                                await addSelectionItem(id, 'plante', itemId);
+                            }}
+                            className="flex items-end gap-3"
+                        >
+                            <div className="space-y-1 flex-1 min-w-0">
+                                <label className={labelClass}>Spécimen</label>
+                                <select name="itemId" className={inputClass}>
+                                    {plantesList.map((plante) => (
+                                        <option
+                                            key={plante.id}
+                                            value={plante.id}
+                                        >
+                                            {plante.nom}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <button
+                                type="submit"
+                                className="px-5 py-2 bg-primary text-background text-xs uppercase tracking-widest hover:bg-primary-light transition-colors shrink-0"
+                            >
+                                Ajouter
+                            </button>
+                        </form>
+                    )}
+                </div>
             </section>
         </div>
     );

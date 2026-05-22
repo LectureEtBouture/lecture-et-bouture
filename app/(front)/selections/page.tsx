@@ -5,7 +5,7 @@ import { SelectionBlock } from './_components/SelectionBlock';
 export const metadata: Metadata = {
     title: 'Sélections',
     description:
-        'Les sélections du conservateur — livres et boutures choisis avec soin par notre équipe.',
+        'Les sélections du libraire — livres et boutures choisis avec soin par notre équipe.',
 };
 
 export const dynamic = 'force-dynamic';
@@ -17,7 +17,7 @@ export default async function SelectionsPage() {
         <div className="max-w-3xl mx-auto px-6 py-section">
             <header className="space-y-4 pb-10 border-b border-border">
                 <p className="text-[11px] uppercase tracking-[0.14em] text-muted">
-                    Conservateur
+                    Libraire
                 </p>
                 <h1 className="font-serif text-[clamp(2rem,4vw,3rem)] font-bold text-foreground leading-[1.05] tracking-[-0.02em]">
                     Sélections

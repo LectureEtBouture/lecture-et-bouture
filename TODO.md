@@ -2,7 +2,8 @@
 
 ## Backlog
 
-- [ ] Recherche BO livres — chercher par titre/auteur Google Books dans `/admin/livres` (filtre complémentaire au filtre URI local)
+### Autres
+
 - [ ] Import ISBN BO — inventaire.io en fallback uniquement (Google Books prioritaire ; les deux coexistent actuellement)
 - [ ] Formbricks — vérifier trigger survey (action key `"test"` → enquête s'ouvre)
 - [ ] Éco-conception — audit thegreenwebfoundation.org
@@ -12,6 +13,16 @@
 
 ## Fait
 
+### Blog
+
+- DB — 5 tables (`auteurs_blog`, `categories_blog`, `articles`, `articles_categories`, `articles_lies`) + `avis.article_id` + `avis.note` nullable
+- Queries — `getArticles` (filtres catégorie + tri), `getArticleBySlug`, `getArticlesEnAvant`, `getArticlesLies` (OR sur 2 FK), `getCategoriesParArticles` (batch anti-N+1)
+- Actions — CRUD articles, togglePublie/EnAvant, addArticleLien/removeArticleLien, CRUD catégories & auteurs
+- `/blog` — listing lede + rows, filtres catégories + tri (recents/anciens/alpha) via searchParams
+- `/blog/[slug]` — contenu HTML sanitisé, articles liés + même catégorie, avis sans note
+- Section home — bento 4 articles `en_avant` (fallback récents), 4 variants selon count
+- BO `/admin/blog` — CRUD articles, gestion catégories & auteurs, articles liés optimistic
+
 ### Front public
 
 - `/` — hero, Choix librairie + Nouveautés + Tendances (Google Books) + sections genre + CTA "Me faire surprendre"
@@ -20,7 +31,7 @@
 - `/boutures` + `/boutures/[slug]` — vitrine bento, fiches, avis
 - `/surprendre` — livre aléatoire parmi les choix librairie (`force-dynamic`)
 - `/evenements` — agenda (en cours / à venir / passé), `EvenementEnAvant`
-- `/selections` — sélections actives du conservateur
+- `/selections` — sélections actives de la libraire
 - `/contact` — formulaire + carte Leaflet
 - Pages éditoriales — concept, mentions légales, CGV, CGU, cookies, politique
 - SEO : sitemap.xml, robots.txt (DB), Open Graph Satori, metadata
@@ -58,5 +69,6 @@
 - NextAuth v5 — JWT, httpOnly cookies, 5 rôles, `types/next-auth.d.ts`, routes whitelist middleware
 - `lib/config.ts` `storeConfig` + `lib/metadata.ts` — templatisation complète (`NEXT_PUBLIC_STORE_*`)
 - Newsletter Loops, Analytics Umami (privacy-first), Surveys Formbricks
-- `VusRecemment` — clear item individuel (×, visible au hover) + clear all ("Effacer" en header), `removeVisit`/`clearHistory` dans `useVisitHistory`
-- Boutures images — `CoverPanel` fiche affiche `next/image` (était fond coloré seul) ; `imageAlt` ajouté à `BouturePublique` query ; `BoutureCard.tsx` dead code supprimé
+- `VusRecemment` — livres uniquement (boutures exclues), clear item individuel (×, hover) + clear all, `removeVisit`/`clearHistory` dans `useVisitHistory`
+- Boutures images — `CoverPanel` fiche affiche `next/image` ; `imageAlt` dans `BouturePublique` query ; `BoutureCard.tsx` dead code supprimé
+- Couvertures livres — `CoverImage` client component (`onError` → fond coloré si 404) ; OL `?default=false` ; `validateCoverUrl` HEAD check (rejette placeholder Google ~9KB) ; couverture personnalisée admin (`livres.image` + `livres.image_alt`) prioritaire sur Google Books/OL ; `imageAlt` propagé dans `LivreComplet` → `LivreCard` + `CoverPanel`
