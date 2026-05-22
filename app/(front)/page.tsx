@@ -7,10 +7,15 @@ import {
     getLivresParSujet,
 } from '@/lib/queries/livres';
 import { getEvenementMisEnAvant } from '@/lib/queries/evenements';
+import {
+    getArticlesEnAvant,
+    getCategoriesParArticles,
+} from '@/lib/queries/articles';
 import { HeroSection } from './_components/HeroSection';
 import { LivresSection } from './_components/LivresSection';
 import { SurprendreSection } from './_components/SurprendreSection';
 import { EvenementEnAvant } from './_components/EvenementEnAvant';
+import { BlogEnAvant } from './_components/BlogEnAvant';
 
 export const metadata: Metadata = {
     title: siteConfig.name,
@@ -36,16 +41,25 @@ const GENRE_SECTIONS = [
 ] as const;
 
 export default async function HomePage() {
-    const [choix, nouveautes, tendances, evenementMisEnAvant, ...genreLivres] =
-        await Promise.all([
-            getLivresMisEnAvant(),
-            getLivresNouveautes(0),
-            getLivresTendances(0),
-            getEvenementMisEnAvant(),
-            ...GENRE_SECTIONS.map((section) =>
-                getLivresParSujet(section.query),
-            ),
-        ]);
+    const [
+        choix,
+        nouveautes,
+        tendances,
+        evenementMisEnAvant,
+        articlesEnAvant,
+        ...genreLivres
+    ] = await Promise.all([
+        getLivresMisEnAvant(),
+        getLivresNouveautes(0),
+        getLivresTendances(0),
+        getEvenementMisEnAvant(),
+        getArticlesEnAvant(),
+        ...GENRE_SECTIONS.map((section) => getLivresParSujet(section.query)),
+    ]);
+
+    const blogCategoriesMap = await getCategoriesParArticles(
+        articlesEnAvant.map((article) => article.id),
+    );
 
     return (
         <>
@@ -83,6 +97,10 @@ export default async function HomePage() {
                     status={evenementMisEnAvant.status}
                 />
             )}
+            <BlogEnAvant
+                articles={articlesEnAvant}
+                categoriesMap={blogCategoriesMap}
+            />
             <SurprendreSection />
         </>
     );
