@@ -9,7 +9,9 @@ import {
     boolean,
     timestamp,
     pgEnum,
+    check,
 } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 
 // ─── Enums ────────────────────────────────────────────────────────────────────
 
@@ -115,7 +117,7 @@ export const plantes = pgTable('plantes', {
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-// ─── Sélections du conservateur ───────────────────────────────────────────────
+// ─── Sélections de la libraire ───────────────────────────────────────────────
 
 export const selections = pgTable('selections', {
     id: uuid('id').primaryKey().defaultRandom(),
@@ -146,12 +148,13 @@ export const selectionItems = pgTable('selection_items', {
 
 export const avis = pgTable('avis', {
     id: uuid('id').primaryKey().defaultRandom(),
-    type: text('type').notNull(), // 'livre' | 'bouture'
+    type: text('type').notNull(), // 'livre' | 'bouture' | 'article'
     livreId: uuid('livre_id'),
     boutureId: uuid('bouture_id'),
+    articleId: uuid('article_id'),
     produitNom: varchar('produit_nom', { length: 300 }),
     auteurNom: varchar('auteur_nom', { length: 100 }).notNull(),
-    note: integer('note').notNull(), // 1-5
+    note: integer('note'), // 1-5, null for article avis
     texte: text('texte'),
     approuve: boolean('approuve').notNull().default(false),
     masque: boolean('masque').notNull().default(false),
@@ -219,3 +222,62 @@ export const pagesEditoriales = pgTable('pages_editoriales', {
     publiee: boolean('publiee').notNull().default(true),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+
+// ─── Blog ─────────────────────────────────────────────────────────────────────
+
+export const auteursBlog = pgTable('auteurs_blog', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    nom: varchar('nom', { length: 200 }).notNull().unique(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const categoriesBlog = pgTable('categories_blog', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    nom: varchar('nom', { length: 200 }).notNull(),
+    slug: varchar('slug', { length: 200 }).notNull().unique(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const articles = pgTable('articles', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    slug: varchar('slug', { length: 200 }).notNull().unique(),
+    titre: varchar('titre', { length: 300 }).notNull(),
+    contenu: text('contenu'),
+    image: text('image'),
+    imageAlt: text('image_alt'),
+    auteurNom: varchar('auteur_nom', { length: 200 }),
+    publie: boolean('publie').notNull().default(false),
+    enAvant: boolean('en_avant').notNull().default(false),
+    publishedAt: timestamp('published_at'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const articlesCategories = pgTable(
+    'articles_categories',
+    {
+        articleId: uuid('article_id')
+            .notNull()
+            .references(() => articles.id, { onDelete: 'cascade' }),
+        categorieId: uuid('categorie_id')
+            .notNull()
+            .references(() => categoriesBlog.id, { onDelete: 'cascade' }),
+    },
+    (t) => [primaryKey({ columns: [t.articleId, t.categorieId] })],
+);
+
+export const articlesLies = pgTable(
+    'articles_lies',
+    {
+        articleAId: uuid('article_a_id')
+            .notNull()
+            .references(() => articles.id, { onDelete: 'cascade' }),
+        articleBId: uuid('article_b_id')
+            .notNull()
+            .references(() => articles.id, { onDelete: 'cascade' }),
+    },
+    (t) => [
+        primaryKey({ columns: [t.articleAId, t.articleBId] }),
+        check('articles_lies_order', sql`${t.articleAId} < ${t.articleBId}`),
+    ],
+);

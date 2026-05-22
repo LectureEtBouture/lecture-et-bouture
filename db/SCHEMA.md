@@ -40,6 +40,8 @@ Table d'**enrichissements** principalement. Les métadonnées catalogue (auteur,
 | note_de_la_librairie | text         | nullable                                       |
 | numero_serie         | integer      | nullable                                       |
 | note_moyenne         | numeric(3,2) | nullable                                       |
+| image                | text         | nullable (couverture personnalisée MinIO)      |
+| image_alt            | text         | nullable                                       |
 | created_at           | timestamp    | NOT NULL, DEFAULT now()                        |
 | updated_at           | timestamp    | NOT NULL, DEFAULT now()                        |
 
@@ -83,23 +85,89 @@ Catalogue boutures / plantes.
 
 ### `avis`
 
-Avis clients — livres et boutures.
+Avis clients — livres, boutures et articles blog.
 
-| Colonne     | Type         | Contraintes                              |
-| ----------- | ------------ | ---------------------------------------- |
-| id          | uuid         | PK                                       |
-| type        | text         | NOT NULL — `'livre'` ou `'bouture'`      |
-| livre_id    | uuid         | nullable (pas de FK — avis orphelins OK) |
-| bouture_id  | uuid         | nullable                                 |
-| produit_nom | varchar(300) | nullable (snapshot au dépôt)             |
-| auteur_nom  | varchar(100) | NOT NULL                                 |
-| note        | integer      | NOT NULL (1–5)                           |
-| texte       | text         | nullable                                 |
-| approuve    | boolean      | NOT NULL, DEFAULT false                  |
-| masque      | boolean      | NOT NULL, DEFAULT false                  |
-| created_at  | timestamp    | NOT NULL, DEFAULT now()                  |
+| Colonne     | Type         | Contraintes                                     |
+| ----------- | ------------ | ----------------------------------------------- |
+| id          | uuid         | PK                                              |
+| type        | text         | NOT NULL — `'livre'`, `'bouture'` ou `'article'`|
+| livre_id    | uuid         | nullable (pas de FK — avis orphelins OK)        |
+| bouture_id  | uuid         | nullable                                        |
+| article_id  | uuid         | nullable, FK → articles.id (ON DELETE SET NULL) |
+| produit_nom | varchar(300) | nullable (snapshot au dépôt)                    |
+| auteur_nom  | varchar(100) | NOT NULL                                        |
+| note        | integer      | **nullable** — absent pour les articles         |
+| texte       | text         | nullable                                        |
+| approuve    | boolean      | NOT NULL, DEFAULT false                         |
+| masque      | boolean      | NOT NULL, DEFAULT false                         |
+| created_at  | timestamp    | NOT NULL, DEFAULT now()                         |
 
-> `livre_id` FK → `livres.id`. Lors d'un dépôt d'avis public, si aucune ligne `livres` n'existe pour cet `inventaire_uri`, `getOrCreateEnrichissement()` en crée une minimale automatiquement. `bouture_id` sans FK — permet des avis orphelins si la bouture est retirée.
+> `livre_id` FK → `livres.id`. `bouture_id` et `article_id` sans FK stricte — permet des avis orphelins. `note` nullable depuis la migration blog (les avis articles n'ont pas de note étoiles).
+
+### `auteurs_blog`
+
+Suggestions d'auteurs pour le blog (champ libre avec datalist).
+
+| Colonne    | Type         | Contraintes             |
+| ---------- | ------------ | ----------------------- |
+| id         | uuid         | PK                      |
+| nom        | varchar(200) | NOT NULL, UNIQUE        |
+| created_at | timestamp    | NOT NULL, DEFAULT now() |
+
+### `categories_blog`
+
+Catégories des articles blog.
+
+| Colonne    | Type         | Contraintes             |
+| ---------- | ------------ | ----------------------- |
+| id         | uuid         | PK                      |
+| nom        | varchar(200) | NOT NULL                |
+| slug       | varchar(200) | NOT NULL, UNIQUE        |
+| created_at | timestamp    | NOT NULL, DEFAULT now() |
+
+### `articles`
+
+Articles du blog.
+
+| Colonne      | Type         | Contraintes                          |
+| ------------ | ------------ | ------------------------------------ |
+| id           | uuid         | PK                                   |
+| slug         | varchar(200) | NOT NULL, UNIQUE                     |
+| titre        | varchar(300) | NOT NULL                             |
+| contenu      | text         | nullable (HTML Tiptap sanitisé)      |
+| image        | text         | nullable (chemin MinIO)              |
+| image_alt    | text         | nullable                             |
+| auteur_nom   | varchar(200) | nullable (champ libre, suggestions)  |
+| publie       | boolean      | NOT NULL, DEFAULT false              |
+| en_avant     | boolean      | NOT NULL, DEFAULT false              |
+| published_at | timestamp    | nullable (null = brouillon)          |
+| created_at   | timestamp    | NOT NULL, DEFAULT now()              |
+| updated_at   | timestamp    | NOT NULL, DEFAULT now()              |
+
+> `publie` passe à `true` + `published_at` est horodaté à la première publication (via `togglePublie`). Les articles en avant (`en_avant = true`) alimentent la section blog de la home — fallback récents si aucun.
+
+### `articles_categories`
+
+Relation N-N articles ↔ catégories blog.
+
+| Colonne      | Type | Contraintes                                         |
+| ------------ | ---- | --------------------------------------------------- |
+| article_id   | uuid | NOT NULL, FK → articles.id (CASCADE DELETE)         |
+| categorie_id | uuid | NOT NULL, FK → categories_blog.id (CASCADE DELETE)  |
+| PK           | —    | (article_id, categorie_id)                          |
+
+### `articles_lies`
+
+Liens bidirectionnels entre articles (ex: articles complémentaires).
+
+| Colonne      | Type | Contraintes                                      |
+| ------------ | ---- | ------------------------------------------------ |
+| article_a_id | uuid | NOT NULL, FK → articles.id (CASCADE DELETE)      |
+| article_b_id | uuid | NOT NULL, FK → articles.id (CASCADE DELETE)      |
+| PK           | —    | (article_a_id, article_b_id)                     |
+| CHECK        | —    | `article_a_id < article_b_id` (anti-doublon)     |
+
+> Relation symétrique stockée une seule fois avec l'ID le plus petit en `article_a_id`. Les queries utilisent `OR` sur les deux colonnes (via `unionAll`) pour retrouver tous les liens d'un article.
 
 ### `evenements`
 
@@ -121,7 +189,7 @@ Agenda de la librairie.
 
 ### `selections`
 
-Sélections du conservateur — listes curatées mixant livres et boutures.
+Sélections de la libraire — listes curatées mixant livres et boutures.
 
 | Colonne     | Type         | Contraintes                                |
 | ----------- | ------------ | ------------------------------------------ |
@@ -225,6 +293,7 @@ npm run db:studio      # Interface Drizzle Studio
 - `livres.inventaire_uri` — clé de liaison avec l'API externe (ex: `isbn:9782070347858`, `wd:Q43361`). NOT NULL UNIQUE.
 - `livres.titre` — dénormalisé pour le BO (liste + heading modifier), évite un appel API. NULL pour les livres créés avant la migration — fallback sur Google Books dans la liste admin.
 - `livres.prix` est stocké en `numeric(8,2)` — Drizzle le renvoie en string JavaScript. Nullable (indicatif, peut être surchargé par l'admin).
+- `livres.image` — couverture personnalisée uploadée via MinIO. Prioritaire sur l'image Google Books dans `merge.ts`. Si null, Google Books / Open Library est utilisé en fallback.
 - `selections.active = false` par défaut — une sélection est privée jusqu'à publication explicite.
 - `avis.masque` permet de masquer sans supprimer (distinct de `approuve`).
 - Images : chemin MinIO relatif (ex: `livres/mon-image.jpg`) ou URL externe. Résolu via `MINIO_PUBLIC_URL` dans `next.config.ts`.

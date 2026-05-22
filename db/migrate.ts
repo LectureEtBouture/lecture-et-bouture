@@ -152,6 +152,61 @@ const statements = [
         publiee boolean NOT NULL DEFAULT true,
         updated_at timestamp NOT NULL DEFAULT now()
     )`,
+
+    // avis: note nullable (articles have no rating), article_id FK
+    `ALTER TABLE avis ALTER COLUMN note DROP NOT NULL`,
+    `ALTER TABLE avis ADD COLUMN IF NOT EXISTS article_id uuid`,
+
+    // blog tables
+    `CREATE TABLE IF NOT EXISTS auteurs_blog (
+        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        nom varchar(200) NOT NULL UNIQUE,
+        created_at timestamp NOT NULL DEFAULT now()
+    )`,
+
+    `CREATE TABLE IF NOT EXISTS categories_blog (
+        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        nom varchar(200) NOT NULL,
+        slug varchar(200) NOT NULL UNIQUE,
+        created_at timestamp NOT NULL DEFAULT now()
+    )`,
+
+    `CREATE TABLE IF NOT EXISTS articles (
+        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        slug varchar(200) NOT NULL UNIQUE,
+        titre varchar(300) NOT NULL,
+        contenu text,
+        image text,
+        image_alt text,
+        auteur_nom varchar(200),
+        publie boolean NOT NULL DEFAULT false,
+        en_avant boolean NOT NULL DEFAULT false,
+        published_at timestamp,
+        created_at timestamp NOT NULL DEFAULT now(),
+        updated_at timestamp NOT NULL DEFAULT now()
+    )`,
+
+    `CREATE TABLE IF NOT EXISTS articles_categories (
+        article_id uuid NOT NULL REFERENCES articles(id) ON DELETE CASCADE,
+        categorie_id uuid NOT NULL REFERENCES categories_blog(id) ON DELETE CASCADE,
+        PRIMARY KEY (article_id, categorie_id)
+    )`,
+
+    `CREATE TABLE IF NOT EXISTS articles_lies (
+        article_a_id uuid NOT NULL REFERENCES articles(id) ON DELETE CASCADE,
+        article_b_id uuid NOT NULL REFERENCES articles(id) ON DELETE CASCADE,
+        PRIMARY KEY (article_a_id, article_b_id),
+        CONSTRAINT articles_lies_order CHECK (article_a_id < article_b_id)
+    )`,
+
+    `DO $$ BEGIN
+        IF NOT EXISTS (
+            SELECT 1 FROM pg_constraint WHERE conname = 'avis_article_id_fkey'
+        ) THEN
+            ALTER TABLE avis ADD CONSTRAINT avis_article_id_fkey
+                FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE SET NULL;
+        END IF;
+    END $$`,
 ];
 
 async function main() {
