@@ -25,6 +25,8 @@ async function getEnrichissementsByIds(
             rayonId: livres.rayonId,
             numeroSerie: livres.numeroSerie,
             noteMoyenne: livres.noteMoyenne,
+            image: livres.image,
+            imageAlt: livres.imageAlt,
         })
         .from(livres)
         .where(

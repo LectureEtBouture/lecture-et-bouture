@@ -6,7 +6,7 @@ import { avis } from '@/db/schema';
 export type AvisItem = {
     id: string;
     auteurNom: string;
-    note: number;
+    note: number | null;
     texte: string | null;
     createdAt: Date;
 };
@@ -52,5 +52,23 @@ export const getAvisForBouture = unstable_cache(
             )
             .orderBy(avis.createdAt),
     ['avis-bouture'],
+    { tags: ['avis'] },
+);
+
+export const getAvisForArticle = unstable_cache(
+    async (articleId: string): Promise<AvisItem[]> =>
+        db
+            .select(select)
+            .from(avis)
+            .where(
+                and(
+                    eq(avis.type, 'article'),
+                    eq(avis.articleId, articleId),
+                    eq(avis.approuve, true),
+                    eq(avis.masque, false),
+                ),
+            )
+            .orderBy(avis.createdAt),
+    ['avis-article'],
     { tags: ['avis'] },
 );
