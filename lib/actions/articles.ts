@@ -83,14 +83,12 @@ export async function createArticle(formData: FormData) {
     }
 
     if (parsed.tagIds.length > 0) {
-        await db
-            .insert(articlesTags)
-            .values(
-                parsed.tagIds.map((tagId) => ({
-                    articleId: article.id,
-                    tagId,
-                })),
-            );
+        await db.insert(articlesTags).values(
+            parsed.tagIds.map((tagId) => ({
+                articleId: article.id,
+                tagId,
+            })),
+        );
     }
 
     invalidate();
