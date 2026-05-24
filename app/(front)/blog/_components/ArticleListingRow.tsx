@@ -41,7 +41,10 @@ export function ArticleLede({
                     </div>
                     <div className="bg-surface flex flex-col justify-between p-10 lg:p-14">
                         <div className="space-y-5">
-                            <ArticleCategoriChips categories={categories} linked={false} />
+                            <ArticleCategoriChips
+                                categories={categories}
+                                linked={false}
+                            />
                             <h2 className="font-serif text-[clamp(1.5rem,2.5vw,2.25rem)] font-bold text-foreground leading-[1.1] tracking-[-0.01em] group-hover:text-primary transition-colors">
                                 {article.titre}
                             </h2>

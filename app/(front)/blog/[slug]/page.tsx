@@ -84,7 +84,6 @@ export default async function ArticlePage({
             <div className="max-w-[72ch] mx-auto px-6 mb-4">
                 <AvisArticleSection avis={avis} articleId={article.id} />
             </div>
-
         </article>
     );
 }

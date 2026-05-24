@@ -16,10 +16,13 @@ export function LiveClock() {
     useEffect(() => {
         let intervalId: ReturnType<typeof setInterval>;
         // Align first tick to wall-clock second boundary to avoid drift
-        const timeoutId = setTimeout(() => {
-            setTime(getTime());
-            intervalId = setInterval(() => setTime(getTime()), 1000);
-        }, 1000 - (Date.now() % 1000));
+        const timeoutId = setTimeout(
+            () => {
+                setTime(getTime());
+                intervalId = setInterval(() => setTime(getTime()), 1000);
+            },
+            1000 - (Date.now() % 1000),
+        );
 
         return () => {
             clearTimeout(timeoutId);

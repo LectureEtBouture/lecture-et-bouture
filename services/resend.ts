@@ -63,12 +63,16 @@ export async function sendNewsletterDiffusion(data: NewsletterDiffusionData) {
             <h1 style="margin:0 0 16px;font-family:Georgia,serif;font-size:26px;font-weight:bold;color:#1a1a1a;line-height:1.3;">${escHtml(data.articleTitre)}</h1>
           </td>
         </tr>
-        ${data.articleImage ? `
+        ${
+            data.articleImage
+                ? `
         <tr>
           <td style="padding:0 40px;">
             <img src="${escHtml(data.articleImage)}" alt="${escHtml(data.articleImageAlt ?? '')}" width="480" style="display:block;width:100%;max-width:480px;height:auto;margin:16px 0;" />
           </td>
-        </tr>` : ''}
+        </tr>`
+                : ''
+        }
         <tr>
           <td style="padding:16px 40px 32px;">
             <p style="margin:0 0 24px;font-family:sans-serif;font-size:15px;line-height:1.7;color:#444;">${escHtml(data.extrait)}</p>

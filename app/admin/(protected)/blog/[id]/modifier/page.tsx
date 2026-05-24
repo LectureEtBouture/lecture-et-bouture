@@ -11,7 +11,10 @@ import {
 } from '@/lib/queries/articles';
 import { getCategoriesBlog } from '@/lib/queries/categories-blog';
 import { getAuteursBlog } from '@/lib/queries/auteurs-blog';
-import { getDiffusionForArticle, getSubscriberCount } from '@/lib/actions/diffusions';
+import {
+    getDiffusionForArticle,
+    getSubscriberCount,
+} from '@/lib/actions/diffusions';
 import { getTagsBlog, getTagsArticle } from '@/lib/queries/tags-blog';
 
 export default async function ModifierArticlePage({

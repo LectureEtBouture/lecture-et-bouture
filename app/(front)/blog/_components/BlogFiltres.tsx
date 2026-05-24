@@ -47,7 +47,10 @@ export function BlogFiltres({
             {categories.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                     <Link
-                        href={buildUrl({ sort: sortBase }, { categorie: null, tag: null })}
+                        href={buildUrl(
+                            { sort: sortBase },
+                            { categorie: null, tag: null },
+                        )}
                         className={`text-[10px] uppercase tracking-[0.12em] px-3 py-1.5 border transition-colors ${
                             !categorieActive && !tagActive
                                 ? 'border-primary bg-primary text-background'
@@ -101,7 +104,11 @@ export function BlogFiltres({
                     <Link
                         key={option.value}
                         href={buildUrl(
-                            { categorie: categorieActive, tag: tagActive, sort: sortActive },
+                            {
+                                categorie: categorieActive,
+                                tag: tagActive,
+                                sort: sortActive,
+                            },
                             { sort: option.value },
                         )}
                         className={`text-[10px] uppercase tracking-[0.1em] px-2.5 py-1.5 transition-colors ${

@@ -61,7 +61,10 @@ export function ArticleHeader({
                             Blog
                         </Link>
                     </li>
-                    <li aria-hidden className="text-border select-none shrink-0">
+                    <li
+                        aria-hidden
+                        className="text-border select-none shrink-0"
+                    >
                         ·
                     </li>
                     <li className="text-foreground truncate uppercase tracking-[0.08em]">
@@ -71,7 +74,9 @@ export function ArticleHeader({
                 <GoBackButton />
             </div>
 
-            <div className={`max-w-[72ch] mx-auto px-6 pb-6 space-y-5 ${image ? 'pt-10' : 'pt-6'}`}>
+            <div
+                className={`max-w-[72ch] mx-auto px-6 pb-6 space-y-5 ${image ? 'pt-10' : 'pt-6'}`}
+            >
                 {(categories.length > 0 || tags.length > 0) && (
                     <div className="flex flex-wrap items-center gap-3">
                         <ArticleCategoriChips categories={categories} />

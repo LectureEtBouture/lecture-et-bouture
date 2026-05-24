@@ -54,9 +54,7 @@ export const getArticles = unstable_cache(
                     eq(articlesTags.articleId, articles.id),
                 )
                 .innerJoin(tagsBlog, eq(tagsBlog.id, articlesTags.tagId))
-                .where(
-                    and(eq(articles.publie, true), eq(tagsBlog.slug, tag)),
-                )
+                .where(and(eq(articles.publie, true), eq(tagsBlog.slug, tag)))
                 .orderBy(orderBy);
         }
 

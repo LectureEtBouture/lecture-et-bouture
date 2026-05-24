@@ -23,10 +23,23 @@ function formatDate(date: Date) {
     });
 }
 
-export function DiffusionWidget({ articleId, articleTitre, subscriberCount, lastDiffusion }: Props) {
+export function DiffusionWidget({
+    articleId,
+    articleTitre,
+    subscriberCount,
+    lastDiffusion,
+}: Props) {
     const [state, setState] = useState<'idle' | 'confirming' | 'done'>('idle');
-    const [result, setResult] = useState<{ count: number; sentAt: Date } | null>(
-        lastDiffusion ? { count: lastDiffusion.recipientCount, sentAt: lastDiffusion.sentAt } : null,
+    const [result, setResult] = useState<{
+        count: number;
+        sentAt: Date;
+    } | null>(
+        lastDiffusion
+            ? {
+                  count: lastDiffusion.recipientCount,
+                  sentAt: lastDiffusion.sentAt,
+              }
+            : null,
     );
     const [error, setError] = useState<string | null>(null);
     const [isPending, startTransition] = useTransition();
@@ -60,14 +73,13 @@ export function DiffusionWidget({ articleId, articleTitre, subscriberCount, last
 
             {alreadySent && (
                 <p className="text-sm text-muted">
-                    Envoyé à {result.count} abonné{result.count !== 1 ? 's' : ''} le{' '}
+                    Envoyé à {result.count} abonné
+                    {result.count !== 1 ? 's' : ''} le{' '}
                     {formatDate(result.sentAt)}.
                 </p>
             )}
 
-            {error && (
-                <p className="text-sm text-danger">{error}</p>
-            )}
+            {error && <p className="text-sm text-danger">{error}</p>}
 
             {state === 'idle' && (
                 <button
@@ -83,8 +95,11 @@ export function DiffusionWidget({ articleId, articleTitre, subscriberCount, last
                 <div className="space-y-3">
                     <p className="text-sm text-foreground">
                         Envoyer{' '}
-                        <span className="font-medium">«&nbsp;{articleTitre}&nbsp;»</span>{' '}
-                        à {subscriberCount} abonné{subscriberCount !== 1 ? 's' : ''} ?
+                        <span className="font-medium">
+                            «&nbsp;{articleTitre}&nbsp;»
+                        </span>{' '}
+                        à {subscriberCount} abonné
+                        {subscriberCount !== 1 ? 's' : ''} ?
                     </p>
                     <div className="flex gap-3">
                         <button

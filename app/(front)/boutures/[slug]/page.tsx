@@ -101,7 +101,9 @@ export default async function BouturePage({ params }: Props) {
                             </h2>
                             <div
                                 className="text-base text-foreground leading-relaxed max-w-[68ch] [&_p]:mb-3 [&_p:last-child]:mb-0"
-                                dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+                                dangerouslySetInnerHTML={{
+                                    __html: descriptionHtml,
+                                }}
                             />
                         </div>
                     )}
@@ -113,7 +115,9 @@ export default async function BouturePage({ params }: Props) {
                             </h2>
                             <div
                                 className="text-base text-foreground leading-relaxed max-w-[68ch] [&_p]:mb-3 [&_p:last-child]:mb-0"
-                                dangerouslySetInnerHTML={{ __html: conseilsHtml }}
+                                dangerouslySetInnerHTML={{
+                                    __html: conseilsHtml,
+                                }}
                             />
                         </div>
                     )}

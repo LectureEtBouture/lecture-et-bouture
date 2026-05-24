@@ -17,11 +17,15 @@ export async function getDiffusionForArticle(articleId: string) {
 }
 
 export async function getSubscriberCount() {
-    const rows = await db.select({ email: newsletterSubscribers.email }).from(newsletterSubscribers);
+    const rows = await db
+        .select({ email: newsletterSubscribers.email })
+        .from(newsletterSubscribers);
     return rows.length;
 }
 
-export async function diffuserArticle(articleId: string): Promise<{ ok: true; count: number } | { ok: false; error: string }> {
+export async function diffuserArticle(
+    articleId: string,
+): Promise<{ ok: true; count: number } | { ok: false; error: string }> {
     const article = await db
         .select()
         .from(articles)

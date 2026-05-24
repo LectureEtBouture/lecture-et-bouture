@@ -25,7 +25,9 @@ export async function GET(
     const dtStart = toIcalDate(new Date(ev.dateDebut));
     const dtEnd = ev.dateFin
         ? toIcalDate(new Date(ev.dateFin))
-        : toIcalDate(new Date(new Date(ev.dateDebut).getTime() + 2 * 60 * 60 * 1000));
+        : toIcalDate(
+              new Date(new Date(ev.dateDebut).getTime() + 2 * 60 * 60 * 1000),
+          );
 
     const lines = [
         'BEGIN:VCALENDAR',
@@ -51,7 +53,9 @@ export async function GET(
     return new Response(lines, {
         headers: {
             'Content-Type': 'text/calendar; charset=utf-8',
-            'Content-Disposition': `attachment; filename="${esc(ev.titre).replace(/[^a-z0-9]/gi, '-').toLowerCase()}.ics"`,
+            'Content-Disposition': `attachment; filename="${esc(ev.titre)
+                .replace(/[^a-z0-9]/gi, '-')
+                .toLowerCase()}.ics"`,
             'Cache-Control': 'no-store',
         },
     });

@@ -29,22 +29,22 @@ Rayons thématiques (Sciences & Nature, Imaginaire, etc.) — catégories de nav
 
 Table d'**enrichissements** principalement. Les métadonnées catalogue (auteur, isbn, éditeur, description, image…) sont gérées par l'API externe (Google Books / inventaire.io). Seul `titre` est dénormalisé localement à des fins d'affichage BO (évite un appel API sur chaque page liste/modifier).
 
-| Colonne              | Type         | Contraintes                                    |
-| -------------------- | ------------ | ---------------------------------------------- |
-| id                   | uuid         | PK                                             |
-| inventaire_uri       | text         | NOT NULL, UNIQUE — ex: `isbn:9782070347858`    |
-| titre                | text         | nullable (snapshot, renseigné au save du form) |
-| rayon_id             | uuid         | FK → rayons.id, nullable                       |
-| prix                 | numeric(8,2) | nullable (indicatif, surchargeable)            |
-| choix_librairie      | boolean      | NOT NULL, DEFAULT false                        |
-| note_de_la_librairie | text         | nullable                                       |
+| Colonne              | Type         | Contraintes                                                    |
+| -------------------- | ------------ | -------------------------------------------------------------- |
+| id                   | uuid         | PK                                                             |
+| inventaire_uri       | text         | NOT NULL, UNIQUE — ex: `isbn:9782070347858`                    |
+| titre                | text         | nullable (snapshot, renseigné au save du form)                 |
+| rayon_id             | uuid         | FK → rayons.id, nullable                                       |
+| prix                 | numeric(8,2) | nullable (indicatif, surchargeable)                            |
+| choix_librairie      | boolean      | NOT NULL, DEFAULT false                                        |
+| note_de_la_librairie | text         | nullable                                                       |
 | description          | text         | nullable (surcouche HTML Tiptap, prioritaire sur Google Books) |
-| numero_serie         | integer      | nullable                                       |
-| note_moyenne         | numeric(3,2) | nullable                                       |
-| image                | text         | nullable (couverture personnalisée MinIO)      |
-| image_alt            | text         | nullable                                       |
-| created_at           | timestamp    | NOT NULL, DEFAULT now()                        |
-| updated_at           | timestamp    | NOT NULL, DEFAULT now()                        |
+| numero_serie         | integer      | nullable                                                       |
+| note_moyenne         | numeric(3,2) | nullable                                                       |
+| image                | text         | nullable (couverture personnalisée MinIO)                      |
+| image_alt            | text         | nullable                                                       |
+| created_at           | timestamp    | NOT NULL, DEFAULT now()                                        |
+| updated_at           | timestamp    | NOT NULL, DEFAULT now()                                        |
 
 > Slugs publics dérivés de `inventaire_uri` : `isbn:9782070347858` → slug `9782070347858`, `wd:Q43361` → slug `wd-Q43361`. Logique dans `lib/services/books/slug.ts`.
 

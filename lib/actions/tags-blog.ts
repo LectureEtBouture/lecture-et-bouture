@@ -9,8 +9,7 @@ import { slugify } from '@/lib/slugify';
 export async function createTagBlog(formData: FormData) {
     const nom = (formData.get('nom') as string)?.trim();
     if (!nom) return;
-    const slug =
-        (formData.get('slug') as string)?.trim() || slugify(nom);
+    const slug = (formData.get('slug') as string)?.trim() || slugify(nom);
     await db.insert(tagsBlog).values({ nom, slug }).onConflictDoNothing();
     revalidateTag('tags-blog', { expire: 0 });
 }

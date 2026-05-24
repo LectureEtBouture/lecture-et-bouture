@@ -49,9 +49,12 @@ export function LivreFormLibrairie({ livre }: { livre?: Livre }) {
                 </div>
 
                 <div>
-                    <label className={labelClass}>Description (surcouche)</label>
+                    <label className={labelClass}>
+                        Description (surcouche)
+                    </label>
                     <p className="text-[11px] text-muted mb-2">
-                        Remplace la description Google Books si renseignée. Toujours affichée.
+                        Remplace la description Google Books si renseignée.
+                        Toujours affichée.
                     </p>
                     <RteField
                         name="description"

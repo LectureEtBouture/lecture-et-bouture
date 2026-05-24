@@ -3,7 +3,12 @@
 import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { db } from '@/db';
-import { articles, articlesCategories, articlesTags, articlesLies } from '@/db/schema';
+import {
+    articles,
+    articlesCategories,
+    articlesTags,
+    articlesLies,
+} from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { auth } from '@/auth';
 import { z } from 'zod';
@@ -78,9 +83,14 @@ export async function createArticle(formData: FormData) {
     }
 
     if (parsed.tagIds.length > 0) {
-        await db.insert(articlesTags).values(
-            parsed.tagIds.map((tagId) => ({ articleId: article.id, tagId })),
-        );
+        await db
+            .insert(articlesTags)
+            .values(
+                parsed.tagIds.map((tagId) => ({
+                    articleId: article.id,
+                    tagId,
+                })),
+            );
     }
 
     invalidate();
@@ -148,9 +158,9 @@ export async function updateArticle(id: string, formData: FormData) {
     await db.delete(articlesTags).where(eq(articlesTags.articleId, id));
 
     if (parsed.tagIds.length > 0) {
-        await db.insert(articlesTags).values(
-            parsed.tagIds.map((tagId) => ({ articleId: id, tagId })),
-        );
+        await db
+            .insert(articlesTags)
+            .values(parsed.tagIds.map((tagId) => ({ articleId: id, tagId })));
     }
 
     invalidate();
