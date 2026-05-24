@@ -32,6 +32,15 @@ export async function getPastEvenements() {
         .limit(3);
 }
 
+export async function getEvenementById(id: string) {
+    return db
+        .select()
+        .from(evenements)
+        .where(and(publie, eq(evenements.id, id)))
+        .limit(1)
+        .then((rows) => rows[0] ?? null);
+}
+
 export async function getEvenementMisEnAvant() {
     const now = new Date();
 

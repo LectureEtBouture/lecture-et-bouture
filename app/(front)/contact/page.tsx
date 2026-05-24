@@ -17,6 +17,9 @@ interface Props {
 
 async function handleContact(formData: FormData) {
     'use server';
+    // Honeypot — bots fill hidden fields, humans don't
+    if (formData.get('website')) redirect('/contact?sent=1');
+
     const name = formData.get('name') as string;
     const email = formData.get('email') as string;
     const message = formData.get('message') as string;
@@ -71,6 +74,22 @@ export default async function ContactPage({ searchParams }: Props) {
 
             {!sent && (
                 <form action={handleContact} className="flex flex-col gap-6">
+                    {/* Honeypot */}
+                    <input
+                        type="text"
+                        name="website"
+                        autoComplete="off"
+                        tabIndex={-1}
+                        aria-hidden="true"
+                        style={{
+                            position: 'absolute',
+                            left: '-9999px',
+                            width: '1px',
+                            height: '1px',
+                            overflow: 'hidden',
+                            opacity: 0,
+                        }}
+                    />
                     <label className="flex flex-col gap-1.5">
                         <span className="text-[11px] uppercase tracking-[0.1em] font-medium text-foreground">
                             Nom

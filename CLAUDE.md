@@ -1,6 +1,18 @@
 @AGENTS.md
 
+## Toutes les règles cu dessous sont TOUJOURS à prendre en compte
+
+Econimoe de tokens au possible.
+
+- **Si ambigu** : Demande. Ne choisis pas en silence.
+- **Diff minimaliste** : Touche uniquement ce qui est demandé.
+- **Définis "Done"** : Avant de commencer, une ligne suffit.
+- **Vérifie le code lastest** : Jamais d'hypothese.
+- **Code minimaliste** : Pas de feature spéculative.
+
 # Conventions de code
+
+Pour ce qui est design, invoke le skill impeccable.
 
 ## Couleurs
 

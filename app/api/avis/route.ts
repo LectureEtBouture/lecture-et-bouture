@@ -3,13 +3,42 @@ import { db } from '@/db';
 import { avis } from '@/db/schema';
 import { getOrCreateEnrichissement } from '@/lib/queries/enrichissements';
 
+const WINDOW_MS = 15 * 60 * 1000; // 15 min
+const MAX_REQUESTS = 5;
+
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function checkRateLimit(ip: string): boolean {
+    const now = Date.now();
+    const entry = rateLimitMap.get(ip);
+    if (!entry || now > entry.resetAt) {
+        rateLimitMap.set(ip, { count: 1, resetAt: now + WINDOW_MS });
+        return true;
+    }
+    if (entry.count >= MAX_REQUESTS) return false;
+    entry.count++;
+    return true;
+}
+
 export async function POST(req: NextRequest) {
+    const ip =
+        req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? '0.0.0.0';
+    if (!checkRateLimit(ip)) {
+        return NextResponse.json(
+            { error: 'Trop de requêtes. Réessayez dans 15 minutes.' },
+            { status: 429 },
+        );
+    }
+
     const body = await req.json().catch(() => null);
     if (!body) {
         return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
     }
 
-    const { type, itemId, auteurNom, note, texte } = body;
+    const { type, itemId, auteurNom, note, texte, website } = body;
+
+    // Honeypot — silently succeed so bots don't retry
+    if (website) return NextResponse.json({ ok: true }, { status: 201 });
 
     const validType =
         type === 'livre' || type === 'bouture' || type === 'article';

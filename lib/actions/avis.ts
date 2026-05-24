@@ -31,7 +31,7 @@ export async function validerAvis(id: string) {
         entityId: id,
         entityLabel: row?.auteurNom,
     });
-    revalidateTag('avis', 'max');
+    revalidateTag('avis', { expire: 0 });
     revalidatePath('/admin/avis');
 }
 
@@ -50,7 +50,7 @@ export async function masquerAvis(id: string) {
         entityId: id,
         entityLabel: row?.auteurNom,
     });
-    revalidateTag('avis', 'max');
+    revalidateTag('avis', { expire: 0 });
     revalidatePath('/admin/avis');
 }
 
@@ -69,7 +69,7 @@ export async function remettreEnLigneAvis(id: string) {
         entityId: id,
         entityLabel: row?.auteurNom,
     });
-    revalidateTag('avis', 'max');
+    revalidateTag('avis', { expire: 0 });
     revalidatePath('/admin/avis');
 }
 
@@ -88,7 +88,7 @@ export async function deleteAvis(id: string) {
         entityId: id,
         entityLabel: row?.auteurNom,
     });
-    revalidateTag('avis', 'max');
+    revalidateTag('avis', { expire: 0 });
     revalidatePath('/admin/avis');
 }
 

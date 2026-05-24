@@ -4,6 +4,8 @@ import {
     articles,
     articlesCategories,
     categoriesBlog,
+    articlesTags,
+    tagsBlog,
     articlesLies,
 } from '@/db/schema';
 import { eq, desc, and, or, asc } from 'drizzle-orm';
@@ -31,13 +33,32 @@ export type ArticleAvecExtrait = ArticleItem & { extrait: string };
 export type ArticlesSort = 'recents' | 'anciens' | 'alpha';
 
 export const getArticles = unstable_cache(
-    async (categorieSlug?: string, sort: ArticlesSort = 'recents') => {
+    async (
+        categorieSlug?: string,
+        sort: ArticlesSort = 'recents',
+        tag?: string,
+    ) => {
         const orderBy =
             sort === 'anciens'
                 ? asc(articles.publishedAt)
                 : sort === 'alpha'
                   ? asc(articles.titre)
                   : desc(articles.publishedAt);
+
+        if (tag) {
+            return db
+                .select(articleSelect)
+                .from(articles)
+                .innerJoin(
+                    articlesTags,
+                    eq(articlesTags.articleId, articles.id),
+                )
+                .innerJoin(tagsBlog, eq(tagsBlog.id, articlesTags.tagId))
+                .where(
+                    and(eq(articles.publie, true), eq(tagsBlog.slug, tag)),
+                )
+                .orderBy(orderBy);
+        }
 
         if (categorieSlug) {
             return db
@@ -67,17 +88,30 @@ export const getArticles = unstable_cache(
             .orderBy(orderBy);
     },
     ['articles'],
-    { tags: ['articles'] },
+    { tags: ['articles', 'tags-blog'] },
 );
 
 export const getArticlesAdmin = unstable_cache(
-    async () =>
-        db
+    async (tagSlug?: string) => {
+        if (tagSlug) {
+            return db
+                .select(articleSelect)
+                .from(articles)
+                .innerJoin(
+                    articlesTags,
+                    eq(articlesTags.articleId, articles.id),
+                )
+                .innerJoin(tagsBlog, eq(tagsBlog.id, articlesTags.tagId))
+                .where(eq(tagsBlog.slug, tagSlug))
+                .orderBy(desc(articles.createdAt));
+        }
+        return db
             .select(articleSelect)
             .from(articles)
-            .orderBy(desc(articles.createdAt)),
+            .orderBy(desc(articles.createdAt));
+    },
     ['articles-admin'],
-    { tags: ['articles'] },
+    { tags: ['articles', 'tags-blog'] },
 );
 
 export const getArticleBySlug = unstable_cache(

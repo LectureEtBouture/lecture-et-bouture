@@ -41,6 +41,7 @@ const statements = [
     `ALTER TABLE livres ADD COLUMN IF NOT EXISTS titre text`,
     `ALTER TABLE livres ADD COLUMN IF NOT EXISTS image text`,
     `ALTER TABLE livres ADD COLUMN IF NOT EXISTS image_alt text`,
+    `ALTER TABLE livres ADD COLUMN IF NOT EXISTS description text`,
 
     `CREATE TABLE IF NOT EXISTS livres_genres (
         livre_id uuid NOT NULL REFERENCES livres(id) ON DELETE CASCADE,
@@ -207,6 +208,32 @@ const statements = [
                 FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE SET NULL;
         END IF;
     END $$`,
+
+    `CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        email varchar(254) NOT NULL UNIQUE,
+        subscribed_at timestamptz NOT NULL DEFAULT now()
+    )`,
+
+    `CREATE TABLE IF NOT EXISTS tags_blog (
+        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        nom varchar(100) NOT NULL UNIQUE,
+        slug varchar(100) NOT NULL UNIQUE,
+        created_at timestamp NOT NULL DEFAULT now()
+    )`,
+
+    `CREATE TABLE IF NOT EXISTS articles_tags (
+        article_id uuid NOT NULL REFERENCES articles(id) ON DELETE CASCADE,
+        tag_id uuid NOT NULL REFERENCES tags_blog(id) ON DELETE CASCADE,
+        PRIMARY KEY (article_id, tag_id)
+    )`,
+
+    `CREATE TABLE IF NOT EXISTS diffusions (
+        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        article_id uuid NOT NULL REFERENCES articles(id) ON DELETE CASCADE,
+        sent_at timestamptz NOT NULL DEFAULT now(),
+        recipient_count integer NOT NULL
+    )`,
 ];
 
 async function main() {

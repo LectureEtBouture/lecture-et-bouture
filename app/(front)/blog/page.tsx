@@ -5,6 +5,7 @@ import {
     type ArticlesSort,
 } from '@/lib/queries/articles';
 import { getCategoriesBlog } from '@/lib/queries/categories-blog';
+import { getTagsBlog } from '@/lib/queries/tags-blog';
 import { ArticleLede, ArticleRow } from './_components/ArticleListingRow';
 import { BlogFiltres } from './_components/BlogFiltres';
 
@@ -12,6 +13,9 @@ export const metadata: Metadata = {
     title: 'Blog',
     description:
         'Réflexions sur les livres, les plantes, et ce qui pousse lentement.',
+    alternates: {
+        types: { 'application/rss+xml': '/blog/feed.xml' },
+    },
 };
 
 const VALID_SORTS: ArticlesSort[] = ['recents', 'anciens', 'alpha'];
@@ -19,16 +23,17 @@ const VALID_SORTS: ArticlesSort[] = ['recents', 'anciens', 'alpha'];
 export default async function BlogPage({
     searchParams,
 }: {
-    searchParams: Promise<{ categorie?: string; sort?: string }>;
+    searchParams: Promise<{ categorie?: string; sort?: string; tag?: string }>;
 }) {
-    const { categorie, sort: sortParam } = await searchParams;
+    const { categorie, sort: sortParam, tag } = await searchParams;
     const sort: ArticlesSort = VALID_SORTS.includes(sortParam as ArticlesSort)
         ? (sortParam as ArticlesSort)
         : 'recents';
 
-    const [articlesList, categories] = await Promise.all([
-        getArticles(categorie, sort),
+    const [articlesList, categories, tags] = await Promise.all([
+        getArticles(categorie, sort, tag),
         getCategoriesBlog(),
+        getTagsBlog(),
     ]);
 
     const categoriesMap = await getCategoriesParArticles(
@@ -52,14 +57,16 @@ export default async function BlogPage({
 
             <BlogFiltres
                 categories={categories}
+                tags={tags}
                 categorieActive={categorie}
+                tagActive={tag}
                 sortActive={sort}
             />
 
             {articlesList.length === 0 ? (
                 <p className="text-sm text-muted py-16 text-center">
-                    {categorie
-                        ? 'Aucun article dans cette catégorie.'
+                    {categorie || tag
+                        ? 'Aucun article pour ce filtre.'
                         : 'Les premières chroniques arrivent bientôt.'}
                 </p>
             ) : (

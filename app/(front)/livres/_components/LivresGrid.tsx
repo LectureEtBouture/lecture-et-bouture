@@ -14,11 +14,13 @@ const API_PAGE_SIZE = 40;
 
 export function LivresGrid({
     initialItems,
+    rawInitialCount,
     filters,
     genresList,
     pageSize,
 }: {
     initialItems: LivreComplet[];
+    rawInitialCount?: number;
     filters: LivresFilters;
     genresList: Genre[];
     pageSize: number;
@@ -26,10 +28,12 @@ export function LivresGrid({
     const isCat = !!filters.cat;
     const [items, setItems] = useState<LivreComplet[]>(initialItems);
     const [loading, setLoading] = useState(false);
-    // For cat browse: assume more if we got any results (raw API may have filtered more).
-    // For regular browse: hasMore only if we filled the page exactly.
+    // Cat browse: use raw count (before ebook filter) to avoid phantom extra request.
+    // Regular browse: hasMore only if we filled the page exactly.
     const [hasMore, setHasMore] = useState(
-        isCat ? initialItems.length > 0 : initialItems.length === pageSize,
+        isCat
+            ? (rawInitialCount ?? initialItems.length) >= API_PAGE_SIZE
+            : initialItems.length === pageSize,
     );
     const sentinelRef = useRef<HTMLDivElement>(null);
     const loadingRef = useRef(false);

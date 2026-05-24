@@ -147,6 +147,14 @@ export function EvenementItem({
                         {evenement.description}
                     </p>
                 )}
+                {status !== 'past' && (
+                    <a
+                        href={`/evenements/${evenement.id}/ical`}
+                        className="inline-block text-[10px] uppercase tracking-[0.1em] text-muted hover:text-primary transition-colors pt-1"
+                    >
+                        + Calendrier
+                    </a>
+                )}
             </div>
             {evenement.image && (
                 <div className="shrink-0 w-16 h-16 sm:w-20 sm:h-20 relative">

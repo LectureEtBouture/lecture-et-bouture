@@ -35,7 +35,7 @@ export function ArticleCoverBlock({
     return (
         <div
             className={`relative overflow-hidden ${className}`}
-            style={{ backgroundColor: bg }}
+            style={image ? undefined : { backgroundColor: bg }}
         >
             {image ? (
                 <Image

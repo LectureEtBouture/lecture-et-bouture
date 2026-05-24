@@ -22,6 +22,7 @@ async function getEnrichissementsByIds(
             prix: livres.prix,
             choixLibrairie: livres.choixLibrairie,
             noteDeLaLibrairie: livres.noteDeLaLibrairie,
+            description: livres.description,
             rayonId: livres.rayonId,
             numeroSerie: livres.numeroSerie,
             noteMoyenne: livres.noteMoyenne,

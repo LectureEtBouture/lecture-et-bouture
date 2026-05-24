@@ -41,7 +41,7 @@ export function ArticleLede({
                     </div>
                     <div className="bg-surface flex flex-col justify-between p-10 lg:p-14">
                         <div className="space-y-5">
-                            <ArticleCategoriChips categories={categories} />
+                            <ArticleCategoriChips categories={categories} linked={false} />
                             <h2 className="font-serif text-[clamp(1.5rem,2.5vw,2.25rem)] font-bold text-foreground leading-[1.1] tracking-[-0.01em] group-hover:text-primary transition-colors">
                                 {article.titre}
                             </h2>
@@ -71,7 +71,7 @@ export function ArticleLede({
             className="group block bg-surface py-14 px-10 lg:px-16"
         >
             <div className="max-w-[64ch] space-y-6">
-                <ArticleCategoriChips categories={categories} />
+                <ArticleCategoriChips categories={categories} linked={false} />
                 <h2 className="font-serif text-[clamp(2rem,4vw,3.25rem)] font-bold text-foreground leading-[1.05] tracking-[-0.02em] group-hover:text-primary transition-colors">
                     {article.titre}
                 </h2>
@@ -121,7 +121,7 @@ export function ArticleRow({
         );
         const content = (
             <div className="flex flex-col justify-center p-8 lg:p-10 space-y-4">
-                <ArticleCategoriChips categories={categories} />
+                <ArticleCategoriChips categories={categories} linked={false} />
                 <h2 className="font-serif text-xl lg:text-2xl font-bold text-foreground leading-[1.15] group-hover:text-primary transition-colors">
                     {article.titre}
                 </h2>
@@ -157,7 +157,7 @@ export function ArticleRow({
             className="group grid md:grid-cols-[3fr_2fr] bg-surface hover:bg-surface/60 transition-colors"
         >
             <div className="py-8 px-8 lg:px-10 space-y-3">
-                <ArticleCategoriChips categories={categories} />
+                <ArticleCategoriChips categories={categories} linked={false} />
                 <h2 className="font-serif text-lg lg:text-xl font-bold text-foreground leading-[1.2] group-hover:text-primary transition-colors">
                     {article.titre}
                 </h2>

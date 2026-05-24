@@ -1,12 +1,18 @@
 'use server';
 
 import { z } from 'zod';
+import { db } from '@/db';
+import { newsletterSubscribers } from '@/db/schema';
 
 const emailSchema = z.string().email();
 
 export async function subscribeToNewsletter(
     email: string,
+    honeypot = '',
 ): Promise<{ ok: boolean; error?: string }> {
+    // Silently succeed for bots that fill the hidden field
+    if (honeypot) return { ok: true };
+
     const parsed = emailSchema.safeParse(email);
     if (!parsed.success)
         return { ok: false, error: 'Adresse e-mail invalide.' };
@@ -29,7 +35,13 @@ export async function subscribeToNewsletter(
             }),
         });
 
-        if (res.ok || res.status === 409) return { ok: true };
+        if (res.ok || res.status === 409) {
+            await db
+                .insert(newsletterSubscribers)
+                .values({ email: parsed.data })
+                .onConflictDoNothing();
+            return { ok: true };
+        }
 
         const data = await res.json().catch(() => ({}));
         return {

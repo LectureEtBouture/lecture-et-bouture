@@ -16,6 +16,7 @@ const baseNavItems = [
     { href: '/admin/selections', label: 'Sélections' },
     { href: '/admin/blog', label: 'Blog' },
     { href: '/admin/pages', label: 'Pages' },
+    { href: '/admin/newsletter', label: 'Newsletter' },
 ];
 
 function getAdminSectionItems(role?: string) {
@@ -115,9 +116,9 @@ function MobileMenu({
                             href="/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[11px] text-muted hover:text-primary transition-colors"
+                            className="text-[11px] px-2 py-0.5 border border-border text-muted hover:border-primary hover:text-primary transition-colors"
                         >
-                            ↗ Voir le site
+                            Site →
                         </a>
                     </div>
                     <button
@@ -271,10 +272,9 @@ export function AdminShell({
                                 href="/"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-[11px] text-muted hover:text-primary transition-colors"
-                                aria-label="Voir le site"
+                                className="text-[11px] px-2 py-0.5 border border-border text-muted hover:border-primary hover:text-primary transition-colors"
                             >
-                                ↗ Site
+                                Site →
                             </a>
                         </div>
                     </div>

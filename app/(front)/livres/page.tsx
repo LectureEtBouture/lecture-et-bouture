@@ -140,6 +140,7 @@ export default async function LivresPage({ searchParams }: Props) {
                         <LivresGrid
                             key={gridKey}
                             initialItems={livresList}
+                            rawInitialCount={livresListRaw.length}
                             filters={activeFilters}
                             genresList={genresList}
                             pageSize={40}

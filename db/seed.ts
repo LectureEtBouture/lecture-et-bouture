@@ -2,180 +2,25 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { sql } from 'drizzle-orm';
 import { config } from 'dotenv';
-import { plantes, evenements, pagesEditoriales, parametres } from './schema';
-import bouturesJson from '../data/boutures.json';
-import avisJson from '../data/avis.json';
+import { pagesEditoriales, parametres } from './schema';
 
 config({ path: '.env.local' });
-
-type BoutureJson = {
-    id: number;
-    slug: string;
-    nom: string;
-    espece: string | null;
-    famille: string | null;
-    prix: string;
-    description: string | null;
-    conseilsEntretien: string | null;
-    difficulte: 'facile' | 'moyen' | 'difficile' | null;
-    lumiere: 'ombre' | 'mi-ombre' | 'lumiere-vive' | 'plein-soleil' | null;
-    arrosage: 'rare' | 'modere' | 'regulier' | 'abondant' | null;
-    images: string[];
-    noteMoyenne: string | null;
-    choixLibrairie: boolean;
-    stock: number;
-};
-
-type AvisJson = {
-    id: number;
-    type: string;
-    livreId: number | null;
-    planteId: number | null;
-    auteurNom: string;
-    note: number;
-    texte: string | null;
-    approuve: boolean;
-};
 
 const client = postgres(process.env['DATABASE_URL'] as string);
 const db = drizzle(client);
 
 async function main() {
-    await db.execute(
-        sql`TRUNCATE TABLE avis, selection_items, evenements, livres_genres, livres, plantes, selections, genres, rayons CASCADE`,
-    );
+    if (process.env.NODE_ENV === 'production') {
+        throw new Error('db:seed interdit en production');
+    }
+
     await db.execute(sql`TRUNCATE TABLE pages_editoriales`);
     await db.execute(sql`TRUNCATE TABLE parametres`);
-
-    // Boutures / plantes
-    const planteIdMap = new Map<number, string>();
-    const sortedBoutures = [...(bouturesJson as BoutureJson[])].sort(
-        (a, b) => a.id - b.id,
-    );
-    for (const bouture of sortedBoutures) {
-        const [row] = await db
-            .insert(plantes)
-            .values({
-                slug: bouture.slug,
-                nom: bouture.nom,
-                espece: bouture.espece ?? null,
-                famille: bouture.famille ?? null,
-                prix: bouture.prix,
-                description: bouture.description ?? null,
-                conseilsEntretien: bouture.conseilsEntretien ?? null,
-                difficulte: bouture.difficulte ?? null,
-                lumiere: bouture.lumiere ?? null,
-                arrosage: bouture.arrosage ?? null,
-                image: bouture.images[0] ?? null,
-                noteMoyenne: bouture.noteMoyenne ?? null,
-                choixLibrairie: bouture.choixLibrairie,
-                stock: bouture.stock,
-            })
-            .returning({ id: plantes.id });
-        planteIdMap.set(bouture.id, row.id);
-    }
-    console.log(`Boutures : ${sortedBoutures.length}`);
-
-    // Événements
-    const now = new Date();
-    const evenementsData = [
-        {
-            titre: 'Rencontre avec Baptiste Morizot',
-            description:
-                "L'auteur de « Manières d'être vivant » dialogue avec notre équipe autour de la question du vivant et de notre rapport aux autres espèces. Entrée libre, places limitées.",
-            lieu: 'Lecture & Bouture — espace principal',
-            dateDebut: new Date(
-                now.getFullYear(),
-                now.getMonth() + 1,
-                15,
-                18,
-                30,
-            ),
-            dateFin: new Date(
-                now.getFullYear(),
-                now.getMonth() + 1,
-                15,
-                20,
-                30,
-            ),
-            publie: true,
-        },
-        {
-            titre: 'Atelier boutures : multiplier ses plantes',
-            description:
-                'Apportez une bouture de chez vous, repartez avec trois nouvelles. Matériel fourni. Animé par notre botaniste. Inscription obligatoire — 8 places.',
-            lieu: 'Serre de la boutique',
-            dateDebut: new Date(
-                now.getFullYear(),
-                now.getMonth() + 1,
-                22,
-                10,
-                0,
-            ),
-            dateFin: new Date(
-                now.getFullYear(),
-                now.getMonth() + 1,
-                22,
-                12,
-                30,
-            ),
-            publie: true,
-        },
-        {
-            titre: 'Lecture à voix haute — Thoreau',
-            description:
-                'Une heure de lecture partagée autour de Walden. Passages choisis, discussion ouverte. Apportez votre propre exemplaire si vous en avez un.',
-            lieu: 'Coin lecture, fond de boutique',
-            dateDebut: new Date(
-                now.getFullYear(),
-                now.getMonth() + 2,
-                5,
-                19,
-                0,
-            ),
-            dateFin: new Date(now.getFullYear(), now.getMonth() + 2, 5, 20, 0),
-            publie: true,
-        },
-        {
-            titre: 'Vernissage — « Planches botaniques »',
-            description:
-                "Exposition de planches botaniques originales. Aquarelles d'Élise Fontaine. Présente le soir du vernissage.",
-            lieu: 'Galerie attenante',
-            dateDebut: new Date(
-                now.getFullYear(),
-                now.getMonth() - 1,
-                10,
-                18,
-                0,
-            ),
-            dateFin: new Date(now.getFullYear(), now.getMonth() - 1, 10, 21, 0),
-            publie: true,
-        },
-        {
-            titre: 'Dédicace — Francis Hallé',
-            description:
-                "Séance de dédicace exceptionnelle autour de l'Herbier du Monde. File d'attente dès 14h.",
-            lieu: 'Lecture & Bouture',
-            dateDebut: new Date(
-                now.getFullYear(),
-                now.getMonth() - 2,
-                18,
-                15,
-                0,
-            ),
-            dateFin: new Date(now.getFullYear(), now.getMonth() - 2, 18, 18, 0),
-            publie: true,
-        },
-    ];
-    for (const ev of evenementsData) {
-        await db.insert(evenements).values(ev);
-    }
-    console.log(`Événements : ${evenementsData.length}`);
 
     // Pages éditoriales
     const conceptContenu =
         '<h2>Une librairie qui ne ressemble pas à une librairie</h2>' +
-        "<p>Lecture &amp; Boutures est née d'une conviction simple : les livres et les plantes partagent la même exigence. Ils demandent du temps, de l'attention, un espace pour exister. Ils ne s'imposent pas — ils s'offrent à qui prend la peine de les choisir.</p>" +
+        "<p>Lecture &amp; Bouture est née d'une conviction simple : les livres et les plantes partagent la même exigence. Ils demandent du temps, de l'attention, un espace pour exister. Ils ne s'imposent pas — ils s'offrent à qui prend la peine de les choisir.</p>" +
         "<p>Notre boutique réunit ces deux mondes sous le même toit. Côté livres, une sélection soignée de titres académiques, de littérature de fond et d'essais qui méritent d'être lus lentement. Côté boutures, des spécimens rares choisis pour leur caractère, accompagnés de conseils d'entretien fiables.</p>" +
         '<h2>Le rôle de la libraire</h2>' +
         '<p>Chaque titre présent dans notre catalogue a été lu, tenu en mains, discuté. Notre équipe ne référence pas : elle sélectionne. Cette différence est notre engagement principal.</p>' +
@@ -205,7 +50,7 @@ async function main() {
     }
     console.log(`Pages éditoriales : ${pagesInitiales.length}`);
 
-    // Paramètres
+    // Paramètres par défaut
     const parametresInitiaux = [
         {
             cle: 'horaires',

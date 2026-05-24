@@ -72,6 +72,7 @@ export const livres = pgTable('livres', {
     prix: decimal('prix', { precision: 8, scale: 2 }),
     choixLibrairie: boolean('choix_librairie').notNull().default(false),
     noteDeLaLibrairie: text('note_de_la_librairie'),
+    description: text('description'),
     numeroSerie: integer('numero_serie'),
     noteMoyenne: decimal('note_moyenne', { precision: 3, scale: 2 }),
     image: text('image'),
@@ -264,6 +265,43 @@ export const articlesCategories = pgTable(
             .references(() => categoriesBlog.id, { onDelete: 'cascade' }),
     },
     (t) => [primaryKey({ columns: [t.articleId, t.categorieId] })],
+);
+
+export const newsletterSubscribers = pgTable('newsletter_subscribers', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    email: varchar('email', { length: 254 }).notNull().unique(),
+    subscribedAt: timestamp('subscribed_at', { withTimezone: true })
+        .notNull()
+        .defaultNow(),
+});
+
+export const diffusions = pgTable('diffusions', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    articleId: uuid('article_id')
+        .notNull()
+        .references(() => articles.id, { onDelete: 'cascade' }),
+    sentAt: timestamp('sent_at', { withTimezone: true }).notNull().defaultNow(),
+    recipientCount: integer('recipient_count').notNull(),
+});
+
+export const tagsBlog = pgTable('tags_blog', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    nom: varchar('nom', { length: 100 }).notNull().unique(),
+    slug: varchar('slug', { length: 100 }).notNull().unique(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const articlesTags = pgTable(
+    'articles_tags',
+    {
+        articleId: uuid('article_id')
+            .notNull()
+            .references(() => articles.id, { onDelete: 'cascade' }),
+        tagId: uuid('tag_id')
+            .notNull()
+            .references(() => tagsBlog.id, { onDelete: 'cascade' }),
+    },
+    (t) => [primaryKey({ columns: [t.articleId, t.tagId] })],
 );
 
 export const articlesLies = pgTable(

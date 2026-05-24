@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { ArticleForm } from '@/components/admin/ArticleForm';
 import { ArticlesLiesManager } from './_components/ArticlesLiesManager';
+import { DiffusionWidget } from './_components/DiffusionWidget';
 import { updateArticle } from '@/lib/actions/articles';
 import {
     getArticleById,
@@ -10,6 +11,8 @@ import {
 } from '@/lib/queries/articles';
 import { getCategoriesBlog } from '@/lib/queries/categories-blog';
 import { getAuteursBlog } from '@/lib/queries/auteurs-blog';
+import { getDiffusionForArticle, getSubscriberCount } from '@/lib/actions/diffusions';
+import { getTagsBlog, getTagsArticle } from '@/lib/queries/tags-blog';
 
 export default async function ModifierArticlePage({
     params,
@@ -25,6 +28,10 @@ export default async function ModifierArticlePage({
         lies,
         tousArticles,
         categoriesArticle,
+        lastDiffusion,
+        subscriberCount,
+        tags,
+        tagsArticle,
     ] = await Promise.all([
         getArticleById(id),
         getCategoriesBlog(),
@@ -32,6 +39,10 @@ export default async function ModifierArticlePage({
         getArticlesLies(id),
         getArticlesAdmin(),
         getCategoriesArticle(id),
+        getDiffusionForArticle(id),
+        getSubscriberCount(),
+        getTagsBlog(),
+        getTagsArticle(id),
     ]);
 
     if (!article) notFound();
@@ -47,6 +58,7 @@ export default async function ModifierArticlePage({
                 action={action}
                 auteurs={auteurs}
                 categories={categories}
+                tags={tags}
                 defaultValues={{
                     titre: article.titre,
                     slug: article.slug,
@@ -59,6 +71,7 @@ export default async function ModifierArticlePage({
                     categorieIds: categoriesArticle.map(
                         (categorie) => categorie.id,
                     ),
+                    tagIds: tagsArticle.map((tag) => tag.id),
                 }}
             />
             <ArticlesLiesManager
@@ -66,6 +79,14 @@ export default async function ModifierArticlePage({
                 lies={lies}
                 tous={tousArticles}
             />
+            {article.publie && (
+                <DiffusionWidget
+                    articleId={id}
+                    articleTitre={article.titre}
+                    subscriberCount={subscriberCount}
+                    lastDiffusion={lastDiffusion}
+                />
+            )}
         </div>
     );
 }

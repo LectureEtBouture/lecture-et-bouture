@@ -8,6 +8,7 @@ import {
     getArticlesParCategorie,
     getCategoriesArticle,
 } from '@/lib/queries/articles';
+import { getTagsArticle } from '@/lib/queries/tags-blog';
 import { getAvisForArticle } from '@/lib/db/avis';
 import { ArticleHeader } from './_components/ArticleHeader';
 import { ArticlesLiesSection } from './_components/ArticlesLiesSection';
@@ -38,8 +39,9 @@ export default async function ArticlePage({
     const article = await getArticleBySlug(slug);
     if (!article || !article.publie) notFound();
 
-    const [categories, avis, lies] = await Promise.all([
+    const [categories, tags, avis, lies] = await Promise.all([
         getCategoriesArticle(article.id),
+        getTagsArticle(article.id),
         getAvisForArticle(article.id),
         getArticlesLies(article.id),
     ]);
@@ -62,6 +64,7 @@ export default async function ArticlePage({
                 image={article.image}
                 imageAlt={article.imageAlt}
                 categories={categories}
+                tags={tags}
             />
 
             {safeHtml && (
@@ -81,6 +84,7 @@ export default async function ArticlePage({
             <div className="max-w-[72ch] mx-auto px-6 mb-4">
                 <AvisArticleSection avis={avis} articleId={article.id} />
             </div>
+
         </article>
     );
 }

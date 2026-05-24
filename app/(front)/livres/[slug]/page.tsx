@@ -19,6 +19,8 @@ import { LivreBreadcrumb } from './_components/LivreBreadcrumb';
 import { LivreHeader } from './_components/LivreHeader';
 import { AvisSection } from '@/components/ui/AvisSection';
 import { VisitTracker } from '@/components/ui/VisitTracker';
+import { WishlistButton } from '@/components/ui/WishlistButton';
+import { ShareButton } from '@/components/ui/ShareButton';
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -55,16 +57,26 @@ export default async function LivrePage({ params }: Props) {
                 : Promise.resolve([]),
         ]);
     const coverColor = getCoverColor(primaryGenreId);
-    const descriptionRaw = livre.description
-        ? sanitizeRte(livre.description)
-        : null;
-    const descriptionText =
-        descriptionRaw?.replace(/<[^>]*>/g, '').trim() ?? '';
-    const descriptionHtml =
-        descriptionText.length >= 20 &&
-        (livre.language === 'fr' || livre.language === null)
-            ? descriptionRaw
-            : null;
+
+    // descriptionAdmin (saisie BO) prioritaire — toujours affichée sans filtre langue
+    // description (Google Books) — masquée si langue ≠ fr ou texte < 20 chars
+    const descriptionHtml = (() => {
+        if (livre.descriptionAdmin) {
+            const sanitized = sanitizeRte(livre.descriptionAdmin);
+            return sanitized.replace(/<[^>]*>/g, '').trim().length >= 20
+                ? sanitized
+                : null;
+        }
+        if (livre.description) {
+            const sanitized = sanitizeRte(livre.description);
+            const text = sanitized.replace(/<[^>]*>/g, '').trim();
+            return text.length >= 20 &&
+                (livre.language === 'fr' || livre.language === null)
+                ? sanitized
+                : null;
+        }
+        return null;
+    })();
 
     return (
         <div className="max-w-6xl mx-auto px-6 py-16">
@@ -90,6 +102,17 @@ export default async function LivrePage({ params }: Props) {
                         rayon={rayon ?? undefined}
                     />
                     <LivreHeader livre={livre} />
+
+                    <div className="flex items-center gap-2">
+                        <WishlistButton
+                            slug={livre.slug}
+                            titre={livre.titre}
+                            auteur={livre.auteur ?? undefined}
+                            coverColor={coverColor}
+                            image={livre.imageUrl ?? undefined}
+                        />
+                        <ShareButton titre={livre.titre} />
+                    </div>
 
                     {descriptionHtml && (
                         <div className="space-y-2">

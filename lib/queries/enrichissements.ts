@@ -12,6 +12,7 @@ async function rowToEnrichissement(row: {
     prix: string | null;
     choixLibrairie: boolean;
     noteDeLaLibrairie: string | null;
+    description: string | null;
     rayonId: string | null;
     numeroSerie: number | null;
     noteMoyenne: string | null;
@@ -28,6 +29,7 @@ async function rowToEnrichissement(row: {
         prix: row.prix,
         choixLibrairie: row.choixLibrairie,
         noteDeLaLibrairie: row.noteDeLaLibrairie,
+        description: row.description,
         rayonId: row.rayonId,
         genreIds: genreRows.map((g) => g.genreId),
         numeroSerie: row.numeroSerie,
@@ -53,6 +55,7 @@ const enrichissementSelect = {
     prix: livres.prix,
     choixLibrairie: livres.choixLibrairie,
     noteDeLaLibrairie: livres.noteDeLaLibrairie,
+    description: livres.description,
     rayonId: livres.rayonId,
     numeroSerie: livres.numeroSerie,
     noteMoyenne: livres.noteMoyenne,

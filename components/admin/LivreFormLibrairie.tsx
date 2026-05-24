@@ -4,6 +4,7 @@ import type { InferSelectModel } from 'drizzle-orm';
 import type { livres } from '@/db/schema';
 import { inputClass, labelClass, fieldsetClass } from './formStyles';
 import { ImageUpload } from './ImageUpload';
+import { RteField } from './RteField';
 
 type Livre = InferSelectModel<typeof livres>;
 
@@ -15,6 +16,7 @@ export function LivreFormLibrairie({ livre }: { livre?: Livre }) {
                 !!(
                     livre?.choixLibrairie ||
                     livre?.noteDeLaLibrairie ||
+                    livre?.description ||
                     livre?.image
                 )
             }
@@ -44,6 +46,17 @@ export function LivreFormLibrairie({ livre }: { livre?: Livre }) {
                     >
                         Choix de la librairie
                     </label>
+                </div>
+
+                <div>
+                    <label className={labelClass}>Description (surcouche)</label>
+                    <p className="text-[11px] text-muted mb-2">
+                        Remplace la description Google Books si renseignée. Toujours affichée.
+                    </p>
+                    <RteField
+                        name="description"
+                        defaultValue={livre?.description ?? ''}
+                    />
                 </div>
 
                 <div>

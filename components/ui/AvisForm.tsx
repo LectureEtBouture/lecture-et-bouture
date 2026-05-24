@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 type Props = {
     itemId: string;
@@ -45,6 +45,7 @@ export function AvisForm({ itemId, type }: Props) {
     const [auteurNom, setAuteurNom] = useState('');
     const [texte, setTexte] = useState('');
     const [status, setStatus] = useState<Status>('idle');
+    const honeypotRef = useRef<HTMLInputElement>(null);
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -54,7 +55,14 @@ export function AvisForm({ itemId, type }: Props) {
             const res = await fetch('/api/avis', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ itemId, type, note, auteurNom, texte }),
+                body: JSON.stringify({
+                    itemId,
+                    type,
+                    note,
+                    auteurNom,
+                    texte,
+                    website: honeypotRef.current?.value ?? '',
+                }),
             });
             setStatus(res.ok ? 'success' : 'error');
         } catch {
@@ -74,6 +82,23 @@ export function AvisForm({ itemId, type }: Props) {
 
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+            {/* Honeypot */}
+            <input
+                ref={honeypotRef}
+                type="text"
+                name="website"
+                autoComplete="off"
+                tabIndex={-1}
+                aria-hidden="true"
+                style={{
+                    position: 'absolute',
+                    left: '-9999px',
+                    width: '1px',
+                    height: '1px',
+                    overflow: 'hidden',
+                    opacity: 0,
+                }}
+            />
             <h2 className="text-xs uppercase tracking-widest text-muted">
                 Laisser un avis
             </h2>

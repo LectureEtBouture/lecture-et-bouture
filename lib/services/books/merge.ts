@@ -19,6 +19,7 @@ export function fusionner(
         imageUrl: enrichissement?.image ?? meta.imageUrl,
         imageAlt: enrichissement?.imageAlt ?? null,
         description: meta.description,
+        descriptionAdmin: enrichissement?.description ?? null,
         language: meta.language ?? null,
         categories: meta.categories ?? [],
         previewLink: meta.previewLink ?? null,

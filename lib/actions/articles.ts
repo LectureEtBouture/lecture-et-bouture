@@ -3,7 +3,7 @@
 import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { db } from '@/db';
-import { articles, articlesCategories, articlesLies } from '@/db/schema';
+import { articles, articlesCategories, articlesTags, articlesLies } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { auth } from '@/auth';
 import { z } from 'zod';
@@ -24,12 +24,14 @@ const articleSchema = z.object({
     publie: z.boolean().default(false),
     enAvant: z.boolean().default(false),
     categorieIds: z.array(z.string()).default([]),
+    tagIds: z.array(z.string()).default([]),
 });
 
 function invalidate() {
-    revalidateTag('articles', 'max');
-    revalidateTag('articles-en-avant', 'max');
-    revalidateTag('categories-blog', 'max');
+    revalidateTag('articles', { expire: 0 });
+    revalidateTag('articles-en-avant', { expire: 0 });
+    revalidateTag('categories-blog', { expire: 0 });
+    revalidateTag('tags-blog', { expire: 0 });
 }
 
 export async function createArticle(formData: FormData) {
@@ -46,6 +48,7 @@ export async function createArticle(formData: FormData) {
         publie: formData.get('publie') === 'on',
         enAvant: formData.get('enAvant') === 'on',
         categorieIds: formData.getAll('categorieIds') as string[],
+        tagIds: formData.getAll('tagIds') as string[],
     });
 
     const publishedAt = parsed.publie ? new Date() : null;
@@ -74,6 +77,12 @@ export async function createArticle(formData: FormData) {
         );
     }
 
+    if (parsed.tagIds.length > 0) {
+        await db.insert(articlesTags).values(
+            parsed.tagIds.map((tagId) => ({ articleId: article.id, tagId })),
+        );
+    }
+
     invalidate();
     redirect(`/admin/blog/${article.id}/modifier`);
 }
@@ -92,6 +101,7 @@ export async function updateArticle(id: string, formData: FormData) {
         publie: formData.get('publie') === 'on',
         enAvant: formData.get('enAvant') === 'on',
         categorieIds: formData.getAll('categorieIds') as string[],
+        tagIds: formData.getAll('tagIds') as string[],
     });
 
     const existing = await db
@@ -132,6 +142,14 @@ export async function updateArticle(id: string, formData: FormData) {
                 articleId: id,
                 categorieId,
             })),
+        );
+    }
+
+    await db.delete(articlesTags).where(eq(articlesTags.articleId, id));
+
+    if (parsed.tagIds.length > 0) {
+        await db.insert(articlesTags).values(
+            parsed.tagIds.map((tagId) => ({ articleId: id, tagId })),
         );
     }
 

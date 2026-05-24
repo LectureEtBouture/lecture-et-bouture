@@ -38,6 +38,7 @@ Table d'**enrichissements** principalement. Les métadonnées catalogue (auteur,
 | prix                 | numeric(8,2) | nullable (indicatif, surchargeable)            |
 | choix_librairie      | boolean      | NOT NULL, DEFAULT false                        |
 | note_de_la_librairie | text         | nullable                                       |
+| description          | text         | nullable (surcouche HTML Tiptap, prioritaire sur Google Books) |
 | numero_serie         | integer      | nullable                                       |
 | note_moyenne         | numeric(3,2) | nullable                                       |
 | image                | text         | nullable (couverture personnalisée MinIO)      |
@@ -87,20 +88,20 @@ Catalogue boutures / plantes.
 
 Avis clients — livres, boutures et articles blog.
 
-| Colonne     | Type         | Contraintes                                     |
-| ----------- | ------------ | ----------------------------------------------- |
-| id          | uuid         | PK                                              |
-| type        | text         | NOT NULL — `'livre'`, `'bouture'` ou `'article'`|
-| livre_id    | uuid         | nullable (pas de FK — avis orphelins OK)        |
-| bouture_id  | uuid         | nullable                                        |
-| article_id  | uuid         | nullable, FK → articles.id (ON DELETE SET NULL) |
-| produit_nom | varchar(300) | nullable (snapshot au dépôt)                    |
-| auteur_nom  | varchar(100) | NOT NULL                                        |
-| note        | integer      | **nullable** — absent pour les articles         |
-| texte       | text         | nullable                                        |
-| approuve    | boolean      | NOT NULL, DEFAULT false                         |
-| masque      | boolean      | NOT NULL, DEFAULT false                         |
-| created_at  | timestamp    | NOT NULL, DEFAULT now()                         |
+| Colonne     | Type         | Contraintes                                      |
+| ----------- | ------------ | ------------------------------------------------ |
+| id          | uuid         | PK                                               |
+| type        | text         | NOT NULL — `'livre'`, `'bouture'` ou `'article'` |
+| livre_id    | uuid         | nullable (pas de FK — avis orphelins OK)         |
+| bouture_id  | uuid         | nullable                                         |
+| article_id  | uuid         | nullable, FK → articles.id (ON DELETE SET NULL)  |
+| produit_nom | varchar(300) | nullable (snapshot au dépôt)                     |
+| auteur_nom  | varchar(100) | NOT NULL                                         |
+| note        | integer      | **nullable** — absent pour les articles          |
+| texte       | text         | nullable                                         |
+| approuve    | boolean      | NOT NULL, DEFAULT false                          |
+| masque      | boolean      | NOT NULL, DEFAULT false                          |
+| created_at  | timestamp    | NOT NULL, DEFAULT now()                          |
 
 > `livre_id` FK → `livres.id`. `bouture_id` et `article_id` sans FK stricte — permet des avis orphelins. `note` nullable depuis la migration blog (les avis articles n'ont pas de note étoiles).
 
@@ -129,20 +130,20 @@ Catégories des articles blog.
 
 Articles du blog.
 
-| Colonne      | Type         | Contraintes                          |
-| ------------ | ------------ | ------------------------------------ |
-| id           | uuid         | PK                                   |
-| slug         | varchar(200) | NOT NULL, UNIQUE                     |
-| titre        | varchar(300) | NOT NULL                             |
-| contenu      | text         | nullable (HTML Tiptap sanitisé)      |
-| image        | text         | nullable (chemin MinIO)              |
-| image_alt    | text         | nullable                             |
-| auteur_nom   | varchar(200) | nullable (champ libre, suggestions)  |
-| publie       | boolean      | NOT NULL, DEFAULT false              |
-| en_avant     | boolean      | NOT NULL, DEFAULT false              |
-| published_at | timestamp    | nullable (null = brouillon)          |
-| created_at   | timestamp    | NOT NULL, DEFAULT now()              |
-| updated_at   | timestamp    | NOT NULL, DEFAULT now()              |
+| Colonne      | Type         | Contraintes                         |
+| ------------ | ------------ | ----------------------------------- |
+| id           | uuid         | PK                                  |
+| slug         | varchar(200) | NOT NULL, UNIQUE                    |
+| titre        | varchar(300) | NOT NULL                            |
+| contenu      | text         | nullable (HTML Tiptap sanitisé)     |
+| image        | text         | nullable (chemin MinIO)             |
+| image_alt    | text         | nullable                            |
+| auteur_nom   | varchar(200) | nullable (champ libre, suggestions) |
+| publie       | boolean      | NOT NULL, DEFAULT false             |
+| en_avant     | boolean      | NOT NULL, DEFAULT false             |
+| published_at | timestamp    | nullable (null = brouillon)         |
+| created_at   | timestamp    | NOT NULL, DEFAULT now()             |
+| updated_at   | timestamp    | NOT NULL, DEFAULT now()             |
 
 > `publie` passe à `true` + `published_at` est horodaté à la première publication (via `togglePublie`). Les articles en avant (`en_avant = true`) alimentent la section blog de la home — fallback récents si aucun.
 
@@ -150,22 +151,22 @@ Articles du blog.
 
 Relation N-N articles ↔ catégories blog.
 
-| Colonne      | Type | Contraintes                                         |
-| ------------ | ---- | --------------------------------------------------- |
-| article_id   | uuid | NOT NULL, FK → articles.id (CASCADE DELETE)         |
-| categorie_id | uuid | NOT NULL, FK → categories_blog.id (CASCADE DELETE)  |
-| PK           | —    | (article_id, categorie_id)                          |
+| Colonne      | Type | Contraintes                                        |
+| ------------ | ---- | -------------------------------------------------- |
+| article_id   | uuid | NOT NULL, FK → articles.id (CASCADE DELETE)        |
+| categorie_id | uuid | NOT NULL, FK → categories_blog.id (CASCADE DELETE) |
+| PK           | —    | (article_id, categorie_id)                         |
 
 ### `articles_lies`
 
 Liens bidirectionnels entre articles (ex: articles complémentaires).
 
-| Colonne      | Type | Contraintes                                      |
-| ------------ | ---- | ------------------------------------------------ |
-| article_a_id | uuid | NOT NULL, FK → articles.id (CASCADE DELETE)      |
-| article_b_id | uuid | NOT NULL, FK → articles.id (CASCADE DELETE)      |
-| PK           | —    | (article_a_id, article_b_id)                     |
-| CHECK        | —    | `article_a_id < article_b_id` (anti-doublon)     |
+| Colonne      | Type | Contraintes                                  |
+| ------------ | ---- | -------------------------------------------- |
+| article_a_id | uuid | NOT NULL, FK → articles.id (CASCADE DELETE)  |
+| article_b_id | uuid | NOT NULL, FK → articles.id (CASCADE DELETE)  |
+| PK           | —    | (article_a_id, article_b_id)                 |
+| CHECK        | —    | `article_a_id < article_b_id` (anti-doublon) |
 
 > Relation symétrique stockée une seule fois avec l'ID le plus petit en `article_a_id`. Les queries utilisent `OR` sur les deux colonnes (via `unionAll`) pour retrouver tous les liens d'un article.
 

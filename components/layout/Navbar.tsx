@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { siteConfig } from '@/lib/metadata';
+import { useWishlist } from '@/hooks/useWishlist';
 
 const ALL_NAV_LINKS = [
     { href: '/livres', label: 'Livres', editorialSlug: null },
@@ -14,6 +15,53 @@ const ALL_NAV_LINKS = [
     { href: '/concept', label: 'Concept', editorialSlug: 'concept' },
     { href: '/contact', label: 'Contact', editorialSlug: null },
 ];
+
+function WishlistNavIcon() {
+    const { items, mounted, has: _has } = useWishlist();
+    const count = items.length;
+    const prevCount = useRef(0);
+    const [pulse, setPulse] = useState(false);
+
+    useEffect(() => {
+        if (mounted && count > prevCount.current) {
+            setPulse(true);
+            const t = setTimeout(() => setPulse(false), 300);
+            prevCount.current = count;
+            return () => clearTimeout(t);
+        }
+        prevCount.current = count;
+    }, [count, mounted]);
+
+    return (
+        <Link
+            href="/ma-liste"
+            aria-label={`Ma liste${mounted && count > 0 ? ` (${count})` : ''}`}
+            className="relative flex items-center text-foreground/50 hover:text-primary transition-colors"
+        >
+            <svg
+                width="18"
+                height="18"
+                viewBox="0 0 18 18"
+                fill="none"
+                aria-hidden="true"
+                className={`transition-transform duration-150 ease-out ${pulse ? 'scale-150' : 'scale-100'}`}
+                style={{ transformOrigin: 'center' }}
+            >
+                <path
+                    d="M9 15.5C9 15.5 1.5 10.8 1.5 5.8C1.5 3.43 3.43 1.5 5.8 1.5C7.1 1.5 8.25 2.1 9 3.05C9.75 2.1 10.9 1.5 12.2 1.5C14.57 1.5 16.5 3.43 16.5 5.8C16.5 10.8 9 15.5 9 15.5Z"
+                    stroke="currentColor"
+                    strokeWidth="1.25"
+                    strokeLinejoin="round"
+                />
+            </svg>
+            {mounted && count > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 min-w-[14px] h-[14px] bg-primary text-background text-[9px] font-medium flex items-center justify-center px-0.5 leading-none">
+                    {count > 99 ? '99' : count}
+                </span>
+            )}
+        </Link>
+    );
+}
 
 export function Navbar({ publishedSlugs }: { publishedSlugs?: string[] }) {
     const [open, setOpen] = useState(false);
@@ -50,7 +98,7 @@ export function Navbar({ publishedSlugs }: { publishedSlugs?: string[] }) {
                 </Link>
 
                 {/* Desktop links */}
-                <ul className="hidden md:flex items-center gap-8">
+                <ul className="hidden lg:flex items-center gap-6 xl:gap-8">
                     {navLinks.map(({ href, label }) => (
                         <li key={href}>
                             <Link
@@ -63,32 +111,35 @@ export function Navbar({ publishedSlugs }: { publishedSlugs?: string[] }) {
                     ))}
                 </ul>
 
-                {/* Burger */}
-                <button
-                    type="button"
-                    onClick={() => setOpen((v) => !v)}
-                    className="md:hidden flex flex-col justify-center items-center w-9 h-9 gap-[6px] text-foreground -mr-1"
-                    aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
-                    aria-expanded={open}
-                    aria-controls="mobile-menu"
-                >
-                    <span
-                        className={`block w-5 h-px bg-current transition-all duration-200 ease-out origin-center ${open ? 'rotate-45 translate-y-[7px]' : ''}`}
-                    />
-                    <span
-                        className={`block w-5 h-px bg-current transition-all duration-200 ease-out ${open ? 'opacity-0 scale-x-0' : ''}`}
-                    />
-                    <span
-                        className={`block w-5 h-px bg-current transition-all duration-200 ease-out origin-center ${open ? '-rotate-45 -translate-y-[7px]' : ''}`}
-                    />
-                </button>
+                {/* Right controls */}
+                <div className="flex items-center gap-3">
+                    <WishlistNavIcon />
+                    <button
+                        type="button"
+                        onClick={() => setOpen((v) => !v)}
+                        className="lg:hidden flex flex-col justify-center items-center w-9 h-9 gap-[6px] text-foreground -mr-1"
+                        aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
+                        aria-expanded={open}
+                        aria-controls="mobile-menu"
+                    >
+                        <span
+                            className={`block w-5 h-px bg-current transition-all duration-200 ease-out origin-center ${open ? 'rotate-45 translate-y-[7px]' : ''}`}
+                        />
+                        <span
+                            className={`block w-5 h-px bg-current transition-all duration-200 ease-out ${open ? 'opacity-0 scale-x-0' : ''}`}
+                        />
+                        <span
+                            className={`block w-5 h-px bg-current transition-all duration-200 ease-out origin-center ${open ? '-rotate-45 -translate-y-[7px]' : ''}`}
+                        />
+                    </button>
+                </div>
             </nav>
 
             {/* Mobile menu */}
             <div
                 id="mobile-menu"
                 aria-hidden={!open}
-                className={`md:hidden absolute top-full left-0 right-0 bg-background border-b border-border transition-all duration-200 ease-out ${
+                className={`lg:hidden absolute top-full left-0 right-0 bg-background border-b border-border transition-all duration-200 ease-out ${
                     open
                         ? 'opacity-100 translate-y-0 pointer-events-auto'
                         : 'opacity-0 -translate-y-1 pointer-events-none'
@@ -106,6 +157,15 @@ export function Navbar({ publishedSlugs }: { publishedSlugs?: string[] }) {
                             </Link>
                         </li>
                     ))}
+                    <li>
+                        <Link
+                            href="/ma-liste"
+                            onClick={() => setOpen(false)}
+                            className="flex items-center h-11 text-sm text-foreground/80 hover:text-primary transition-colors border-t border-border/50"
+                        >
+                            Ma liste
+                        </Link>
+                    </li>
                 </ul>
             </div>
         </header>

@@ -7,11 +7,15 @@ export function ArticleFormMeta({
     defaultEnAvant = false,
     categories,
     defaultCategorieIds = [],
+    tags = [],
+    defaultTagIds = [],
 }: {
     defaultPublie?: boolean;
     defaultEnAvant?: boolean;
     categories: { id: string; nom: string }[];
     defaultCategorieIds?: string[];
+    tags?: { id: string; nom: string }[];
+    defaultTagIds?: string[];
 }) {
     return (
         <div className="space-y-4 pb-6 border-b border-border/60">
@@ -60,6 +64,32 @@ export function ArticleFormMeta({
                                 />
                                 <span className="text-xs text-foreground">
                                     {categorie.nom}
+                                </span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+            )}
+            {tags.length > 0 && (
+                <div>
+                    <p className={labelClass}>Tags</p>
+                    <div className="flex flex-wrap gap-3 mt-1">
+                        {tags.map((tag) => (
+                            <label
+                                key={tag.id}
+                                className="flex items-center gap-1.5 cursor-pointer"
+                            >
+                                <input
+                                    type="checkbox"
+                                    name="tagIds"
+                                    value={tag.id}
+                                    defaultChecked={defaultTagIds.includes(
+                                        tag.id,
+                                    )}
+                                    className="accent-primary"
+                                />
+                                <span className="text-xs text-foreground">
+                                    {tag.nom}
                                 </span>
                             </label>
                         ))}

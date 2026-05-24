@@ -7,6 +7,7 @@ import { StatsLedger } from './_components/dashboard/StatsLedger';
 import { AlerteBar } from './_components/dashboard/AlerteBar';
 import { DerniersAvis } from './_components/dashboard/DerniersAvis';
 import { AgendaPanel } from './_components/dashboard/AgendaPanel';
+import { LiveClock } from './_components/dashboard/LiveClock';
 
 function formatDate() {
     return new Date().toLocaleDateString('fr-FR', {
@@ -83,7 +84,7 @@ export default async function AdminPage() {
         <div className="space-y-8">
             <div>
                 <p className="text-[11px] uppercase tracking-[0.12em] text-muted mb-1">
-                    {formatDate()}
+                    {formatDate()} · <LiveClock />
                 </p>
                 <h1 className="font-serif text-3xl font-bold text-foreground leading-tight">
                     {siteConfig.name}

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState, useEffect, useRef, type FormEvent } from 'react';
+import { usePathname } from 'next/navigation';
 import { subscribeToNewsletter } from '@/lib/actions/newsletter';
 
 export function NewsletterForm() {
@@ -9,11 +10,34 @@ export function NewsletterForm() {
         'idle' | 'loading' | 'success' | 'error'
     >('idle');
     const [errorMsg, setErrorMsg] = useState('');
+    const honeypotRef = useRef<HTMLInputElement>(null);
+    const pathname = usePathname();
+    const prevPathname = useRef(pathname);
+
+    useEffect(() => {
+        if (prevPathname.current !== pathname) {
+            prevPathname.current = pathname;
+            setStatus('idle');
+            setEmail('');
+        }
+    }, [pathname]);
+
+    useEffect(() => {
+        if (status !== 'success') return;
+        const t = setTimeout(() => {
+            setStatus('idle');
+            setEmail('');
+        }, 5000);
+        return () => clearTimeout(t);
+    }, [status]);
 
     async function handleSubmit(e: FormEvent) {
         e.preventDefault();
         setStatus('loading');
-        const result = await subscribeToNewsletter(email);
+        const result = await subscribeToNewsletter(
+            email,
+            honeypotRef.current?.value ?? '',
+        );
         if (result.ok) {
             setStatus('success');
         } else {
@@ -33,6 +57,23 @@ export function NewsletterForm() {
 
     return (
         <form onSubmit={handleSubmit} noValidate>
+            {/* Honeypot — hidden from real users, bots fill it */}
+            <input
+                ref={honeypotRef}
+                type="text"
+                name="website"
+                autoComplete="off"
+                tabIndex={-1}
+                aria-hidden="true"
+                style={{
+                    position: 'absolute',
+                    left: '-9999px',
+                    width: '1px',
+                    height: '1px',
+                    overflow: 'hidden',
+                    opacity: 0,
+                }}
+            />
             <div className="flex flex-col sm:flex-row gap-2">
                 <div className="flex-1">
                     <label htmlFor="newsletter-email" className="sr-only">

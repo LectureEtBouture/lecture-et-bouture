@@ -39,6 +39,7 @@ export type EnrichissementLocal = {
     prix: string | null;
     choixLibrairie: boolean;
     noteDeLaLibrairie: string | null;
+    description: string | null;
     rayonId: string | null;
     genreIds: string[];
     numeroSerie: number | null;
@@ -60,6 +61,7 @@ export type LivreComplet = {
     imageUrl: string | null;
     imageAlt: string | null;
     description: string | null;
+    descriptionAdmin: string | null;
     language: string | null;
     categories: string[];
     previewLink: string | null;

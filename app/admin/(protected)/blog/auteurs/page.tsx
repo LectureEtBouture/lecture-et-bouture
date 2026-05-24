@@ -63,19 +63,28 @@ export default async function AdminBlogAuteursPage() {
                             <p className="text-sm text-foreground">
                                 {auteur.nom}
                             </p>
-                            <form
-                                action={async () => {
-                                    'use server';
-                                    await deleteAuteurBlog(auteur.id);
-                                }}
-                            >
-                                <button
-                                    type="submit"
-                                    className="text-[10px] uppercase tracking-widest text-muted hover:text-foreground transition-colors"
+                            <div className="flex items-center gap-4">
+                                <Link
+                                    href={`/admin/blog/auteurs/${auteur.id}/modifier`}
+                                    className="text-xs text-muted hover:text-primary transition-colors"
                                 >
-                                    Supprimer
-                                </button>
-                            </form>
+                                    Modifier
+                                </Link>
+                                <form
+                                    action={async () => {
+                                        'use server';
+                                        await deleteAuteurBlog(auteur.id);
+                                    }}
+                                    className="contents"
+                                >
+                                    <button
+                                        type="submit"
+                                        className="text-xs text-muted hover:text-red-600 transition-colors"
+                                    >
+                                        Supprimer
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     ))}
                 </div>

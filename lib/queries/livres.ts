@@ -280,26 +280,32 @@ export async function getLivresParCategorie(
     );
 }
 
-export async function getLivresTendances(
-    startIndex = 0,
-): Promise<LivreComplet[]> {
-    const metas = await discoveryProvider.rechercherTendances(startIndex);
-    return buildDiscoveryList(metas);
-}
+export const getLivresTendances = unstable_cache(
+    async (startIndex = 0): Promise<LivreComplet[]> => {
+        const metas = await discoveryProvider.rechercherTendances(startIndex);
+        return buildDiscoveryList(metas);
+    },
+    ['livres-tendances'],
+    { tags: ['discovery'], revalidate: 1800 },
+);
 
-export async function getLivresNouveautes(
-    startIndex = 0,
-): Promise<LivreComplet[]> {
-    const metas = await discoveryProvider.rechercherNouveautes(startIndex);
-    return buildDiscoveryList(metas);
-}
+export const getLivresNouveautes = unstable_cache(
+    async (startIndex = 0): Promise<LivreComplet[]> => {
+        const metas = await discoveryProvider.rechercherNouveautes(startIndex);
+        return buildDiscoveryList(metas);
+    },
+    ['livres-nouveautes'],
+    { tags: ['discovery'], revalidate: 1800 },
+);
 
-export async function getLivresParSujet(
-    query: string,
-): Promise<LivreComplet[]> {
-    const metas = await discoveryProvider.rechercherParSujet(query);
-    return buildDiscoveryList(metas);
-}
+export const getLivresParSujet = unstable_cache(
+    async (query: string): Promise<LivreComplet[]> => {
+        const metas = await discoveryProvider.rechercherParSujet(query);
+        return buildDiscoveryList(metas);
+    },
+    ['livres-par-sujet'],
+    { tags: ['discovery'], revalidate: 1800 },
+);
 
 export async function getMemeAuteur(
     auteur: string,

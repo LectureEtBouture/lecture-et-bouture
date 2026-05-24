@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { ArticleFormIdentite } from './ArticleFormIdentite';
 import { ArticleFormMeta } from './ArticleFormMeta';
 import { RteField } from './RteField';
@@ -9,11 +9,13 @@ export function ArticleForm({
     action,
     auteurs,
     categories,
+    tags = [],
     defaultValues,
 }: {
     action: (formData: FormData) => Promise<void>;
     auteurs: { id: string; nom: string }[];
     categories: { id: string; nom: string }[];
+    tags?: { id: string; nom: string }[];
     defaultValues?: {
         titre?: string;
         slug?: string;
@@ -24,13 +26,22 @@ export function ArticleForm({
         publie?: boolean;
         enAvant?: boolean;
         categorieIds?: string[];
+        tagIds?: string[];
     };
 }) {
     const [pending, startTransition] = useTransition();
+    const [saved, setSaved] = useState(false);
 
     return (
         <form
-            action={(formData) => startTransition(() => action(formData))}
+            action={(formData) => {
+                setSaved(false);
+                startTransition(async () => {
+                    await action(formData);
+                    setSaved(true);
+                    setTimeout(() => setSaved(false), 3000);
+                });
+            }}
             className="space-y-6"
         >
             <ArticleFormIdentite
@@ -55,8 +66,10 @@ export function ArticleForm({
                 defaultEnAvant={defaultValues?.enAvant}
                 categories={categories}
                 defaultCategorieIds={defaultValues?.categorieIds}
+                tags={tags}
+                defaultTagIds={defaultValues?.tagIds}
             />
-            <div className="flex gap-3 pt-2">
+            <div className="flex items-center gap-4 pt-2">
                 <button
                     type="submit"
                     disabled={pending}
@@ -64,6 +77,11 @@ export function ArticleForm({
                 >
                     {pending ? 'Enregistrement…' : 'Enregistrer'}
                 </button>
+                {saved && !pending && (
+                    <span className="text-[11px] text-primary uppercase tracking-[0.1em]">
+                        ✓ Sauvegardé
+                    </span>
+                )}
             </div>
         </form>
     );

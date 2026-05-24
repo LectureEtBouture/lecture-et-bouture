@@ -8,10 +8,10 @@ import {
 
 function PublieToggle({ id, publie }: { id: string; publie: boolean }) {
     return (
-        <form action={togglePublie.bind(null, id)}>
+        <form action={togglePublie.bind(null, id)} className="contents">
             <button
                 type="submit"
-                className={`text-[10px] uppercase tracking-widest px-2 py-0.5 border ${publie ? 'border-primary text-primary' : 'border-border text-muted'}`}
+                className={`text-[10px] uppercase tracking-[0.08em] px-1.5 py-0.5 border transition-colors leading-none ${publie ? 'border-primary text-primary hover:bg-primary hover:text-background' : 'border-border text-muted hover:border-primary hover:text-primary'}`}
             >
                 {publie ? 'Publié' : 'Brouillon'}
             </button>
@@ -21,10 +21,10 @@ function PublieToggle({ id, publie }: { id: string; publie: boolean }) {
 
 function EnAvantToggle({ id, enAvant }: { id: string; enAvant: boolean }) {
     return (
-        <form action={toggleEnAvant.bind(null, id)}>
+        <form action={toggleEnAvant.bind(null, id)} className="contents">
             <button
                 type="submit"
-                className={`text-[10px] uppercase tracking-widest px-2 py-0.5 border ${enAvant ? 'border-primary text-primary' : 'border-border text-muted'}`}
+                className={`text-[10px] uppercase tracking-[0.08em] px-1.5 py-0.5 border transition-colors leading-none ${enAvant ? 'border-primary text-primary hover:bg-primary hover:text-background' : 'border-border text-muted hover:border-primary hover:text-primary'}`}
             >
                 {enAvant ? '★ avant' : '☆ avant'}
             </button>
@@ -39,10 +39,11 @@ function DeleteButton({ id }: { id: string }) {
                 'use server';
                 await deleteArticle(id);
             }}
+            className="contents"
         >
             <button
                 type="submit"
-                className="text-[10px] uppercase tracking-widest text-muted hover:text-foreground transition-colors"
+                className="text-xs text-muted hover:text-red-600 transition-colors"
             >
                 Supprimer
             </button>
@@ -86,7 +87,7 @@ export function ArticleRow({ article }: { article: ArticleItem }) {
                 <div className="flex items-center justify-end gap-3">
                     <Link
                         href={`/admin/blog/${article.id}/modifier`}
-                        className="text-[10px] uppercase tracking-widest text-muted hover:text-foreground transition-colors"
+                        className="text-xs text-muted hover:text-primary transition-colors"
                     >
                         Modifier
                     </Link>

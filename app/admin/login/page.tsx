@@ -16,6 +16,7 @@ export default function LoginPage() {
         setLoading(true);
 
         const form = new FormData(e.currentTarget);
+
         const result = await signIn('credentials', {
             email: form.get('email'),
             password: form.get('password'),
@@ -32,8 +33,8 @@ export default function LoginPage() {
     }
 
     return (
-        <main className="min-h-screen flex items-center justify-center bg-[#F5F4EF]">
-            <div className="w-full max-w-sm bg-white rounded-2xl shadow-sm p-8 space-y-6">
+        <main className="min-h-screen flex items-center justify-center bg-background">
+            <div className="w-full max-w-sm bg-surface rounded-2xl shadow-sm p-8 space-y-6">
                 <div className="space-y-1">
                     <h1 className="text-xl font-semibold text-foreground">
                         Back-office
@@ -57,7 +58,7 @@ export default function LoginPage() {
                             type="email"
                             required
                             autoComplete="email"
-                            className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4B3E]"
+                            className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                         />
                     </div>
 
@@ -74,7 +75,7 @@ export default function LoginPage() {
                             type="password"
                             required
                             autoComplete="current-password"
-                            className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4B3E]"
+                            className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                         />
                     </div>
 
@@ -83,7 +84,7 @@ export default function LoginPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-2 bg-[#2D4B3E] text-white text-sm font-medium rounded-lg hover:bg-[#243d32] disabled:opacity-50 transition-colors"
+                        className="w-full py-2 bg-primary text-background text-sm font-medium rounded-lg hover:bg-primary-light disabled:opacity-50 transition-colors"
                     >
                         {loading ? 'Connexion...' : 'Se connecter'}
                     </button>

@@ -1,3 +1,5 @@
+'use client';
+
 import type { InferSelectModel } from 'drizzle-orm';
 import type { plantes } from '@/db/schema';
 import {
@@ -7,6 +9,7 @@ import {
     legendClass,
 } from './formStyles';
 import { ImageUpload } from './ImageUpload';
+import { RteField } from './RteField';
 
 type Plante = InferSelectModel<typeof plantes>;
 
@@ -16,11 +19,16 @@ export function PlanteFormContenu({ plante }: { plante?: Plante }) {
             <legend className={legendClass}>Contenu</legend>
             <div>
                 <label className={labelClass}>Description</label>
-                <textarea
+                <RteField
                     name="description"
                     defaultValue={plante?.description ?? ''}
-                    rows={5}
-                    className={`${inputClass} resize-none`}
+                />
+            </div>
+            <div>
+                <label className={labelClass}>Conseils d&apos;entretien</label>
+                <RteField
+                    name="conseilsEntretien"
+                    defaultValue={plante?.conseilsEntretien ?? ''}
                 />
             </div>
             <div>

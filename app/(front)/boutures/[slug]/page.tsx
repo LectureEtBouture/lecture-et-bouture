@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { getBoutureBySlug, getBouturesPubliques } from '@/lib/queries/boutures';
 import { getBoutureCoverColor, DIFFICULTE_LABELS } from '@/lib/data';
 import { getAvisForBouture } from '@/lib/db/avis';
+import { sanitizeRte } from '@/lib/sanitize';
 import { CoverPanel } from './_components/CoverPanel';
 import { NoteLibrairie } from '@/app/(front)/livres/[slug]/_components/NoteLibrairie';
 import { Stars } from '@/components/ui/Stars';
@@ -35,6 +36,12 @@ export default async function BouturePage({ params }: Props) {
     const coverColor = getBoutureCoverColor(bouture.lumiere ?? '');
     const noteMoyenne = bouture.noteMoyenne
         ? parseFloat(bouture.noteMoyenne)
+        : null;
+    const descriptionHtml = bouture.description
+        ? sanitizeRte(bouture.description)
+        : null;
+    const conseilsHtml = bouture.conseilsEntretien
+        ? sanitizeRte(bouture.conseilsEntretien)
         : null;
 
     return (
@@ -86,27 +93,28 @@ export default async function BouturePage({ params }: Props) {
                         )}
                     </div>
 
-                    {/* Description */}
-                    {bouture.description && (
+                    {/* sanitizeRte strips all unsafe HTML server-side before render */}
+                    {descriptionHtml && (
                         <div className="space-y-2">
                             <h2 className="text-xs uppercase tracking-widest text-muted">
                                 Description
                             </h2>
-                            <p className="text-base text-foreground leading-relaxed max-w-[68ch]">
-                                {bouture.description}
-                            </p>
+                            <div
+                                className="text-base text-foreground leading-relaxed max-w-[68ch] [&_p]:mb-3 [&_p:last-child]:mb-0"
+                                dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+                            />
                         </div>
                     )}
 
-                    {/* Entretien */}
-                    {bouture.conseilsEntretien && (
+                    {conseilsHtml && (
                         <div className="space-y-2">
                             <h2 className="text-xs uppercase tracking-widest text-muted">
                                 Entretien
                             </h2>
-                            <p className="text-base text-foreground leading-relaxed max-w-[68ch]">
-                                {bouture.conseilsEntretien}
-                            </p>
+                            <div
+                                className="text-base text-foreground leading-relaxed max-w-[68ch] [&_p]:mb-3 [&_p:last-child]:mb-0"
+                                dangerouslySetInnerHTML={{ __html: conseilsHtml }}
+                            />
                         </div>
                     )}
 

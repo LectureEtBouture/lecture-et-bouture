@@ -88,10 +88,11 @@ export default async function AdminBlogCategoriesPage() {
                                     'use server';
                                     await deleteCategorieBlog(categorie.id);
                                 }}
+                                className="contents"
                             >
                                 <button
                                     type="submit"
-                                    className="text-[10px] uppercase tracking-widest text-muted hover:text-foreground transition-colors"
+                                    className="text-xs text-muted hover:text-red-600 transition-colors"
                                 >
                                     Supprimer
                                 </button>

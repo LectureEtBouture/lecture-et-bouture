@@ -1657,7 +1657,7 @@ export default async function SurprendrePage() {
     return (
         <div className="max-w-4xl mx-auto px-6 py-16 lg:py-24">
             <p className="text-[11px] uppercase tracking-[0.14em] text-muted mb-16">
-                Le choix du conservateur
+                Le choix de la libraire
             </p>
             <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-12 lg:gap-20 items-start">
                 <div
