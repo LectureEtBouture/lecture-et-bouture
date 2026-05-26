@@ -1,0 +1,75 @@
+services:
+    postgres:
+        image: postgres:16-alpine
+        container_name: leb-db
+        environment:
+            POSTGRES_USER: leb
+            POSTGRES_PASSWORD: leb
+            POSTGRES_DB: leb
+        ports:
+            - '5432:5432'
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U leb']
+            interval: 5s
+            timeout: 5s
+            retries: 5
+
+    minio:
+        image: minio/minio:latest
+        container_name: leb-minio
+        command: server /data --console-address ":9101"
+        environment:
+            MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
+            MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin123}
+        ports:
+            - '9100:9000'
+            - '9101:9101'
+        volumes:
+            - minio_data:/data
+        restart: unless-stopped
+
+    app:
+        image: ${DOCKER_IMAGE:-sankarej/lecture-et-bouture:latest}
+        container_name: leb-app
+        restart: unless-stopped
+        ports:
+            - '3000:3000'
+        env_file:
+            - .env
+        environment:
+            DATABASE_URL: postgresql://leb:leb@leb-db:5432/leb
+            MINIO_ENDPOINT: leb-minio
+            MINIO_PORT: 9000
+            MINIO_USE_SSL: 'false'
+            MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL}
+        depends_on:
+            postgres:
+                condition: service_healthy
+            minio:
+                condition: service_started
+
+    adminer:
+        image: adminer:latest
+        container_name: leb-adminer
+        restart: unless-stopped
+        ports:
+            - '8080:8080'
+        depends_on:
+            - postgres
+
+    portainer:
+        image: portainer/portainer-ce:latest
+        container_name: leb-portainer
+        restart: unless-stopped
+        ports:
+            - '9000:9000'
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - portainer_data:/data
+
+volumes:
+    postgres_data:
+    portainer_data:
+    minio_data:
