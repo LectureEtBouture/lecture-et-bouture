@@ -223,3 +223,28 @@ export async function sendContactEmail(data: ContactEmailData) {
 
     return res.json();
 }
+
+type DevFeedbackEmailData = {
+    type: 'Bug' | 'Feedback' | 'Idée';
+    message: string;
+    fromEmail: string;
+    devEmail: string;
+};
+
+export async function sendDevFeedbackEmail(data: DevFeedbackEmailData) {
+    const res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            from: process.env.RESEND_FROM_EMAIL,
+            to: data.devEmail,
+            subject: `[L&B Admin] ${data.type} — back-office`,
+            text: `Type : ${data.type}\nDe : ${data.fromEmail}\n\n${data.message}`,
+        }),
+    });
+
+    if (!res.ok) throw new Error(`Resend error: ${res.status}`);
+}
