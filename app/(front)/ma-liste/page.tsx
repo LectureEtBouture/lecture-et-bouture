@@ -68,9 +68,9 @@ export default function MaListePage() {
                     </div>
                 ) : (
                     <>
-                        <p className="text-[11px] text-muted -mt-4">
-                            Cochez les livres pour lesquels vous souhaitez
-                            vérifier la disponibilité en boutique.
+                        <p className="text-xs text-foreground/60 -mt-4 flex items-center gap-2">
+                            <span className="inline-flex w-4 h-4 border border-border bg-background items-center justify-center shrink-0" aria-hidden="true" />
+                            Cochez les livres pour demander leur disponibilité en boutique.
                         </p>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pt-4 border-t border-border">
                             {items.map((item) => (
@@ -149,7 +149,7 @@ function WishlistCard({
                 className={`absolute top-2 left-2 w-6 h-6 border transition-all z-10 flex items-center justify-center cursor-pointer ${
                     isSelected
                         ? 'bg-primary border-primary text-background opacity-100'
-                        : 'bg-background/80 border-border text-transparent opacity-0 group-hover/card:opacity-100 hover:border-primary'
+                        : 'bg-background/80 border-border text-transparent opacity-40 group-hover/card:opacity-100 hover:border-primary'
                 }`}
             >
                 {isSelected && (

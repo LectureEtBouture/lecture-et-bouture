@@ -39,7 +39,16 @@ export function NudgeToast({
                 aria-label="Fermer"
                 className="absolute top-2.5 right-2.5 text-muted hover:text-foreground transition-colors"
             >
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+                <svg
+                    width="10"
+                    height="10"
+                    viewBox="0 0 10 10"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    aria-hidden="true"
+                >
                     <path d="M1 1l8 8M9 1L1 9" />
                 </svg>
             </button>
@@ -48,7 +57,7 @@ export function NudgeToast({
                 En ce moment, un lecteur s&apos;intéresse à
             </p>
 
-            <ul className="space-y-1">
+            <ul className="space-y-1 pr-4">
                 {shown.map((livre) => (
                     <li key={livre.slug}>
                         <Link
