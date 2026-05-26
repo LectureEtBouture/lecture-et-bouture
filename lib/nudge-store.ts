@@ -4,6 +4,7 @@ export type NudgeEvent = {
     id: string;
     titres: { titre: string; slug: string }[];
     ts: number;
+    excludeCid?: string;
 };
 
 type Handler = (event: NudgeEvent) => void;
@@ -21,11 +22,12 @@ class NudgeStore {
         this.handlers.delete(fn);
     }
 
-    emit(titres: { titre: string; slug: string }[]) {
+    emit(titres: { titre: string; slug: string }[], excludeCid?: string) {
         const event: NudgeEvent = {
             id: randomUUID(),
             titres,
             ts: Date.now(),
+            excludeCid,
         };
         this.buffer = [event, ...this.buffer].slice(0, this.MAX);
         this.handlers.forEach((fn) => fn(event));

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { NUDGE_CLIENT_ID } from '@/lib/nudge-client-id';
 
 export type NudgeTitre = { titre: string; slug: string };
 
@@ -13,7 +14,10 @@ const DISPLAY_MS = 6_000;
 const FADEOUT_MS = 200;
 
 export function useNudge() {
-    const [state, setState] = useState<NudgeState>({ titres: [], visible: false });
+    const [state, setState] = useState<NudgeState>({
+        titres: [],
+        visible: false,
+    });
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     function dismiss() {
@@ -22,12 +26,13 @@ export function useNudge() {
     }
 
     useEffect(() => {
-        const es = new EventSource('/api/nudge-stream');
+        const es = new EventSource(`/api/nudge-stream?cid=${NUDGE_CLIENT_ID}`);
 
         es.onmessage = (e: MessageEvent<string>) => {
             try {
                 const data = JSON.parse(e.data) as { titres: NudgeTitre[] };
-                if (!Array.isArray(data.titres) || data.titres.length === 0) return;
+                if (!Array.isArray(data.titres) || data.titres.length === 0)
+                    return;
 
                 setState({ titres: data.titres, visible: true });
 

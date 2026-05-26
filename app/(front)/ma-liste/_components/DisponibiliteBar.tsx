@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { WishlistItem } from '@/hooks/useWishlist';
+import { NUDGE_CLIENT_ID } from '@/lib/nudge-client-id';
 
 type FormState = 'idle' | 'sending' | 'success' | 'error';
 
@@ -35,6 +36,7 @@ export function DisponibiliteBar({
                     email: data.get('email'),
                     telephone: data.get('telephone') || null,
                     website: data.get('website'),
+                    cid: NUDGE_CLIENT_ID,
                     livres: selected.map((l) => ({
                         inventaireUri: l.slug,
                         titre: l.titre,

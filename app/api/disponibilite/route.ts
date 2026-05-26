@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     if (!body)
         return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
 
-    const { nom, prenom, email, telephone, website, livres } = body as Record<
+    const { nom, prenom, email, telephone, website, cid, livres } = body as Record<
         string,
         unknown
     >;
@@ -89,20 +89,26 @@ export async function POST(req: NextRequest) {
         );
     }
 
-    await sendDisponibiliteEmail({
-        nom: (nom as string).trim(),
-        prenom: (prenom as string).trim(),
-        email: (email as string).trim(),
-        telephone:
-            typeof telephone === 'string' ? telephone.trim() || null : null,
-        livres: livresValides,
-    });
+    // TODO: remove try/catch when Resend is properly configured
+    try {
+        await sendDisponibiliteEmail({
+            nom: (nom as string).trim(),
+            prenom: (prenom as string).trim(),
+            email: (email as string).trim(),
+            telephone:
+                typeof telephone === 'string' ? telephone.trim() || null : null,
+            livres: livresValides,
+        });
+    } catch (err) {
+        console.warn('[disponibilite] email skipped:', err);
+    }
 
     nudgeStore.emit(
         livresValides.map((livre) => ({
             titre: livre.titre,
             slug: livre.slug,
         })),
+        typeof cid === 'string' ? cid : undefined,
     );
 
     return NextResponse.json({ ok: true }, { status: 201 });

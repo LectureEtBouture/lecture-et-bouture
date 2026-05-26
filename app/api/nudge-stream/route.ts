@@ -4,7 +4,8 @@ import { nudgeStore, type NudgeEvent } from '@/lib/nudge-store';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(req: Request) {
+    const cid = new URL(req.url).searchParams.get('cid') ?? '';
     let cleanup: (() => void) | null = null;
 
     const stream = new ReadableStream({
@@ -22,8 +23,9 @@ export async function GET() {
             // Initial ping to confirm connection
             send(': connected\n\n');
 
-            // Push nudge events to client
+            // Push nudge events to client — skip if this client is the emitter
             function onEvent(event: NudgeEvent) {
+                if (cid && event.excludeCid === cid) return;
                 send(`data: ${JSON.stringify({ titres: event.titres })}\n\n`);
             }
 
