@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { siteConfig } from '@/lib/metadata';
+import { AdminDevWidget } from './AdminDevWidget';
 
 const baseNavItems = [
     { href: '/admin', label: 'Dashboard' },
@@ -208,11 +209,13 @@ export function AdminShell({
     email,
     role,
     signOutAction,
+    devEmail,
 }: {
     children: React.ReactNode;
     email: string;
     role?: string;
     signOutAction: () => Promise<void>;
+    devEmail?: string;
 }) {
     const [menuOpen, setMenuOpen] = useState(false);
 
@@ -302,6 +305,7 @@ export function AdminShell({
                     </div>
                 </main>
             </div>
+            {devEmail && <AdminDevWidget />}
         </div>
     );
 }

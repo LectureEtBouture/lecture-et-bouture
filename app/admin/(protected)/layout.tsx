@@ -20,6 +20,7 @@ export default async function AdminLayout({
             email={session.user?.email ?? ''}
             role={session.user?.role}
             signOutAction={signOutAction}
+            devEmail={process.env.DEVELOPPER_EMAIL}
         >
             {children}
         </AdminShell>
