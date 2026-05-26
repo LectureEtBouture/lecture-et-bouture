@@ -5,6 +5,7 @@ import { MaintenanceScreen } from '@/components/ui/MaintenanceScreen';
 import { PreviewBanner } from '@/components/ui/PreviewBanner';
 import { FormbricksWidget } from '@/components/ui/FormbricksWidget';
 import { FeedbackButton } from '@/components/ui/FeedbackButton';
+import { NudgeListener } from '@/components/ui/NudgeListener';
 import { getAnnonce, getMaintenance } from '@/lib/queries/parametres';
 import { getPublishedEditorialSlugs } from '@/lib/queries/pages';
 
@@ -49,6 +50,7 @@ export default async function FrontLayout({
                     <FeedbackButton actionKey="test" />
                 </>
             )}
+            <NudgeListener />
         </div>
     );
 }
