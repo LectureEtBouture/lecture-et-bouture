@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendDisponibiliteEmail } from '@/services/resend';
+import { nudgeStore } from '@/lib/nudge-store';
 
 const WINDOW_MS = 15 * 60 * 1000;
 const MAX_REQUESTS = 3;
@@ -96,6 +97,13 @@ export async function POST(req: NextRequest) {
             typeof telephone === 'string' ? telephone.trim() || null : null,
         livres: livresValides,
     });
+
+    nudgeStore.emit(
+        livresValides.map((livre) => ({
+            titre: livre.titre,
+            slug: livre.slug,
+        })),
+    );
 
     return NextResponse.json({ ok: true }, { status: 201 });
 }
