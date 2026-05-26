@@ -1,3 +1,5 @@
+import { randomUUID } from 'crypto';
+
 export type NudgeEvent = {
     id: string;
     titres: { titre: string; slug: string }[];
@@ -21,7 +23,7 @@ class NudgeStore {
 
     emit(titres: { titre: string; slug: string }[]) {
         const event: NudgeEvent = {
-            id: crypto.randomUUID(),
+            id: randomUUID(),
             titres,
             ts: Date.now(),
         };
