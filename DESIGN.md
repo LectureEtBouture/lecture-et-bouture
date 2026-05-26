@@ -23,19 +23,19 @@ typography:
         lineHeight: 1.15
         letterSpacing: '-0.01em'
     title:
-        fontFamily: 'Manrope, system-ui, sans-serif'
+        fontFamily: 'Raleway, system-ui, sans-serif'
         fontSize: '1.125rem'
         fontWeight: 600
         lineHeight: 1.4
         letterSpacing: 'normal'
     body:
-        fontFamily: 'Manrope, system-ui, sans-serif'
+        fontFamily: 'Raleway, system-ui, sans-serif'
         fontSize: '1rem'
         fontWeight: 400
         lineHeight: 1.75
         letterSpacing: 'normal'
     label:
-        fontFamily: 'Manrope, system-ui, sans-serif'
+        fontFamily: 'Raleway, system-ui, sans-serif'
         fontSize: '0.6875rem'
         fontWeight: 500
         lineHeight: 1
@@ -131,7 +131,8 @@ La palette est construite autour d'un seul axe chromatique : du sable au vert fo
 ## 3. Typography: Le Duo Éditorial
 
 **Display Font:** Noto Serif (Georgian, serif fallback)
-**Body Font:** Manrope (system-ui fallback)
+**Body Font:** Raleway (system-ui fallback)
+**Accent Font:** Dancing Script (`--font-manuscript`, note de la librairie uniquement)
 
 **Character:** Le serif ancre dans le temps, dans la bibliothèque, dans le jardin botanique. Le sans-serif sert l'information sans se signaler. La hiérarchie se joue exclusivement dans la taille et le poids — jamais dans la couleur, jamais dans la décoration.
 
@@ -139,9 +140,9 @@ La palette est construite autour d'un seul axe chromatique : du sable au vert fo
 
 - **Display** (700, clamp(3rem→5rem), line-height 1.05, letter-spacing −0.02em): Titres héros, nom de la boutique en grand format. Noto Serif uniquement.
 - **Headline** (700, clamp(1.75rem→2.5rem), line-height 1.15, letter-spacing −0.01em): Titres de page, noms de produit en fiche. Noto Serif.
-- **Title** (Manrope 600, 1.125rem, line-height 1.4): Sous-titres de section, noms d'auteur, noms d'espèce. Sans-serif quand l'information est structurelle.
-- **Body** (Manrope 400, 1rem, line-height 1.75): Descriptions, blocs de texte. Max 68ch. Jamais comprimé.
-- **Label** (Manrope 500, 0.6875rem, letter-spacing 0.1em, UPPERCASE): Navigation, catégories, badges de filtre, métadonnées comme "À partir de". Espacement de lettres généreux.
+- **Title** (Raleway 600, 1.125rem, line-height 1.4): Sous-titres de section, noms d'auteur, noms d'espèce. Sans-serif quand l'information est structurelle.
+- **Body** (Raleway 400, 1rem, line-height 1.75): Descriptions, blocs de texte. Max 68ch. Jamais comprimé.
+- **Label** (Raleway 500, 0.6875rem, letter-spacing 0.1em, UPPERCASE): Navigation, catégories, badges de filtre, métadonnées comme "À partir de". Espacement de lettres généreux.
 
 ### Named Rules
 

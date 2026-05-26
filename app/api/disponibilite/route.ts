@@ -35,10 +35,8 @@ export async function POST(req: NextRequest) {
     if (!body)
         return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
 
-    const { nom, prenom, email, telephone, website, cid, livres } = body as Record<
-        string,
-        unknown
-    >;
+    const { nom, prenom, email, telephone, website, cid, livres } =
+        body as Record<string, unknown>;
 
     // Honeypot — silently succeed
     if (website) return NextResponse.json({ ok: true }, { status: 201 });

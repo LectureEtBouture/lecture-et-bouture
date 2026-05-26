@@ -69,8 +69,12 @@ export default function MaListePage() {
                 ) : (
                     <>
                         <p className="text-xs text-foreground/60 -mt-4 flex items-center gap-2">
-                            <span className="inline-flex w-4 h-4 border border-border bg-background items-center justify-center shrink-0" aria-hidden="true" />
-                            Cochez les livres pour demander leur disponibilité en boutique.
+                            <span
+                                className="inline-flex w-4 h-4 border border-border bg-background items-center justify-center shrink-0"
+                                aria-hidden="true"
+                            />
+                            Cochez les livres pour demander leur disponibilité
+                            en boutique.
                         </p>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pt-4 border-t border-border">
                             {items.map((item) => (
