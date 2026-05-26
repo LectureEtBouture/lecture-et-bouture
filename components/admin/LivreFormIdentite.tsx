@@ -18,6 +18,8 @@ interface Props {
     onImport?: (data: LivreMetadata) => void;
     inventaireUri?: string;
     onInventaireUriChange?: (val: string) => void;
+    titre?: string;
+    onTitreChange?: (val: string) => void;
 }
 
 export function LivreFormIdentite({
@@ -25,6 +27,8 @@ export function LivreFormIdentite({
     onImport,
     inventaireUri,
     onInventaireUriChange,
+    titre,
+    onTitreChange,
 }: Props) {
     return (
         <fieldset className={fieldsetClass}>
@@ -45,6 +49,24 @@ export function LivreFormIdentite({
                     <p className="text-[11px] text-muted mt-1">
                         L&apos;URI inventaire ne peut pas être modifiée après
                         création.
+                    </p>
+                )}
+            </div>
+
+            <div>
+                <label className={labelClass}>Titre *</label>
+                <input
+                    name="titre"
+                    value={livre ? (livre.titre ?? '') : (titre ?? '')}
+                    onChange={(e) => onTitreChange?.(e.target.value)}
+                    readOnly={!!livre}
+                    required
+                    placeholder="Titre du livre"
+                    className={inputClass}
+                />
+                {livre && (
+                    <p className="text-[11px] text-muted mt-1">
+                        Le titre est mis à jour via l&apos;enrichissement externe.
                     </p>
                 )}
             </div>

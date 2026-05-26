@@ -38,10 +38,10 @@ function LivreIdentite({
 }) {
     return (
         <div className="flex items-center gap-3 min-w-0">
-            {meta?.imageUrl ? (
+            {(livre.image ?? meta?.imageUrl) ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                    src={meta.imageUrl}
+                    src={livre.image ?? meta!.imageUrl!}
                     alt=""
                     className="w-8 h-11 object-cover shrink-0 rounded-sm"
                 />

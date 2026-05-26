@@ -110,12 +110,13 @@ export function LivreForm({
                     </div>
                 </div>
             )}
-            <input type="hidden" name="titre" value={titre} />
             <LivreFormIdentite
                 livre={livre}
                 onImport={handleImport}
                 inventaireUri={sourceId}
                 onInventaireUriChange={setSourceId}
+                titre={titre}
+                onTitreChange={setTitre}
             />
             <LivreFormClassification
                 checkedGenreIds={checkedGenreIds}

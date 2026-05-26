@@ -165,6 +165,7 @@ export async function getLivres(
             prix: livres.prix,
             choixLibrairie: livres.choixLibrairie,
             noteMoyenne: livres.noteMoyenne,
+            image: livres.image,
             createdAt: livres.createdAt,
         })
         .from(livres)
