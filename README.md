@@ -115,54 +115,33 @@ Schéma : `db/schema.ts` · `db/SCHEMA.md`
 
 ## Variables d'environnement
 
+Voir `.env.example` pour la liste complète. Valeurs minimales :
+
 ```env
-# Base
 DATABASE_URL=postgresql://leb:leb@localhost:5432/leb
 AUTH_SECRET=<openssl rand -base64 33>
 AUTH_URL=http://localhost:3000
+NEXTAUTH_URL=http://localhost:3000
 PREVIEW_SECRET=<openssl rand -base64 20>
-
-# Google Books API (catalogue public — browse, search, discovery)
 GOOGLE_BOOKS_API_KEY=
 
-# Boutique (config publique)
 NEXT_PUBLIC_STORE_NAME=Lecture & Bouture
-NEXT_PUBLIC_STORE_TAGLINE=Cultiver l'esprit, nourrir la terre.
-NEXT_PUBLIC_STORE_DESCRIPTION=...
 NEXT_PUBLIC_STORE_URL=https://lectureetbouture.fr
-NEXT_PUBLIC_STORE_ADDRESS_STREET=...
-NEXT_PUBLIC_STORE_ADDRESS_CITY=...
-NEXT_PUBLIC_STORE_LAT=...
-NEXT_PUBLIC_STORE_LNG=...
-NEXT_PUBLIC_STORE_LOCALE=fr
+NEXT_PUBLIC_STORE_LOCALE=fr_FR
 
-# MinIO (stockage images)
 MINIO_ENDPOINT=localhost
 MINIO_PORT=9100
 MINIO_USE_SSL=false
-MINIO_ACCESS_KEY=
-MINIO_SECRET_KEY=
+MINIO_ACCESS_KEY=minioadmin
+MINIO_SECRET_KEY=minioadmin123
 MINIO_BUCKET=leb
 MINIO_PUBLIC_URL=http://localhost:9100/leb
 
-# Email (Resend)
 RESEND_API_KEY=
-RESEND_FROM_EMAIL=contact@lectureetbouture.fr
-RESEND_TO_EMAIL=contact@lectureetbouture.fr
-
-# Newsletter (Loops)
 LOOPS_API_KEY=
 
-# Analytics (Umami)
-NEXT_PUBLIC_UMAMI_WEBSITE_ID=
-NEXT_PUBLIC_UMAMI_HOST=https://cloud.umami.is
-
-# Surveys (Formbricks)
-NEXT_PUBLIC_FORMBRICKS_ENV_ID=
-NEXT_PUBLIC_FORMBRICKS_HOST=
-
-# Import livres BO (inventaire.io/wikidata)
 BOOK_IMPORT_PROVIDER=               # vide = Google Books (défaut) | inventaire | wikidata
+WIKIDATA_ACCESS_TOKEN=              # requis si BOOK_IMPORT_PROVIDER=wikidata
 ```
 
 ---
@@ -191,7 +170,9 @@ npm run admin:create <email> <mot-de-passe>
 - `/evenements` — agenda (en cours / à venir / passé)
 - `/selections` — sélections actives de la libraire
 - `/contact` — formulaire + carte Leaflet
+- `/ma-liste` — wishlist localStorage, sélection de livres, demande de disponibilité (`POST /api/disponibilite` → Resend)
 - Pages éditoriales — concept, mentions légales, CGV, CGU, cookies, politique
+- Nudge social proof — toast SSE bottom-left sur toutes les pages front quand une demande de dispo est soumise (titres cliquables, auto-dismiss 6s, émetteur exclu)
 
 ### Back-office (`/admin`)
 
@@ -211,6 +192,7 @@ npm run admin:create <email> <mot-de-passe>
 - PostgreSQL + Drizzle — PKs uuid, migrations idempotentes
 - MinIO — images livres, boutures, événements
 - Google Books API — import BO : ISBN → préremplissage formulaire enrichissement (inventaire.io/wikidata via `BOOK_IMPORT_PROVIDER`)
+- Docker — image prod `sankarej/lecture-et-bouture` sur Docker Hub · voir `DEPLOY.md`
 
 ---
 
@@ -220,3 +202,4 @@ npm run admin:create <email> <mot-de-passe>
 - ~~Meilisearch~~ — obsolète, recherche full-text assurée par Google Books API
 - API leslibraires.fr / Librisoft — stocks temps réel, panier, commandes
 - Éco-conception — audit thegreenwebfoundation.org
+- Resend — câbler clé API en prod (workaround try/catch temporaire dans `/api/disponibilite`)

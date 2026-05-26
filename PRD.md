@@ -67,6 +67,7 @@ Concept hybride : livres académiques + boutures végétales. Expérience d'acha
 - **Événements** : agenda administrable, état calculé à la volée (passé / en cours / à venir), événement mis en avant sur la home (en cours prioritaire, sinon prochain).
 - **Erreurs custom** : 404 et 500 dans le thème.
 - **Contact** : formulaire → Resend
+- **Demande de disponibilité** : depuis `/ma-liste`, sélection de livres par checkbox → barre fixe bas → formulaire inline → `POST /api/disponibilite` (rate limit 3/15min, honeypot) → email Resend boutique. Nudge SSE : toast bottom-left "En ce moment, un lecteur s'intéresse à [titres cliquables]" diffusé à tous les visiteurs front (auto-dismiss 6s, émetteur exclu via `clientId`).
 - **Newsletter** : Loops
 - **Analytics** : Umami (privacy-first)
 - **Écoconception** : design sobre, certifications existantes affichées, section engagement

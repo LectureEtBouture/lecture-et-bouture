@@ -48,6 +48,7 @@ Ce document détaille les choix techniques, la structure architecturale et la ph
 - **Services (lib/services)** : Couche d'abstraction pour les appels aux API externes (Google Books, Inventaire) et la logique métier.
 - **Queries (lib/queries)** : Fonctions dédiées à la récupération et à la manipulation des données via Drizzle.
 - **Actions (lib/actions)** : Utilisation des "Server Actions" de Next.js pour les mutations de données.
+- **Nudge SSE (lib/nudge-store.ts + /api/nudge-stream)** : Système pub/sub in-memory. Quand un visiteur soumet une demande de disponibilité, un event est émis à tous les clients SSE connectés — toast "social proof" bottom-left avec titres cliquables. L'émetteur est exclu via `clientId` par onglet.
 
 ### Atomic Design & Identité Visuelle
 
@@ -75,7 +76,7 @@ Ce document détaille les choix techniques, la structure architecturale et la ph
 
 ## 4. Outils de Développement & Infrastructure
 
-- **Docker Compose** : Orchestration des services locaux (DB, MinIO, Adminer, Portainer).
+- **Docker Compose** : Orchestration des services locaux (DB, MinIO, Adminer, Portainer) et production (image `sankarej/lecture-et-bouture` sur Docker Hub). Voir `DEPLOY.md`.
 - **Caddy** : Serveur proxy inverse (reverse proxy) gérant le HTTPS local automatiquement pour un environnement de développement sécurisé.
 - **Adminer / Portainer** : Outils de gestion graphique pour la base de données et les conteneurs Docker.
 - **Drizzle Studio** : Interface utilisateur pour l'exploration et la modification rapide des données en DB.

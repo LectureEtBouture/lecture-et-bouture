@@ -62,6 +62,16 @@
 - `langRestrict` : actif sur ISBN/URI/titre. Désactivé sur discovery (requêtes françaises assurent la pertinence)
 - Description fallback : Open Library (`fetchOLDescriptionByISBN`) si Google Books absent
 
+### Nudge disponibilité (social proof)
+
+- SSE endpoint `/api/nudge-stream` — `ReadableStream`, ping 30s, subscribe/unsubscribe propre
+- `lib/nudge-store.ts` — singleton in-memory, ring buffer 10 events, pub/sub
+- `lib/nudge-client-id.ts` — ID unique par onglet (`globalThis.crypto.randomUUID()`)
+- `hooks/useNudge.ts` — EventSource + auto-dismiss 6s + dismiss manuel
+- `NudgeToast` — toast bottom-left, titres cliquables `/livres/[slug]`, design herbier, `motion-reduce`
+- Exclusion de l'émetteur via `clientId` (passé en `?cid=` SSE + body POST)
+- `/ma-liste` — checkbox affordance (opacity 40% au repos), instruction inline avec pictogramme
+
 ### Infra & Auth
 
 - PostgreSQL 16 + Drizzle ORM — UUID PKs, migrations idempotentes, seed avec Maps cross-références
