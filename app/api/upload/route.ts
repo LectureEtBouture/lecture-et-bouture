@@ -46,9 +46,15 @@ export async function POST(req: Request) {
     const objectName = `${folder}/${Date.now()}-${crypto.randomUUID().slice(0, 8)}.webp`;
 
     await ensureBucket();
-    await minioClient.putObject(BUCKET, objectName, optimized, optimized.length, {
-        'Content-Type': 'image/webp',
-    });
+    await minioClient.putObject(
+        BUCKET,
+        objectName,
+        optimized,
+        optimized.length,
+        {
+            'Content-Type': 'image/webp',
+        },
+    );
 
     return NextResponse.json({ url: `${PUBLIC_URL}/${objectName}` });
 }

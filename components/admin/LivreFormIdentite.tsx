@@ -66,7 +66,8 @@ export function LivreFormIdentite({
                 />
                 {livre && (
                     <p className="text-[11px] text-muted mt-1">
-                        Le titre est mis à jour via l&apos;enrichissement externe.
+                        Le titre est mis à jour via l&apos;enrichissement
+                        externe.
                     </p>
                 )}
             </div>

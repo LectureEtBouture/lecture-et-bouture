@@ -82,7 +82,10 @@ export function AdminDevWidget() {
                                 </p>
                             </div>
                         ) : (
-                            <form onSubmit={handleSubmit} className="p-4 space-y-4">
+                            <form
+                                onSubmit={handleSubmit}
+                                className="p-4 space-y-4"
+                            >
                                 <div>
                                     <span className="text-[11px] uppercase tracking-[0.12em] font-medium text-muted block mb-2">
                                         Type
@@ -124,8 +127,7 @@ export function AdminDevWidget() {
 
                                 {status === 'error' && (
                                     <p className="text-[11px] text-danger">
-                                        Erreur lors de l&rsquo;envoi.
-                                        Réessayez.
+                                        Erreur lors de l&rsquo;envoi. Réessayez.
                                     </p>
                                 )}
 
@@ -149,12 +151,7 @@ export function AdminDevWidget() {
                     onClick={() => setOpen(!open)}
                     className="flex items-center gap-2 px-3 py-2 bg-surface border border-border text-muted text-[11px] uppercase tracking-[0.1em] hover:border-primary hover:text-primary transition-colors shadow-sm"
                 >
-                    <svg
-                        width="13"
-                        height="13"
-                        viewBox="0 0 13 13"
-                        fill="none"
-                    >
+                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
                         <circle
                             cx="6.5"
                             cy="6.5"

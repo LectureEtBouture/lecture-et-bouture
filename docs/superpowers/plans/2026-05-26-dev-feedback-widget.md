@@ -12,19 +12,20 @@
 
 ## File Map
 
-| Action | Fichier |
-|--------|---------|
-| Modify | `services/resend.ts` — ajouter `sendDevFeedbackEmail` |
-| Create | `lib/actions/dev-feedback.ts` — server action `envoyerFeedbackDev` |
-| Create | `app/admin/(protected)/_components/AdminDevWidget.tsx` — widget complet |
+| Action | Fichier                                                                              |
+| ------ | ------------------------------------------------------------------------------------ |
+| Modify | `services/resend.ts` — ajouter `sendDevFeedbackEmail`                                |
+| Create | `lib/actions/dev-feedback.ts` — server action `envoyerFeedbackDev`                   |
+| Create | `app/admin/(protected)/_components/AdminDevWidget.tsx` — widget complet              |
 | Modify | `app/admin/(protected)/_components/AdminShell.tsx` — prop `devEmail` + render widget |
-| Modify | `app/admin/(protected)/layout.tsx` — lire `DEVELOPPER_EMAIL` + passer à AdminShell |
+| Modify | `app/admin/(protected)/layout.tsx` — lire `DEVELOPPER_EMAIL` + passer à AdminShell   |
 
 ---
 
 ### Task 1 : `sendDevFeedbackEmail` dans services/resend.ts
 
 **Files:**
+
 - Modify: `services/resend.ts`
 
 - [ ] **Step 1 : Ajouter le type et la fonction à la fin de `services/resend.ts`**
@@ -78,6 +79,7 @@ git commit -m "feat: add sendDevFeedbackEmail to resend service"
 ### Task 2 : Server action `envoyerFeedbackDev`
 
 **Files:**
+
 - Create: `lib/actions/dev-feedback.ts`
 
 - [ ] **Step 1 : Créer le fichier**
@@ -128,6 +130,7 @@ git commit -m "feat: add envoyerFeedbackDev server action"
 ### Task 3 : Composant `AdminDevWidget`
 
 **Files:**
+
 - Create: `app/admin/(protected)/_components/AdminDevWidget.tsx`
 
 - [ ] **Step 1 : Créer le composant**
@@ -194,7 +197,12 @@ export function AdminDevWidget() {
                                 className="text-muted hover:text-foreground transition-colors p-1"
                                 aria-label="Fermer"
                             >
-                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                <svg
+                                    width="12"
+                                    height="12"
+                                    viewBox="0 0 12 12"
+                                    fill="none"
+                                >
                                     <path
                                         d="M1 1L11 11M11 1L1 11"
                                         stroke="currentColor"
@@ -212,7 +220,10 @@ export function AdminDevWidget() {
                                 </p>
                             </div>
                         ) : (
-                            <form onSubmit={handleSubmit} className="p-4 space-y-4">
+                            <form
+                                onSubmit={handleSubmit}
+                                className="p-4 space-y-4"
+                            >
                                 <div>
                                     <span className="text-[11px] uppercase tracking-[0.12em] font-medium text-muted block mb-2">
                                         Type
@@ -222,7 +233,9 @@ export function AdminDevWidget() {
                                             <button
                                                 key={feedbackType}
                                                 type="button"
-                                                onClick={() => setType(feedbackType)}
+                                                onClick={() =>
+                                                    setType(feedbackType)
+                                                }
                                                 className={`px-3 py-1.5 text-[11px] uppercase tracking-[0.08em] transition-colors rounded-sm ${
                                                     type === feedbackType
                                                         ? 'bg-primary text-background'
@@ -241,7 +254,9 @@ export function AdminDevWidget() {
                                     </span>
                                     <textarea
                                         value={message}
-                                        onChange={(e) => setMessage(e.target.value)}
+                                        onChange={(e) =>
+                                            setMessage(e.target.value)
+                                        }
                                         required
                                         rows={4}
                                         className="w-full border border-border bg-surface text-foreground px-[14px] py-[10px] text-sm rounded-sm focus:outline-none focus:border-primary resize-none"
@@ -260,7 +275,9 @@ export function AdminDevWidget() {
                                         disabled={status === 'loading'}
                                         className="bg-primary text-background px-6 py-2 text-[11px] uppercase tracking-[0.1em] font-medium transition-colors hover:bg-primary-light disabled:opacity-50"
                                     >
-                                        {status === 'loading' ? 'Envoi…' : 'Envoyer →'}
+                                        {status === 'loading'
+                                            ? 'Envoi…'
+                                            : 'Envoyer →'}
                                     </button>
                                 </div>
                             </form>
@@ -315,6 +332,7 @@ git commit -m "feat: add AdminDevWidget client component"
 ### Task 4 : Wiring — layout + AdminShell
 
 **Files:**
+
 - Modify: `app/admin/(protected)/layout.tsx`
 - Modify: `app/admin/(protected)/_components/AdminShell.tsx`
 
@@ -386,7 +404,9 @@ export function AdminShell({
 Et à la fin du JSX, avant la fermeture du `<div className="min-h-screen bg-background">`, ajouter :
 
 ```tsx
-{devEmail && <AdminDevWidget />}
+{
+    devEmail && <AdminDevWidget />;
+}
 ```
 
 Le JSX final du composant ressemble à :
@@ -426,6 +446,7 @@ npm run dev
 ```
 
 Ouvrir `http://localhost:3000/admin`. Vérifier :
+
 - Pill "Signaler un problème" visible en bas à droite
 - Clic ouvre le popover
 - Sélecteur Bug/Feedback/Idée fonctionne (highlight du type actif)

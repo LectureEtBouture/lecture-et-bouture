@@ -2,7 +2,7 @@
 name: dev-feedback-widget
 description: Widget flottant admin permettant d'envoyer bug/feedback/idée au développeur via DEVELOPPER_EMAIL
 metadata:
-  type: project
+    type: project
 ---
 
 # Widget "Signaler un problème"
