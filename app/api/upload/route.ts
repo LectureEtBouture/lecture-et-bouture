@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
+import sharp from 'sharp';
 import { auth } from '@/auth';
 import { minioClient, BUCKET, PUBLIC_URL, ensureBucket } from '@/lib/minio';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
+const MAX_WIDTH = 1200;
 
 export async function POST(req: Request) {
     const session = await auth();
@@ -34,14 +36,18 @@ export async function POST(req: Request) {
         );
     }
 
-    const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg';
-    const objectName = `${folder}/${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
+    const raw = Buffer.from(await file.arrayBuffer());
 
-    const buffer = Buffer.from(await file.arrayBuffer());
+    const optimized = await sharp(raw)
+        .resize({ width: MAX_WIDTH, withoutEnlargement: true })
+        .webp({ quality: 85 })
+        .toBuffer();
+
+    const objectName = `${folder}/${Date.now()}-${crypto.randomUUID().slice(0, 8)}.webp`;
 
     await ensureBucket();
-    await minioClient.putObject(BUCKET, objectName, buffer, file.size, {
-        'Content-Type': file.type,
+    await minioClient.putObject(BUCKET, objectName, optimized, optimized.length, {
+        'Content-Type': 'image/webp',
     });
 
     return NextResponse.json({ url: `${PUBLIC_URL}/${objectName}` });
