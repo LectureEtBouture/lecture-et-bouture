@@ -3,6 +3,8 @@ import { getLivresPubliques } from '@/lib/queries/livres';
 import { getBouturesPubliques } from '@/lib/queries/boutures';
 import { siteConfig } from '@/lib/metadata';
 
+export const dynamic = 'force-dynamic';
+
 const base = siteConfig.url;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

@@ -9,6 +9,8 @@ import { NudgeListener } from '@/components/ui/NudgeListener';
 import { getAnnonce, getMaintenance } from '@/lib/queries/parametres';
 import { getPublishedEditorialSlugs } from '@/lib/queries/pages';
 
+export const dynamic = 'force-dynamic';
+
 export default async function FrontLayout({
     children,
 }: {
