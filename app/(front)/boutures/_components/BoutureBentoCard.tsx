@@ -129,7 +129,7 @@ export function LargeCard({ bouture }: { bouture: BouturePublique }) {
                     </div>
                     <div className="mt-6 space-y-3">
                         <p className="text-sm text-foreground leading-[1.7] line-clamp-3 max-w-[40ch]">
-                            {bouture.description}
+                            {bouture.description?.replace(/<[^>]+>/g, '')}
                         </p>
                         {bouture.noteDeLaLibrairie && (
                             <div className="flex items-baseline gap-2 pt-1 border-t border-border">

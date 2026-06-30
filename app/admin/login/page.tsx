@@ -1,36 +1,11 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useActionState } from 'react';
+import { login } from '@/lib/actions/auth';
 import { siteConfig } from '@/lib/metadata';
 
 export default function LoginPage() {
-    const router = useRouter();
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
-
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
-
-        const form = new FormData(e.currentTarget);
-
-        const result = await signIn('credentials', {
-            email: form.get('email'),
-            password: form.get('password'),
-            redirect: false,
-        });
-
-        setLoading(false);
-
-        if (result?.error) {
-            setError('Email ou mot de passe incorrect.');
-        } else {
-            router.push('/admin');
-        }
-    }
+    const [state, action, pending] = useActionState(login, null);
 
     return (
         <main className="min-h-screen flex items-center justify-center bg-background">
@@ -44,7 +19,7 @@ export default function LoginPage() {
                     </p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form action={action} method="post" className="space-y-4">
                     <div className="space-y-1">
                         <label
                             htmlFor="email"
@@ -79,14 +54,16 @@ export default function LoginPage() {
                         />
                     </div>
 
-                    {error && <p className="text-sm text-red-600">{error}</p>}
+                    {state?.error && (
+                        <p className="text-sm text-red-600">{state.error}</p>
+                    )}
 
                     <button
                         type="submit"
-                        disabled={loading}
+                        disabled={pending}
                         className="w-full py-2 bg-primary text-background text-sm font-medium rounded-lg hover:bg-primary-light disabled:opacity-50 transition-colors"
                     >
-                        {loading ? 'Connexion...' : 'Se connecter'}
+                        {pending ? 'Connexion...' : 'Se connecter'}
                     </button>
 
                     <div className="text-center">

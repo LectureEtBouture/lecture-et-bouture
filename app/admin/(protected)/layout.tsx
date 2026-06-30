@@ -1,5 +1,6 @@
-import { auth, signOut } from '@/auth';
 import { redirect } from 'next/navigation';
+import { auth } from '@/auth';
+import { logout } from '@/lib/actions/auth';
 import { AdminShell } from './_components/AdminShell';
 
 export default async function AdminLayout({
@@ -10,16 +11,11 @@ export default async function AdminLayout({
     const session = await auth();
     if (!session) redirect('/admin/login');
 
-    const signOutAction = async () => {
-        'use server';
-        await signOut({ redirectTo: '/admin/login' });
-    };
-
     return (
         <AdminShell
             email={session.user?.email ?? ''}
             role={session.user?.role}
-            signOutAction={signOutAction}
+            signOutAction={logout as () => Promise<void>}
             devEmail={process.env.DEVELOPPER_EMAIL}
         >
             {children}

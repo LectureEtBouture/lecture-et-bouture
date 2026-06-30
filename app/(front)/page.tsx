@@ -11,8 +11,10 @@ import {
     getArticlesEnAvant,
     getCategoriesParArticles,
 } from '@/lib/queries/articles';
+import { getBouturesPubliques } from '@/lib/queries/boutures';
 import { HeroSection } from './_components/HeroSection';
 import { LivresSection } from './_components/LivresSection';
+import { BouturesSection } from './_components/BouturesSection';
 import { SurprendreSection } from './_components/SurprendreSection';
 import { EvenementEnAvant } from './_components/EvenementEnAvant';
 import { BlogEnAvant } from './_components/BlogEnAvant';
@@ -47,6 +49,7 @@ export default async function HomePage() {
         tendances,
         evenementMisEnAvant,
         articlesEnAvant,
+        boutures,
         ...genreLivres
     ] = await Promise.all([
         getLivresMisEnAvant(),
@@ -54,6 +57,7 @@ export default async function HomePage() {
         getLivresTendances(0),
         getEvenementMisEnAvant(),
         getArticlesEnAvant(),
+        getBouturesPubliques({ choixLibrairie: true, limit: 6 }),
         ...GENRE_SECTIONS.map((section) => getLivresParSujet(section.query)),
     ]);
 
@@ -91,6 +95,7 @@ export default async function HomePage() {
                     href={section.href}
                 />
             ))}
+            <BouturesSection boutures={boutures} />
             {evenementMisEnAvant && (
                 <EvenementEnAvant
                     evenement={evenementMisEnAvant.evenement}

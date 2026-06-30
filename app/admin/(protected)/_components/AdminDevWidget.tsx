@@ -149,7 +149,8 @@ export function AdminDevWidget() {
 
                 <button
                     onClick={() => setOpen(!open)}
-                    className="flex items-center gap-2 px-3 py-2 bg-surface border border-border text-muted text-[11px] uppercase tracking-[0.1em] hover:border-primary hover:text-primary transition-colors shadow-sm"
+                    aria-label={open ? 'Fermer' : 'Signaler un problème'}
+                    className="flex items-center gap-1.5 px-2.5 py-2 bg-surface border border-border text-muted hover:border-primary hover:text-primary transition-colors shadow-sm"
                 >
                     <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
                         <circle
@@ -166,7 +167,21 @@ export function AdminDevWidget() {
                             strokeLinecap="round"
                         />
                     </svg>
-                    Signaler un problème
+                    <svg
+                        width="7"
+                        height="7"
+                        viewBox="0 0 7 7"
+                        fill="none"
+                        className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+                    >
+                        <path
+                            d="M5.5 1L2 3.5L5.5 6"
+                            stroke="currentColor"
+                            strokeWidth="1.2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        />
+                    </svg>
                 </button>
             </div>
         </>

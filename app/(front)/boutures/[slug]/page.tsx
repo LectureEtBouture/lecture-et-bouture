@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getBoutureBySlug, getBouturesPubliques } from '@/lib/queries/boutures';
+import { getBoutureBySlug } from '@/lib/queries/boutures';
 import { getBoutureCoverColor, DIFFICULTE_LABELS } from '@/lib/data';
 import { getAvisForBouture } from '@/lib/db/avis';
 import { sanitizeRte } from '@/lib/sanitize';
@@ -22,10 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
 }
 
-export async function generateStaticParams() {
-    const boutures = await getBouturesPubliques();
-    return boutures.map((bouture) => ({ slug: bouture.slug }));
-}
+export const dynamic = 'force-dynamic';
 
 export default async function BouturePage({ params }: Props) {
     const { slug } = await params;
@@ -100,7 +97,7 @@ export default async function BouturePage({ params }: Props) {
                                 Description
                             </h2>
                             <div
-                                className="text-base text-foreground leading-relaxed max-w-[68ch] [&_p]:mb-3 [&_p:last-child]:mb-0"
+                                className="prose max-w-[68ch]"
                                 dangerouslySetInnerHTML={{
                                     __html: descriptionHtml,
                                 }}
@@ -114,7 +111,7 @@ export default async function BouturePage({ params }: Props) {
                                 Entretien
                             </h2>
                             <div
-                                className="text-base text-foreground leading-relaxed max-w-[68ch] [&_p]:mb-3 [&_p:last-child]:mb-0"
+                                className="prose max-w-[68ch]"
                                 dangerouslySetInnerHTML={{
                                     __html: conseilsHtml,
                                 }}

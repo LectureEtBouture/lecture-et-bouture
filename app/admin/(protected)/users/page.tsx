@@ -78,16 +78,21 @@ export default async function AdminUsersPage() {
                                     key={user.id}
                                     className="border-b border-border/50 hover:bg-white transition-colors"
                                 >
-                                    <td className="py-3 pr-6 text-foreground truncate max-w-[220px]">
-                                        {user.email}
-                                        {user.id === session?.user?.id && (
-                                            <span className="ml-2 text-[10px] uppercase tracking-[0.08em] text-muted">
-                                                vous
+                                    <td className="py-3 pr-6 max-w-[200px]">
+                                        <div className="flex items-center gap-2 min-w-0">
+                                            <span className="text-foreground truncate">
+                                                {user.email}
                                             </span>
-                                        )}
+                                            {user.id ===
+                                                session?.user?.id && (
+                                                <span className="flex-none text-[10px] uppercase tracking-[0.08em] text-muted">
+                                                    vous
+                                                </span>
+                                            )}
+                                        </div>
                                     </td>
                                     <td className="py-3 pr-6">
-                                        <span className="text-[10px] uppercase tracking-[0.08em] px-1.5 py-0.5 border border-border text-muted leading-none">
+                                        <span className="whitespace-nowrap text-[10px] uppercase tracking-[0.08em] px-1.5 py-0.5 border border-border text-muted leading-none">
                                             {ROLE_LABELS[user.role] ??
                                                 user.role}
                                         </span>

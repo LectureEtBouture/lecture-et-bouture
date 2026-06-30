@@ -1,41 +1,16 @@
-import NextAuth from 'next-auth';
-import Credentials from 'next-auth/providers/credentials';
-import { eq } from 'drizzle-orm';
-import { db } from '@/db';
-import { users } from '@/db/schema';
-import argon2 from 'argon2';
-import { z } from 'zod';
-import { authConfig } from './auth.config';
+import { cookies } from 'next/headers';
+import { getIronSession } from 'iron-session';
+import { sessionOptions, type SessionData } from '@/lib/session';
 
-const loginSchema = z.object({
-    email: z.string().email(),
-    password: z.string().min(8),
-});
-
-export const { handlers, signIn, signOut, auth } = NextAuth({
-    ...authConfig,
-    providers: [
-        Credentials({
-            async authorize(credentials) {
-                const parsed = loginSchema.safeParse(credentials);
-                if (!parsed.success) return null;
-
-                const { email, password } = parsed.data;
-
-                const user = await db
-                    .select()
-                    .from(users)
-                    .where(eq(users.email, email))
-                    .limit(1)
-                    .then((r) => r[0]);
-
-                if (!user) return null;
-
-                const valid = await argon2.verify(user.passwordHash, password);
-                if (!valid) return null;
-
-                return { id: user.id, email: user.email, role: user.role };
-            },
-        }),
-    ],
-});
+export async function auth() {
+    const cookieStore = await cookies();
+    const session = await getIronSession<SessionData>(cookieStore, sessionOptions);
+    if (!session.isLoggedIn) return null;
+    return {
+        user: {
+            id: session.userId,
+            email: session.email,
+            role: session.role,
+        },
+    };
+}

@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { getArticlesAdmin } from '@/lib/queries/articles';
 import { getTagsBlog } from '@/lib/queries/tags-blog';
+import { getCategoriesBlog } from '@/lib/queries/categories-blog';
+import { getAuteursBlog } from '@/lib/queries/auteurs-blog';
 import { ArticleRow } from './_components/ArticleRow';
 
 export default async function AdminBlogPage({
@@ -9,14 +11,16 @@ export default async function AdminBlogPage({
     searchParams: Promise<{ tag?: string }>;
 }) {
     const { tag } = await searchParams;
-    const [data, tags] = await Promise.all([
+    const [data, tags, categories, auteurs] = await Promise.all([
         getArticlesAdmin(tag),
         getTagsBlog(),
+        getCategoriesBlog(),
+        getAuteursBlog(),
     ]);
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h1 className="font-serif text-2xl font-bold text-foreground">
                         Blog
@@ -25,28 +29,43 @@ export default async function AdminBlogPage({
                         {data.length} article{data.length > 1 ? 's' : ''}
                     </p>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-2">
                     <Link
                         href="/admin/blog/tags"
-                        className="px-4 py-2 border border-border text-foreground text-[11px] uppercase tracking-[0.1em] hover:border-primary transition-colors"
+                        className="flex items-center gap-2 px-3 py-2 border border-border text-foreground text-[11px] uppercase tracking-[0.1em] hover:border-primary transition-colors"
                     >
                         Tags
+                        {tags.length > 0 && (
+                            <span className="text-[10px] tabular-nums text-muted font-normal normal-case tracking-normal leading-none">
+                                {tags.length}
+                            </span>
+                        )}
                     </Link>
                     <Link
                         href="/admin/blog/categories"
-                        className="px-4 py-2 border border-border text-foreground text-[11px] uppercase tracking-[0.1em] hover:border-primary transition-colors"
+                        className="flex items-center gap-2 px-3 py-2 border border-border text-foreground text-[11px] uppercase tracking-[0.1em] hover:border-primary transition-colors"
                     >
                         Catégories
+                        {categories.length > 0 && (
+                            <span className="text-[10px] tabular-nums text-muted font-normal normal-case tracking-normal leading-none">
+                                {categories.length}
+                            </span>
+                        )}
                     </Link>
                     <Link
                         href="/admin/blog/auteurs"
-                        className="px-4 py-2 border border-border text-foreground text-[11px] uppercase tracking-[0.1em] hover:border-primary transition-colors"
+                        className="flex items-center gap-2 px-3 py-2 border border-border text-foreground text-[11px] uppercase tracking-[0.1em] hover:border-primary transition-colors"
                     >
                         Auteurs
+                        {auteurs.length > 0 && (
+                            <span className="text-[10px] tabular-nums text-muted font-normal normal-case tracking-normal leading-none">
+                                {auteurs.length}
+                            </span>
+                        )}
                     </Link>
                     <Link
                         href="/admin/blog/nouveau"
-                        className="px-4 py-2 bg-primary text-background text-[11px] uppercase tracking-[0.1em] hover:bg-primary-light transition-colors"
+                        className="px-3 py-2 bg-primary text-background text-[11px] uppercase tracking-[0.1em] hover:bg-primary-light transition-colors"
                     >
                         Nouvel article
                     </Link>

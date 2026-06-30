@@ -1,16 +1,12 @@
 import { ImageResponse } from 'next/og';
-import { getBoutureBySlug, getBouturesPubliques } from '@/lib/queries/boutures';
+import { getBoutureBySlug } from '@/lib/queries/boutures';
 import { getBoutureCoverColor } from '@/lib/data';
 import { loadOgFonts } from '@/lib/og-fonts';
 import { siteConfig } from '@/lib/metadata';
 
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
-
-export async function generateStaticParams() {
-    const boutures = await getBouturesPubliques();
-    return boutures.map((bouture) => ({ slug: bouture.slug }));
-}
+export const dynamic = 'force-dynamic';
 
 export default async function Image({
     params,

@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getPage, updatePage } from '@/lib/actions/pages';
-import { RtePageForm } from '@/components/admin/RtePageForm';
+import { RtePageForm } from './_components/RtePageFormClient';
 
 type Props = { params: Promise<{ slug: string }> };
 
