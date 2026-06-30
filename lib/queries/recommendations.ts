@@ -1,7 +1,7 @@
 import { unstable_cache } from 'next/cache';
 import { db } from '@/db';
-import { livres, livresGenres } from '@/db/schema';
-import { and, ne, notInArray, sql, eq, type SQL } from 'drizzle-orm';
+import { livres } from '@/db/schema';
+import { and, ne, sql, type SQL } from 'drizzle-orm';
 import type {
     LivreComplet,
     EnrichissementLocal,
@@ -9,46 +9,6 @@ import type {
 import { bookProvider } from '@/lib/services/books';
 import { fusionnerListe } from '@/lib/services/books/merge';
 import { getEnrichissementByUri } from './enrichissements';
-
-async function getEnrichissementsByIds(
-    ids: string[],
-): Promise<EnrichissementLocal[]> {
-    if (ids.length === 0) return [];
-    const { livresGenres: lg } = await import('@/db/schema');
-    const rows = await db
-        .select({
-            id: livres.id,
-            inventaireUri: livres.inventaireUri,
-            prix: livres.prix,
-            choixLibrairie: livres.choixLibrairie,
-            noteDeLaLibrairie: livres.noteDeLaLibrairie,
-            description: livres.description,
-            rayonId: livres.rayonId,
-            numeroSerie: livres.numeroSerie,
-            noteMoyenne: livres.noteMoyenne,
-            image: livres.image,
-            imageAlt: livres.imageAlt,
-        })
-        .from(livres)
-        .where(
-            ids.length === 1
-                ? eq(livres.id, ids[0])
-                : sql`${livres.id} = ANY(${ids})`,
-        );
-    return Promise.all(
-        rows.map(async (row) => {
-            const genreRows = await db
-                .select({ genreId: lg.genreId })
-                .from(lg)
-                .where(eq(lg.livreId, row.id));
-            return {
-                localId: row.id,
-                ...row,
-                genreIds: genreRows.map((g) => g.genreId),
-            };
-        }),
-    );
-}
 
 export type Recommendations = {
     memeGenre: LivreComplet[];

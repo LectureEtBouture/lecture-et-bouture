@@ -17,7 +17,7 @@ const ALL_NAV_LINKS = [
 ];
 
 function WishlistNavIcon() {
-    const { items, mounted, has: _has } = useWishlist();
+    const { items, mounted } = useWishlist();
     const count = items.length;
     const prevCount = useRef(0);
     const [pulse, setPulse] = useState(false);

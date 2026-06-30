@@ -31,7 +31,10 @@ export function BouturesSection({ boutures }: Props) {
 
                 <div className="flex gap-5 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     {boutures.map((bouture) => (
-                        <div key={bouture.id} className="flex-none w-40 sm:w-44">
+                        <div
+                            key={bouture.id}
+                            className="flex-none w-40 sm:w-44"
+                        >
                             <SmallCard bouture={bouture} />
                         </div>
                     ))}

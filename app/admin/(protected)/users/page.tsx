@@ -83,8 +83,7 @@ export default async function AdminUsersPage() {
                                             <span className="text-foreground truncate">
                                                 {user.email}
                                             </span>
-                                            {user.id ===
-                                                session?.user?.id && (
+                                            {user.id === session?.user?.id && (
                                                 <span className="flex-none text-[10px] uppercase tracking-[0.08em] text-muted">
                                                     vous
                                                 </span>

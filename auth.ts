@@ -4,7 +4,10 @@ import { sessionOptions, type SessionData } from '@/lib/session';
 
 export async function auth() {
     const cookieStore = await cookies();
-    const session = await getIronSession<SessionData>(cookieStore, sessionOptions);
+    const session = await getIronSession<SessionData>(
+        cookieStore,
+        sessionOptions,
+    );
     if (!session.isLoggedIn) return null;
     return {
         user: {

@@ -38,7 +38,10 @@ export async function login(_: unknown, formData: FormData) {
     if (!valid) return { error: 'Email ou mot de passe incorrect.' };
 
     const cookieStore = await cookies();
-    const session = await getIronSession<SessionData>(cookieStore, sessionOptions);
+    const session = await getIronSession<SessionData>(
+        cookieStore,
+        sessionOptions,
+    );
     session.userId = user.id;
     session.email = user.email;
     session.role = user.role;
@@ -50,7 +53,10 @@ export async function login(_: unknown, formData: FormData) {
 
 export async function logout() {
     const cookieStore = await cookies();
-    const session = await getIronSession<SessionData>(cookieStore, sessionOptions);
+    const session = await getIronSession<SessionData>(
+        cookieStore,
+        sessionOptions,
+    );
     session.destroy();
     redirect('/admin/login');
 }

@@ -4,7 +4,7 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { db } from '@/db';
 import { livres, livresGenres } from '@/db/schema';
-import { eq, desc, ilike, and, sql, SQL } from 'drizzle-orm';
+import { eq, desc, ilike, and, SQL } from 'drizzle-orm';
 import { auth } from '@/auth';
 import { z } from 'zod';
 import { createLog } from './admin-logs';

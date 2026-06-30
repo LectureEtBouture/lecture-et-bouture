@@ -1,12 +1,10 @@
 import type { BookProvider, LivreMetadata, LivreSearchResult } from '../types';
 import {
     BASE_URL,
-    LANG_FR,
     USER_AGENT,
     normaliserISBN,
     labelFr,
     extractYear,
-    langCode,
     resolveRedirect,
     fetchInvEntities,
     fetchOLDescription,
@@ -100,8 +98,6 @@ export class InventaireProvider implements BookProvider {
         let auteur = labelFr(authorUri ? resolved[authorUri] : undefined);
 
         const work = workUri ? resolved[workUri] : null;
-        const workLangUri = work?.claims['wdt:P407']?.[0] ?? null;
-        const isFrench = workLangUri === LANG_FR;
         const olId = work?.claims['wdt:P648']?.[0] ?? null;
         const wdDescription =
             work?.descriptions?.fr ?? work?.descriptions?.en ?? null;
@@ -149,8 +145,6 @@ export class InventaireProvider implements BookProvider {
         const seriesUri = entity.claims['wdt:P179']?.[0] ?? null;
         const authorUri = entity.claims['wdt:P50']?.[0] ?? null;
         const olId = entity.claims['wdt:P648']?.[0] ?? null;
-        const workLangUri = entity.claims['wdt:P407']?.[0] ?? null;
-        const isFrench = workLangUri === LANG_FR;
 
         const toResolve = [publisherUri, seriesUri, authorUri].filter(
             (u): u is string => u !== null,
