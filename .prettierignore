@@ -1,0 +1,15 @@
+.next
+node_modules
+
+# Fichiers stub /dev/null créés par l'environnement sandbox (bind-mounts)
+.bashrc
+.bash_profile
+.profile
+.zshrc
+.zprofile
+.gitconfig
+.gitmodules
+.mcp.json
+.ripgreprc
+.claude
+.vscode
