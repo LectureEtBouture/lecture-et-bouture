@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import sharp from 'sharp';
 import { auth } from '@/auth';
-import { minioClient, BUCKET, PUBLIC_URL, ensureBucket } from '@/lib/minio';
+import { minioClient, BUCKET, ensureBucket } from '@/lib/minio';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
@@ -53,9 +53,8 @@ export async function POST(req: Request) {
         optimized.length,
         {
             'Content-Type': 'image/webp',
-            'x-amz-acl': 'public-read',
         },
     );
 
-    return NextResponse.json({ url: `${PUBLIC_URL}/${objectName}` });
+    return NextResponse.json({ url: `/api/images/${objectName}` });
 }

@@ -30,33 +30,14 @@ export const minioClient = new Client({
 });
 
 export const BUCKET = process.env.MINIO_BUCKET ?? 'leb';
-export const PUBLIC_URL =
-    process.env.MINIO_PUBLIC_URL ?? 'http://localhost:9100/leb';
-
-const PUBLIC_POLICY = JSON.stringify({
-    Version: '2012-10-17',
-    Statement: [
-        {
-            Effect: 'Allow',
-            Principal: { AWS: ['*'] },
-            Action: ['s3:GetObject'],
-            Resource: [`arn:aws:s3:::${BUCKET}/*`],
-        },
-    ],
-});
 
 let bucketReady = false;
 
+// Le bucket reste privé — les images sont servies via /api/images (voir
+// app/api/images/[...path]/route.ts), pas de policy publique à appliquer.
 export async function ensureBucket() {
     if (bucketReady) return;
     const exists = await minioClient.bucketExists(BUCKET);
     if (!exists) await minioClient.makeBucket(BUCKET);
-    try {
-        await minioClient.setBucketPolicy(BUCKET, PUBLIC_POLICY);
-    } catch (error) {
-        // Certains providers S3-compatible (ex: bucket Railway) n'implémentent
-        // pas l'API de bucket policy — le bucket doit alors être public par défaut
-        console.warn('setBucketPolicy non supporté par ce provider:', error);
-    }
     bucketReady = true;
 }
