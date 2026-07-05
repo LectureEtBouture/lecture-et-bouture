@@ -88,6 +88,7 @@ nano .env   # remplir toutes les valeurs (voir section Variables)
 | `RESEND_TO_EMAIL`              | ✓           | Destinataire notifications                                |
 | `LOOPS_API_KEY`                | ✓           | Clé API Loops (newsletter)                                |
 | `PREVIEW_SECRET`               | ✓           | `openssl rand -base64 20`                                 |
+| `ALTCHA_HMAC_SECRET`           | ✓           | `openssl rand -base64 33` — anti-spam formulaires publics |
 | `GOOGLE_BOOKS_API_KEY`         | ✓           | Google Books API                                          |
 | `WIKIDATA_ACCESS_TOKEN`        | —           | Import livres via Wikidata                                |
 | `BOOK_IMPORT_PROVIDER`         | —           | `inventaire` (défaut) ou `wikidata`                       |

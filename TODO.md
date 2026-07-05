@@ -80,6 +80,7 @@
 - `lib/config.ts` `storeConfig` + `lib/metadata.ts` — templatisation complète (`NEXT_PUBLIC_STORE_*`)
 - Newsletter Loops, Analytics Umami (privacy-first)
 - Avis visiteurs — `FeedbackWidget` (widget maison) + `envoyerAvisVisiteur` + Resend, remplace Formbricks (retiré : trigger survey ne fonctionnait pas, dépendance externe en moins)
+- Anti-spam ALTCHA — `lib/altcha.ts` (self-hosted, `ALTCHA_HMAC_SECRET`), `AltchaWidget` sur contact / avis visiteur / demande de disponibilité, challenge servi par `/api/altcha-challenge`
 - `VusRecemment` — livres uniquement (boutures exclues), clear item individuel (×, hover) + clear all, `removeVisit`/`clearHistory` dans `useVisitHistory`
 - Boutures images — `CoverPanel` fiche affiche `next/image` ; `imageAlt` dans `BouturePublique` query ; `BoutureCard.tsx` dead code supprimé
 - Couvertures livres — `CoverImage` client component (`onError` → fond coloré si 404) ; OL `?default=false` ; `validateCoverUrl` HEAD check (rejette placeholder Google ~9KB) ; couverture personnalisée admin (`livres.image` + `livres.image_alt`) prioritaire sur Google Books/OL ; `imageAlt` propagé dans `LivreComplet` → `LivreCard` + `CoverPanel`

@@ -1,8 +1,13 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { sendContactEmail } from '@/services/resend';
+import {
+    sendContactEmail,
+    sendContactConfirmationEmail,
+} from '@/services/resend';
+import { verifyAltcha } from '@/lib/altcha';
 import { siteConfig } from '@/lib/metadata';
 import { getHoraires, getFermetures } from '@/lib/queries/parametres';
+import { AltchaWidget } from '@/components/ui/AltchaWidget';
 import { HorairesDisplay } from '@/components/ui/HorairesDisplay';
 import { MapWrapper } from './_components/MapWrapper';
 
@@ -20,6 +25,10 @@ async function handleContact(formData: FormData) {
     // Honeypot — bots fill hidden fields, humans don't
     if (formData.get('website')) redirect('/contact?sent=1');
 
+    if (!(await verifyAltcha(formData.get('altcha')))) {
+        redirect('/contact?error=1');
+    }
+
     const name = formData.get('name') as string;
     const email = formData.get('email') as string;
     const message = formData.get('message') as string;
@@ -29,6 +38,15 @@ async function handleContact(formData: FormData) {
         await sendContactEmail({ name, email, message });
     } catch {
         ok = false;
+    }
+
+    if (ok) {
+        // Best-effort — l'échec de la confirmation ne doit pas cacher le succès
+        try {
+            await sendContactConfirmationEmail({ name, email, message });
+        } catch {
+            // ignoré
+        }
     }
 
     redirect(ok ? '/contact?sent=1' : '/contact?error=1');
@@ -125,6 +143,7 @@ export default async function ContactPage({ searchParams }: Props) {
                             className="border border-border bg-surface text-foreground px-[14px] py-[10px] text-base rounded-sm focus:outline-none focus:border-primary resize-none"
                         />
                     </label>
+                    <AltchaWidget />
                     <button
                         type="submit"
                         className="self-start bg-primary text-background px-10 py-3.5 text-[11px] uppercase tracking-[0.1em] font-medium transition-colors duration-200 hover:bg-primary-light"

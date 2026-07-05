@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { WishlistItem } from '@/hooks/useWishlist';
 import { NUDGE_CLIENT_ID } from '@/lib/nudge-client-id';
+import { AltchaWidget } from '@/components/ui/AltchaWidget';
 
 type FormState = 'idle' | 'sending' | 'success' | 'error';
 
@@ -36,6 +37,7 @@ export function DisponibiliteBar({
                     email: data.get('email'),
                     telephone: data.get('telephone') || null,
                     website: data.get('website'),
+                    altcha: data.get('altcha'),
                     cid: NUDGE_CLIENT_ID,
                     livres: selected.map((l) => ({
                         inventaireUri: l.slug,
@@ -184,6 +186,7 @@ export function DisponibiliteBar({
                                 </button>
                             </div>
                         </div>
+                        <AltchaWidget />
                         {formState === 'error' && (
                             <p className="text-xs text-red-300">{errorMsg}</p>
                         )}

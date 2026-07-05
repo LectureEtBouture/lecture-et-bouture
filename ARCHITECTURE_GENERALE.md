@@ -21,6 +21,7 @@ Ce document détaille les choix techniques, la structure architecturale et la ph
 - **NextAuth v5** : Solution d'authentification gérant 5 rôles distincts via JWT et cookies httpOnly.
 - **MinIO** : Serveur de stockage d'objets (S3-compatible) auto-hébergé pour les images (livres, boutures, événements).
 - **Resend** : Service d'envoi d'emails transactionnels (notifications, réinitialisations de mots de passe).
+- **ALTCHA** : Protection anti-spam par preuve de travail (proof-of-work), self-hosted (`lib/altcha.ts`) — pas de service tiers, pas de clé API externe.
 - **Loops** : Plateforme de marketing et de gestion de newsletter pour la communication avec les lecteurs.
 - **Umami Analytics** : Solution d'analyse d'audience respectueuse de la vie privée, auto-hébergée.
 

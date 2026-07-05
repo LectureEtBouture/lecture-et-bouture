@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendDisponibiliteEmail } from '@/services/resend';
 import { nudgeStore } from '@/lib/nudge-store';
+import { verifyAltcha } from '@/lib/altcha';
 
 const WINDOW_MS = 15 * 60 * 1000;
 const MAX_REQUESTS = 3;
@@ -35,11 +36,18 @@ export async function POST(req: NextRequest) {
     if (!body)
         return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
 
-    const { nom, prenom, email, telephone, website, cid, livres } =
+    const { nom, prenom, email, telephone, website, altcha, cid, livres } =
         body as Record<string, unknown>;
 
     // Honeypot — silently succeed
     if (website) return NextResponse.json({ ok: true }, { status: 201 });
+
+    if (!(await verifyAltcha(altcha))) {
+        return NextResponse.json(
+            { error: 'Vérification anti-spam échouée.' },
+            { status: 422 },
+        );
+    }
 
     if (
         typeof nom !== 'string' ||

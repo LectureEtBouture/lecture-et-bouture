@@ -1,5 +1,6 @@
 'use server';
 
+import { verifyAltcha } from '@/lib/altcha';
 import { sendVisitorFeedbackEmail } from '@/services/resend';
 
 export async function envoyerAvisVisiteur(
@@ -7,6 +8,10 @@ export async function envoyerAvisVisiteur(
 ): Promise<{ ok: true } | { ok: false; error: string }> {
     // Honeypot — bots remplissent les champs cachés, les humains non
     if (formData.get('website')) return { ok: true };
+
+    if (!(await verifyAltcha(formData.get('altcha')))) {
+        return { ok: false, error: 'Vérification anti-spam échouée.' };
+    }
 
     const message = (formData.get('message') as string)?.trim();
     const email = (formData.get('email') as string)?.trim();

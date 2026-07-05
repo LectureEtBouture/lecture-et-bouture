@@ -123,6 +123,7 @@ AUTH_SECRET=<openssl rand -base64 33>
 AUTH_URL=http://localhost:3000
 NEXTAUTH_URL=http://localhost:3000
 PREVIEW_SECRET=<openssl rand -base64 20>
+ALTCHA_HMAC_SECRET=<openssl rand -base64 33>
 GOOGLE_BOOKS_API_KEY=
 
 NEXT_PUBLIC_STORE_NAME=Lecture & Bouture

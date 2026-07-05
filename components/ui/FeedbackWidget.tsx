@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { envoyerAvisVisiteur } from '@/lib/actions/visitor-feedback';
+import { AltchaWidget } from '@/components/ui/AltchaWidget';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
@@ -12,14 +13,12 @@ export function FeedbackWidget() {
     const [status, setStatus] = useState<Status>('idle');
     const [error, setError] = useState<string | null>(null);
 
-    async function handleSubmit(evt: React.FormEvent) {
+    async function handleSubmit(evt: React.FormEvent<HTMLFormElement>) {
         evt.preventDefault();
         setStatus('loading');
         setError(null);
 
-        const formData = new FormData();
-        formData.set('message', message);
-        formData.set('email', email);
+        const formData = new FormData(evt.currentTarget);
 
         const result = await envoyerAvisVisiteur(formData);
         if (result.ok) {
@@ -91,6 +90,7 @@ export function FeedbackWidget() {
                                 }}
                             />
                             <textarea
+                                name="message"
                                 value={message}
                                 onChange={(evt) => setMessage(evt.target.value)}
                                 required
@@ -100,11 +100,13 @@ export function FeedbackWidget() {
                             />
                             <input
                                 type="email"
+                                name="email"
                                 value={email}
                                 onChange={(evt) => setEmail(evt.target.value)}
                                 placeholder="Email (optionnel, pour vous répondre)"
                                 className="w-full border border-border bg-surface text-foreground px-[14px] py-[10px] text-sm rounded-sm focus:outline-none focus:border-primary"
                             />
+                            <AltchaWidget />
                             {status === 'error' && (
                                 <p className="text-[11px] text-danger">
                                     {error}
