@@ -30,7 +30,7 @@ export function ConfirmDialog({
         <dialog
             ref={dialogRef}
             onCancel={onCancel}
-            className="backdrop:bg-foreground/20 border border-border bg-surface p-6 max-w-sm w-full"
+            className="m-auto backdrop:bg-foreground/20 border border-border bg-surface p-6 max-w-sm w-full"
         >
             <p className="font-serif text-base font-bold text-foreground mb-2">
                 {title}

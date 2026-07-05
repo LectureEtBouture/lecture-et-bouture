@@ -13,11 +13,9 @@ async function requireAdmin() {
         redirect('/admin/login');
 }
 
-export async function deleteStorageObject(
+async function deleteOne(
     key: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
-    await requireAdmin();
-
     const url = `/api/images/${key}`;
     if (await isUrlInUse(url)) {
         return {
@@ -32,7 +30,34 @@ export async function deleteStorageObject(
         entityType: 'stockage',
         entityLabel: key,
     });
-    revalidatePath('/admin/stockage');
 
     return { ok: true };
+}
+
+export async function deleteStorageObject(
+    key: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+    await requireAdmin();
+    const result = await deleteOne(key);
+    revalidatePath('/admin/stockage');
+    return result;
+}
+
+export async function deleteStorageObjects(keys: string[]): Promise<{
+    deleted: string[];
+    failed: { key: string; error: string }[];
+}> {
+    await requireAdmin();
+
+    const deleted: string[] = [];
+    const failed: { key: string; error: string }[] = [];
+
+    for (const key of keys) {
+        const result = await deleteOne(key);
+        if (result.ok) deleted.push(key);
+        else failed.push({ key, error: result.error });
+    }
+
+    revalidatePath('/admin/stockage');
+    return { deleted, failed };
 }

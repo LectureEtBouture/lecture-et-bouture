@@ -1,5 +1,7 @@
-function formatGo(bytes: number) {
-    return (bytes / 1_000_000_000).toFixed(2);
+function formatBytes(bytes: number) {
+    if (bytes < 1_000_000) return `${(bytes / 1000).toFixed(0)} Ko`;
+    if (bytes < 1_000_000_000) return `${(bytes / 1_000_000).toFixed(1)} Mo`;
+    return `${(bytes / 1_000_000_000).toFixed(2)} Go`;
 }
 
 export function StorageQuotaBar({
@@ -16,7 +18,7 @@ export function StorageQuotaBar({
         <div className="space-y-1.5">
             <div className="flex items-baseline justify-between">
                 <span className="text-sm font-medium text-foreground">
-                    {formatGo(totalBytes)} Go / {formatGo(quotaBytes)} Go
+                    {formatBytes(totalBytes)} / {formatBytes(quotaBytes)}
                 </span>
                 <span className="text-[11px] text-muted">
                     {percent.toFixed(1)}%
