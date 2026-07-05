@@ -24,12 +24,14 @@ async function handleContact(formData: FormData) {
     const email = formData.get('email') as string;
     const message = formData.get('message') as string;
 
+    let ok = true;
     try {
         await sendContactEmail({ name, email, message });
-        redirect('/contact?sent=1');
     } catch {
-        redirect('/contact?error=1');
+        ok = false;
     }
+
+    redirect(ok ? '/contact?sent=1' : '/contact?error=1');
 }
 
 export default async function ContactPage({ searchParams }: Props) {
