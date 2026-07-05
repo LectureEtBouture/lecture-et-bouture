@@ -53,6 +53,7 @@ export async function POST(req: Request) {
         optimized.length,
         {
             'Content-Type': 'image/webp',
+            'x-amz-acl': 'public-read',
         },
     );
 
