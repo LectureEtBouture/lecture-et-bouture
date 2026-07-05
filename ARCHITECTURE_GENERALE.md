@@ -22,7 +22,6 @@ Ce document détaille les choix techniques, la structure architecturale et la ph
 - **MinIO** : Serveur de stockage d'objets (S3-compatible) auto-hébergé pour les images (livres, boutures, événements).
 - **Resend** : Service d'envoi d'emails transactionnels (notifications, réinitialisations de mots de passe).
 - **Loops** : Plateforme de marketing et de gestion de newsletter pour la communication avec les lecteurs.
-- **Formbricks** : Outil de collecte de retours et d'enquêtes utilisateurs (surveys) intégré au front-end.
 - **Umami Analytics** : Solution d'analyse d'audience respectueuse de la vie privée, auto-hébergée.
 
 ### UI & UX

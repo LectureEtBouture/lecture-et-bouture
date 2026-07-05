@@ -3,8 +3,7 @@ import { Footer } from '@/components/layout/Footer';
 import { AnnonceBar } from '@/components/ui/AnnonceBar';
 import { MaintenanceScreen } from '@/components/ui/MaintenanceScreen';
 import { PreviewBanner } from '@/components/ui/PreviewBanner';
-import { FormbricksWidget } from '@/components/ui/FormbricksWidget';
-import { FeedbackButton } from '@/components/ui/FeedbackButton';
+import { FeedbackWidget } from '@/components/ui/FeedbackWidget';
 import { NudgeListener } from '@/components/ui/NudgeListener';
 import { getAnnonce, getMaintenance } from '@/lib/queries/parametres';
 import { getPublishedEditorialSlugs } from '@/lib/queries/pages';
@@ -38,20 +37,7 @@ export default async function FrontLayout({
             <Navbar publishedSlugs={publishedSlugs} />
             <main className="flex-1">{children}</main>
             <Footer />
-            {process.env.NEXT_PUBLIC_FORMBRICKS_ENV_ID && (
-                <>
-                    <FormbricksWidget
-                        environmentId={
-                            process.env.NEXT_PUBLIC_FORMBRICKS_ENV_ID
-                        }
-                        appUrl={
-                            process.env.NEXT_PUBLIC_FORMBRICKS_HOST ??
-                            'https://app.formbricks.com'
-                        }
-                    />
-                    <FeedbackButton actionKey="test" />
-                </>
-            )}
+            <FeedbackWidget />
             <NudgeListener />
         </div>
     );

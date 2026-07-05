@@ -5,7 +5,6 @@
 ### Autres
 
 - [ ] Import ISBN BO — inventaire.io en fallback uniquement (Google Books prioritaire ; les deux coexistent actuellement)
-- [ ] Formbricks — vérifier trigger survey (action key `"test"` → enquête s'ouvre)
 - [ ] Éco-conception — audit thegreenwebfoundation.org
 - [ ] API leslibraires.fr / Librisoft — stocks temps réel, panier, commandes (v2)
 
@@ -79,7 +78,8 @@
 - MinIO — upload API, `ImageUpload` component, images servies via proxy interne `/api/images/[...path]` (bucket privé, pas de policy publique requise)
 - NextAuth v5 — JWT, httpOnly cookies, 5 rôles, `types/next-auth.d.ts`, routes whitelist middleware
 - `lib/config.ts` `storeConfig` + `lib/metadata.ts` — templatisation complète (`NEXT_PUBLIC_STORE_*`)
-- Newsletter Loops, Analytics Umami (privacy-first), Surveys Formbricks
+- Newsletter Loops, Analytics Umami (privacy-first)
+- Avis visiteurs — `FeedbackWidget` (widget maison) + `envoyerAvisVisiteur` + Resend, remplace Formbricks (retiré : trigger survey ne fonctionnait pas, dépendance externe en moins)
 - `VusRecemment` — livres uniquement (boutures exclues), clear item individuel (×, hover) + clear all, `removeVisit`/`clearHistory` dans `useVisitHistory`
 - Boutures images — `CoverPanel` fiche affiche `next/image` ; `imageAlt` dans `BouturePublique` query ; `BoutureCard.tsx` dead code supprimé
 - Couvertures livres — `CoverImage` client component (`onError` → fond coloré si 404) ; OL `?default=false` ; `validateCoverUrl` HEAD check (rejette placeholder Google ~9KB) ; couverture personnalisée admin (`livres.image` + `livres.image_alt`) prioritaire sur Google Books/OL ; `imageAlt` propagé dans `LivreComplet` → `LivreCard` + `CoverPanel`

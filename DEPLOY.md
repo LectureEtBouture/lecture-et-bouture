@@ -74,27 +74,26 @@ nano .env   # remplir toutes les valeurs (voir section Variables)
 
 ## 3. Variables d'environnement (`.env`)
 
-| Variable                        | Obligatoire | Description                                               |
-| ------------------------------- | ----------- | --------------------------------------------------------- |
-| `AUTH_SECRET`                   | ✓           | `openssl rand -base64 33`                                 |
-| `AUTH_URL`                      | ✓           | URL publique de l'app (ex: `https://lectureetbouture.fr`) |
-| `NEXTAUTH_URL`                  | ✓           | Idem `AUTH_URL`                                           |
-| `DATABASE_URL`                  | auto        | Géré par compose (`leb-db`) — ne pas changer              |
-| `MINIO_ACCESS_KEY`              | ✓           | Clé MinIO (choisir au déploiement)                        |
-| `MINIO_SECRET_KEY`              | ✓           | Secret MinIO (choisir au déploiement)                     |
-| `MINIO_BUCKET`                  | ✓           | `leb` par défaut                                          |
-| `RESEND_API_KEY`                | ✓           | Clé API Resend (emails transactionnels)                   |
-| `RESEND_FROM_EMAIL`             | ✓           | Expéditeur emails                                         |
-| `RESEND_TO_EMAIL`               | ✓           | Destinataire notifications                                |
-| `LOOPS_API_KEY`                 | ✓           | Clé API Loops (newsletter)                                |
-| `PREVIEW_SECRET`                | ✓           | `openssl rand -base64 20`                                 |
-| `GOOGLE_BOOKS_API_KEY`          | ✓           | Google Books API                                          |
-| `WIKIDATA_ACCESS_TOKEN`         | —           | Import livres via Wikidata                                |
-| `BOOK_IMPORT_PROVIDER`          | —           | `inventaire` (défaut) ou `wikidata`                       |
-| `NEXT_PUBLIC_STORE_*`           | ✓           | Infos boutique affichées publiquement                     |
-| `NEXT_PUBLIC_UMAMI_WEBSITE_ID`  | —           | Analytics Umami                                           |
-| `NEXT_PUBLIC_FORMBRICKS_ENV_ID` | —           | Surveys Formbricks                                        |
-| `DOCKER_IMAGE`                  | —           | `sankarej/lecture-et-bouture:latest`                      |
+| Variable                       | Obligatoire | Description                                               |
+| ------------------------------ | ----------- | --------------------------------------------------------- |
+| `AUTH_SECRET`                  | ✓           | `openssl rand -base64 33`                                 |
+| `AUTH_URL`                     | ✓           | URL publique de l'app (ex: `https://lectureetbouture.fr`) |
+| `NEXTAUTH_URL`                 | ✓           | Idem `AUTH_URL`                                           |
+| `DATABASE_URL`                 | auto        | Géré par compose (`leb-db`) — ne pas changer              |
+| `MINIO_ACCESS_KEY`             | ✓           | Clé MinIO (choisir au déploiement)                        |
+| `MINIO_SECRET_KEY`             | ✓           | Secret MinIO (choisir au déploiement)                     |
+| `MINIO_BUCKET`                 | ✓           | `leb` par défaut                                          |
+| `RESEND_API_KEY`               | ✓           | Clé API Resend (emails transactionnels)                   |
+| `RESEND_FROM_EMAIL`            | ✓           | Expéditeur emails                                         |
+| `RESEND_TO_EMAIL`              | ✓           | Destinataire notifications                                |
+| `LOOPS_API_KEY`                | ✓           | Clé API Loops (newsletter)                                |
+| `PREVIEW_SECRET`               | ✓           | `openssl rand -base64 20`                                 |
+| `GOOGLE_BOOKS_API_KEY`         | ✓           | Google Books API                                          |
+| `WIKIDATA_ACCESS_TOKEN`        | —           | Import livres via Wikidata                                |
+| `BOOK_IMPORT_PROVIDER`         | —           | `inventaire` (défaut) ou `wikidata`                       |
+| `NEXT_PUBLIC_STORE_*`          | ✓           | Infos boutique affichées publiquement                     |
+| `NEXT_PUBLIC_UMAMI_WEBSITE_ID` | —           | Analytics Umami                                           |
+| `DOCKER_IMAGE`                 | —           | `sankarej/lecture-et-bouture:latest`                      |
 
 > `DATABASE_URL`, `MINIO_ENDPOINT`, `MINIO_PORT`, `MINIO_USE_SSL` sont **overridés dans docker-compose** — les valeurs dans `.env` pour ces 4 sont ignorées en prod.
 

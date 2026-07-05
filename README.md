@@ -197,7 +197,7 @@ npm run admin:create <email> <mot-de-passe>
 
 ## Backlog
 
-- Formbricks — vérifier trigger survey (`NEXT_PUBLIC_FORMBRICKS_ENV_ID`)
+- ~~Formbricks~~ — retiré, remplacé par `FeedbackWidget` (widget maison + Resend, pas de dépendance externe)
 - ~~Meilisearch~~ — obsolète, recherche full-text assurée par Google Books API
 - API leslibraires.fr / Librisoft — stocks temps réel, panier, commandes
 - Éco-conception — audit thegreenwebfoundation.org
