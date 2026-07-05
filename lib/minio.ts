@@ -1,9 +1,30 @@
 import { Client } from 'minio';
 
+// MINIO_ENDPOINT peut être un host nu (docker-compose) ou une URL complète
+// (ex: Railway bucket qui expose ${{bucket.ENDPOINT}} sous forme https://host)
+function resolveEndpoint() {
+    const raw = process.env.MINIO_ENDPOINT ?? 'localhost';
+    if (raw.startsWith('http://') || raw.startsWith('https://')) {
+        const url = new URL(raw);
+        return {
+            endPoint: url.hostname,
+            port: url.port
+                ? parseInt(url.port)
+                : url.protocol === 'https:'
+                  ? 443
+                  : 80,
+            useSSL: url.protocol === 'https:',
+        };
+    }
+    return {
+        endPoint: raw,
+        port: parseInt(process.env.MINIO_PORT ?? '9100'),
+        useSSL: process.env.MINIO_USE_SSL === 'true',
+    };
+}
+
 export const minioClient = new Client({
-    endPoint: process.env.MINIO_ENDPOINT ?? 'localhost',
-    port: parseInt(process.env.MINIO_PORT ?? '9100'),
-    useSSL: process.env.MINIO_USE_SSL === 'true',
+    ...resolveEndpoint(),
     accessKey: process.env.MINIO_ACCESS_KEY ?? 'minioadmin',
     secretKey: process.env.MINIO_SECRET_KEY ?? 'minioadmin123',
 });
