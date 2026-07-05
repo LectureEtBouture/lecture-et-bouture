@@ -50,6 +50,7 @@
 - Paramètres — horaires, fermetures, annonce, maintenance, réseaux sociaux, QR code (export PNG + SVG)
 - Utilisateurs — CRUD + 5 rôles (voir `ROLES.md`), reset password self-service + admin-initiated (Resend)
 - Journaux — FIFO 200, guard `super_admin`
+- Stockage — inventaire bucket + croisement usage (livre/bouture/événement/blog/aucun), quota 10 Go, filtres, suppression des fichiers non-utilisés (guard `admin`/`super_admin`)
 
 ### Architecture livres (Phases A–M)
 
@@ -75,7 +76,7 @@
 ### Infra & Auth
 
 - PostgreSQL 16 + Drizzle ORM — UUID PKs, migrations idempotentes, seed avec Maps cross-références
-- MinIO — upload API, `ImageUpload` component, `next/image` + remotePatterns dynamique depuis `MINIO_PUBLIC_URL`
+- MinIO — upload API, `ImageUpload` component, images servies via proxy interne `/api/images/[...path]` (bucket privé, pas de policy publique requise)
 - NextAuth v5 — JWT, httpOnly cookies, 5 rôles, `types/next-auth.d.ts`, routes whitelist middleware
 - `lib/config.ts` `storeConfig` + `lib/metadata.ts` — templatisation complète (`NEXT_PUBLIC_STORE_*`)
 - Newsletter Loops, Analytics Umami (privacy-first), Surveys Formbricks

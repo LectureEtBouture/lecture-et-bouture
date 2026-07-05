@@ -40,10 +40,11 @@
 
 ### Administration
 
-| Action                   | super_admin | admin | editor | moderator | contributor |
-| ------------------------ | ----------- | ----- | ------ | --------- | ----------- |
-| Journaux (`/admin/logs`) | ✓           | —     | —      | —         | —           |
-| Dashboard                | ✓           | ✓     | ✓      | ✓         | ✓           |
+| Action                       | super_admin | admin | editor | moderator | contributor |
+| ---------------------------- | ----------- | ----- | ------ | --------- | ----------- |
+| Journaux (`/admin/logs`)     | ✓           | —     | —      | —         | —           |
+| Stockage (`/admin/stockage`) | ✓           | ✓     | —      | —         | —           |
+| Dashboard                    | ✓           | ✓     | ✓      | ✓         | ✓           |
 
 ## Reset password
 

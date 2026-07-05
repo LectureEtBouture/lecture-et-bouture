@@ -297,4 +297,4 @@ npm run db:studio      # Interface Drizzle Studio
 - `livres.image` — couverture personnalisée uploadée via MinIO. Prioritaire sur l'image Google Books dans `merge.ts`. Si null, Google Books / Open Library est utilisé en fallback.
 - `selections.active = false` par défaut — une sélection est privée jusqu'à publication explicite.
 - `avis.masque` permet de masquer sans supprimer (distinct de `approuve`).
-- Images : chemin MinIO relatif (ex: `livres/mon-image.jpg`) ou URL externe. Résolu via `MINIO_PUBLIC_URL` dans `next.config.ts`.
+- Images : valeur stockée = `/api/images/<chemin-bucket>` (ex: `/api/images/livres/mon-image.webp`) ou URL externe. Servies via `app/api/images/[...path]/route.ts`, qui stream l'objet depuis le bucket privé (MinIO/S3) — jamais d'accès direct au bucket depuis le front.

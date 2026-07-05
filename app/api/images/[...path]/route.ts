@@ -18,6 +18,9 @@ export async function GET(
             },
         });
     } catch {
-        return NextResponse.json({ error: 'Image introuvable' }, { status: 404 });
+        return NextResponse.json(
+            { error: 'Image introuvable' },
+            { status: 404 },
+        );
     }
 }

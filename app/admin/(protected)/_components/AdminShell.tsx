@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { siteConfig } from '@/lib/metadata';
 import { AdminDevWidget } from './AdminDevWidget';
+import { ToastProvider } from './ToastProvider';
 
 const baseNavItems = [
     { href: '/admin', label: 'Dashboard' },
@@ -24,6 +25,7 @@ function getAdminSectionItems(role?: string) {
     const items = [{ href: '/admin/parametres', label: 'Paramètres' }];
     if (role === 'super_admin' || role === 'admin') {
         items.push({ href: '/admin/users', label: 'Utilisateurs' });
+        items.push({ href: '/admin/stockage', label: 'Stockage' });
     }
     if (role === 'super_admin') {
         items.push({ href: '/admin/logs', label: 'Journaux' });
@@ -220,92 +222,94 @@ export function AdminShell({
     const [menuOpen, setMenuOpen] = useState(false);
 
     return (
-        <div className="min-h-screen bg-background">
-            {/* Mobile top bar */}
-            <header className="md:hidden bg-white border-b border-border sticky top-0 z-40">
-                <div className="px-4 py-3 flex items-center justify-between gap-4">
-                    <Link
-                        href="/admin"
-                        className="font-serif text-sm font-bold text-primary"
-                    >
-                        L&amp;B
-                    </Link>
-                    <button
-                        onClick={() => setMenuOpen(true)}
-                        className="text-foreground/70 hover:text-primary transition-colors p-1"
-                        aria-label="Ouvrir le menu"
-                    >
-                        <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 20 20"
-                            fill="none"
+        <ToastProvider>
+            <div className="min-h-screen bg-background">
+                {/* Mobile top bar */}
+                <header className="md:hidden bg-white border-b border-border sticky top-0 z-40">
+                    <div className="px-4 py-3 flex items-center justify-between gap-4">
+                        <Link
+                            href="/admin"
+                            className="font-serif text-sm font-bold text-primary"
                         >
-                            <path
-                                d="M3 5H17M3 10H17M3 15H17"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                            />
-                        </svg>
-                    </button>
-                </div>
-            </header>
+                            L&amp;B
+                        </Link>
+                        <button
+                            onClick={() => setMenuOpen(true)}
+                            className="text-foreground/70 hover:text-primary transition-colors p-1"
+                            aria-label="Ouvrir le menu"
+                        >
+                            <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 20 20"
+                                fill="none"
+                            >
+                                <path
+                                    d="M3 5H17M3 10H17M3 15H17"
+                                    stroke="currentColor"
+                                    strokeWidth="1.5"
+                                    strokeLinecap="round"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+                </header>
 
-            <MobileMenu
-                open={menuOpen}
-                onClose={() => setMenuOpen(false)}
-                email={email}
-                role={role}
-                signOutAction={signOutAction}
-            />
+                <MobileMenu
+                    open={menuOpen}
+                    onClose={() => setMenuOpen(false)}
+                    email={email}
+                    role={role}
+                    signOutAction={signOutAction}
+                />
 
-            {/* Desktop layout */}
-            <div className="md:flex">
-                <aside className="hidden md:flex w-56 shrink-0 bg-white border-r border-border flex-col h-screen sticky top-0">
-                    <div className="px-5 py-5 border-b border-border shrink-0">
-                        <p className="font-serif text-sm font-bold text-primary tracking-tight">
-                            {siteConfig.name}
-                        </p>
-                        <div className="flex items-center justify-between mt-0.5">
-                            <p className="text-[11px] text-muted uppercase tracking-widest">
-                                Back-office
+                {/* Desktop layout */}
+                <div className="md:flex">
+                    <aside className="hidden md:flex w-56 shrink-0 bg-white border-r border-border flex-col h-screen sticky top-0">
+                        <div className="px-5 py-5 border-b border-border shrink-0">
+                            <p className="font-serif text-sm font-bold text-primary tracking-tight">
+                                {siteConfig.name}
                             </p>
-                            <a
-                                href="/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-[11px] px-2 py-0.5 border border-border text-muted hover:border-primary hover:text-primary transition-colors"
-                            >
-                                Site →
-                            </a>
+                            <div className="flex items-center justify-between mt-0.5">
+                                <p className="text-[11px] text-muted uppercase tracking-widest">
+                                    Back-office
+                                </p>
+                                <a
+                                    href="/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-[11px] px-2 py-0.5 border border-border text-muted hover:border-primary hover:text-primary transition-colors"
+                                >
+                                    Site →
+                                </a>
+                            </div>
                         </div>
-                    </div>
 
-                    <SidebarNav role={role} />
+                        <SidebarNav role={role} />
 
-                    <div className="px-5 py-4 border-t border-border shrink-0">
-                        <p className="text-[11px] text-muted truncate mb-2">
-                            {email}
-                        </p>
-                        <form action={signOutAction}>
-                            <button
-                                type="submit"
-                                className="text-[11px] uppercase tracking-widest text-muted hover:text-foreground transition-colors"
-                            >
-                                Déconnexion
-                            </button>
-                        </form>
-                    </div>
-                </aside>
+                        <div className="px-5 py-4 border-t border-border shrink-0">
+                            <p className="text-[11px] text-muted truncate mb-2">
+                                {email}
+                            </p>
+                            <form action={signOutAction}>
+                                <button
+                                    type="submit"
+                                    className="text-[11px] uppercase tracking-widest text-muted hover:text-foreground transition-colors"
+                                >
+                                    Déconnexion
+                                </button>
+                            </form>
+                        </div>
+                    </aside>
 
-                <main className="flex-1 min-w-0">
-                    <div className="max-w-5xl mx-auto px-4 sm:px-8 py-6 sm:py-8">
-                        {children}
-                    </div>
-                </main>
+                    <main className="flex-1 min-w-0">
+                        <div className="max-w-5xl mx-auto px-4 sm:px-8 py-6 sm:py-8">
+                            {children}
+                        </div>
+                    </main>
+                </div>
+                {devEmail && <AdminDevWidget />}
             </div>
-            {devEmail && <AdminDevWidget />}
-        </div>
+        </ToastProvider>
     );
 }

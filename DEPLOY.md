@@ -74,30 +74,35 @@ nano .env   # remplir toutes les valeurs (voir section Variables)
 
 ## 3. Variables d'environnement (`.env`)
 
-| Variable                        | Obligatoire | Description                                                      |
-| ------------------------------- | ----------- | ---------------------------------------------------------------- |
-| `AUTH_SECRET`                   | ✓           | `openssl rand -base64 33`                                        |
-| `AUTH_URL`                      | ✓           | URL publique de l'app (ex: `https://lectureetbouture.fr`)        |
-| `NEXTAUTH_URL`                  | ✓           | Idem `AUTH_URL`                                                  |
-| `DATABASE_URL`                  | auto        | Géré par compose (`leb-db`) — ne pas changer                     |
-| `MINIO_ACCESS_KEY`              | ✓           | Clé MinIO (choisir au déploiement)                               |
-| `MINIO_SECRET_KEY`              | ✓           | Secret MinIO (choisir au déploiement)                            |
-| `MINIO_BUCKET`                  | ✓           | `leb` par défaut                                                 |
-| `MINIO_PUBLIC_URL`              | ✓           | URL publique MinIO (ex: `https://media.lectureetbouture.fr/leb`) |
-| `RESEND_API_KEY`                | ✓           | Clé API Resend (emails transactionnels)                          |
-| `RESEND_FROM_EMAIL`             | ✓           | Expéditeur emails                                                |
-| `RESEND_TO_EMAIL`               | ✓           | Destinataire notifications                                       |
-| `LOOPS_API_KEY`                 | ✓           | Clé API Loops (newsletter)                                       |
-| `PREVIEW_SECRET`                | ✓           | `openssl rand -base64 20`                                        |
-| `GOOGLE_BOOKS_API_KEY`          | ✓           | Google Books API                                                 |
-| `WIKIDATA_ACCESS_TOKEN`         | —           | Import livres via Wikidata                                       |
-| `BOOK_IMPORT_PROVIDER`          | —           | `inventaire` (défaut) ou `wikidata`                              |
-| `NEXT_PUBLIC_STORE_*`           | ✓           | Infos boutique affichées publiquement                            |
-| `NEXT_PUBLIC_UMAMI_WEBSITE_ID`  | —           | Analytics Umami                                                  |
-| `NEXT_PUBLIC_FORMBRICKS_ENV_ID` | —           | Surveys Formbricks                                               |
-| `DOCKER_IMAGE`                  | —           | `sankarej/lecture-et-bouture:latest`                             |
+| Variable                        | Obligatoire | Description                                               |
+| ------------------------------- | ----------- | --------------------------------------------------------- |
+| `AUTH_SECRET`                   | ✓           | `openssl rand -base64 33`                                 |
+| `AUTH_URL`                      | ✓           | URL publique de l'app (ex: `https://lectureetbouture.fr`) |
+| `NEXTAUTH_URL`                  | ✓           | Idem `AUTH_URL`                                           |
+| `DATABASE_URL`                  | auto        | Géré par compose (`leb-db`) — ne pas changer              |
+| `MINIO_ACCESS_KEY`              | ✓           | Clé MinIO (choisir au déploiement)                        |
+| `MINIO_SECRET_KEY`              | ✓           | Secret MinIO (choisir au déploiement)                     |
+| `MINIO_BUCKET`                  | ✓           | `leb` par défaut                                          |
+| `RESEND_API_KEY`                | ✓           | Clé API Resend (emails transactionnels)                   |
+| `RESEND_FROM_EMAIL`             | ✓           | Expéditeur emails                                         |
+| `RESEND_TO_EMAIL`               | ✓           | Destinataire notifications                                |
+| `LOOPS_API_KEY`                 | ✓           | Clé API Loops (newsletter)                                |
+| `PREVIEW_SECRET`                | ✓           | `openssl rand -base64 20`                                 |
+| `GOOGLE_BOOKS_API_KEY`          | ✓           | Google Books API                                          |
+| `WIKIDATA_ACCESS_TOKEN`         | —           | Import livres via Wikidata                                |
+| `BOOK_IMPORT_PROVIDER`          | —           | `inventaire` (défaut) ou `wikidata`                       |
+| `NEXT_PUBLIC_STORE_*`           | ✓           | Infos boutique affichées publiquement                     |
+| `NEXT_PUBLIC_UMAMI_WEBSITE_ID`  | —           | Analytics Umami                                           |
+| `NEXT_PUBLIC_FORMBRICKS_ENV_ID` | —           | Surveys Formbricks                                        |
+| `DOCKER_IMAGE`                  | —           | `sankarej/lecture-et-bouture:latest`                      |
 
 > `DATABASE_URL`, `MINIO_ENDPOINT`, `MINIO_PORT`, `MINIO_USE_SSL` sont **overridés dans docker-compose** — les valeurs dans `.env` pour ces 4 sont ignorées en prod.
+
+> **Déploiement Railway (hors docker-compose)** : `MINIO_ENDPOINT` accepte
+> aussi une URL complète (`https://host`) — pratique car les buckets Railway
+> exposent leur endpoint sous cette forme (`${{<bucket>.ENDPOINT}}`).
+> `lib/minio.ts` détecte le préfixe `http(s)://` et en déduit host/port/SSL
+> automatiquement ; sinon `MINIO_PORT`/`MINIO_USE_SSL` sont utilisés tels quels.
 
 ---
 
@@ -132,7 +137,13 @@ DATABASE_URL=postgresql://leb:leb@<ip-serveur>:5432/leb npm run db:migrate
 1. Ouvrir la console MinIO : `http://<ip-serveur>:9101`
 2. Login : `MINIO_ACCESS_KEY` / `MINIO_SECRET_KEY`
 3. Créer bucket `leb`
-4. Passer le bucket en **public** (policy read-only)
+
+> Le bucket reste **privé**. Les images ne sont jamais servies directement depuis
+> MinIO/S3 — elles passent par `/api/images/[...path]` (voir `lib/minio.ts` et
+> `app/api/images/[...path]/route.ts`), qui les stream via le client MinIO
+> authentifié. Ça évite toute config de policy publique, et ça marche pareil
+> sur un MinIO self-hosted ou un bucket managé (ex: Railway Buckets, qui
+> n'expose de toute façon aucune policy publique).
 
 ### Créer le compte admin
 
