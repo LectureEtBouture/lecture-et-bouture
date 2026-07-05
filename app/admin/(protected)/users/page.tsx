@@ -1,11 +1,8 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { auth } from '@/auth';
-import {
-    getUsers,
-    deleteUser,
-    initiatePasswordReset,
-} from '@/lib/actions/users';
+import { getUsers, deleteUser } from '@/lib/actions/users';
+import { ResetPasswordButton } from './_components/ResetPasswordButton';
 
 const ROLE_LABELS: Record<string, string> = {
     super_admin: 'Super Admin',
@@ -107,22 +104,9 @@ export default async function AdminUsersPage() {
                                             >
                                                 Modifier
                                             </Link>
-                                            <form
-                                                action={async () => {
-                                                    'use server';
-                                                    await initiatePasswordReset(
-                                                        user.id,
-                                                    );
-                                                }}
-                                                className="contents"
-                                            >
-                                                <button
-                                                    type="submit"
-                                                    className="text-xs text-muted hover:text-primary transition-colors"
-                                                >
-                                                    Reset mdp
-                                                </button>
-                                            </form>
+                                            <ResetPasswordButton
+                                                userId={user.id}
+                                            />
                                             {user.id !== session?.user?.id && (
                                                 <form
                                                     action={async () => {
@@ -135,7 +119,7 @@ export default async function AdminUsersPage() {
                                                 >
                                                     <button
                                                         type="submit"
-                                                        className="text-xs text-muted hover:text-red-600 transition-colors"
+                                                        className="text-xs text-muted hover:text-red-600 transition-colors cursor-pointer"
                                                     >
                                                         Supprimer
                                                     </button>

@@ -173,13 +173,15 @@ export async function deleteUser(id: string) {
 }
 
 // Admin-initiated reset
-export async function initiatePasswordReset(id: string) {
+export async function initiatePasswordReset(
+    id: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
     const session = await requireUserManager();
     const target = await getUser(id);
-    if (!target) return;
+    if (!target) return { ok: false, error: 'Utilisateur introuvable.' };
 
     if (!canManageTarget(session.user?.role, target.role)) {
-        throw new Error('Action non autorisée.');
+        return { ok: false, error: 'Action non autorisée.' };
     }
 
     const token = randomBytes(32).toString('hex');
@@ -195,12 +197,17 @@ export async function initiatePasswordReset(id: string) {
         .where(eq(users.id, id));
 
     const baseUrl = process.env.NEXTAUTH_URL ?? 'http://localhost:3000';
-    await sendResetPasswordEmail({
-        to: target.email,
-        resetUrl: `${baseUrl}/admin/reset-password?token=${token}`,
-    });
+    try {
+        await sendResetPasswordEmail({
+            to: target.email,
+            resetUrl: `${baseUrl}/admin/reset-password?token=${token}`,
+        });
+    } catch {
+        return { ok: false, error: "Échec de l'envoi de l'email." };
+    }
 
     revalidatePath('/admin/users');
+    return { ok: true };
 }
 
 // Self-service: forgot password
