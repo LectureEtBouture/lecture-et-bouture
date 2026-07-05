@@ -1,6 +1,8 @@
 import type { MetadataRoute } from 'next';
 import { getLivresPubliques } from '@/lib/queries/livres';
 import { getBouturesPubliques } from '@/lib/queries/boutures';
+import { getArticles } from '@/lib/queries/articles';
+import { getPublishedEditorialSlugs } from '@/lib/queries/pages';
 import { siteConfig } from '@/lib/metadata';
 
 export const dynamic = 'force-dynamic';
@@ -8,9 +10,11 @@ export const dynamic = 'force-dynamic';
 const base = siteConfig.url;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const [livres, boutures] = await Promise.all([
+    const [livres, boutures, articles, editorialSlugs] = await Promise.all([
         getLivresPubliques(),
         getBouturesPubliques(),
+        getArticles(),
+        getPublishedEditorialSlugs(),
     ]);
     const now = new Date();
 
@@ -40,7 +44,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             priority: 0.7,
         },
         {
-            url: `${base}/concept`,
+            url: `${base}/blog`,
+            lastModified: now,
+            changeFrequency: 'weekly',
+            priority: 0.7,
+        },
+        {
+            url: `${base}/evenements`,
+            lastModified: now,
+            changeFrequency: 'weekly',
+            priority: 0.6,
+        },
+        {
+            url: `${base}/selections`,
             lastModified: now,
             changeFrequency: 'monthly',
             priority: 0.6,
@@ -67,5 +83,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.6,
     }));
 
-    return [...staticRoutes, ...livreRoutes, ...boutureRoutes];
+    const articleRoutes: MetadataRoute.Sitemap = articles.map((article) => ({
+        url: `${base}/blog/${article.slug}`,
+        lastModified: article.updatedAt ?? now,
+        changeFrequency: 'monthly',
+        priority: 0.5,
+    }));
+
+    const editorialRoutes: MetadataRoute.Sitemap = editorialSlugs.map(
+        (slug) => ({
+            url: `${base}/${slug}`,
+            lastModified: now,
+            changeFrequency: slug === 'concept' ? 'monthly' : 'yearly',
+            priority: slug === 'concept' ? 0.6 : 0.3,
+        }),
+    );
+
+    return [
+        ...staticRoutes,
+        ...livreRoutes,
+        ...boutureRoutes,
+        ...articleRoutes,
+        ...editorialRoutes,
+    ];
 }

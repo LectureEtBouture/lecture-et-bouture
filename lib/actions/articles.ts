@@ -221,7 +221,7 @@ export async function addArticleLien(articleId: string, autreId: string) {
     if (articleId === autreId) return;
     const pair = canonicalPair(articleId, autreId);
     await db.insert(articlesLies).values(pair).onConflictDoNothing();
-    revalidateTag('articles', 'max');
+    revalidateTag('articles', { expire: 0 });
 }
 
 export async function removeArticleLien(articleId: string, autreId: string) {
@@ -235,5 +235,5 @@ export async function removeArticleLien(articleId: string, autreId: string) {
                 eq(articlesLies.articleBId, pair.articleBId),
             ),
         );
-    revalidateTag('articles', 'max');
+    revalidateTag('articles', { expire: 0 });
 }

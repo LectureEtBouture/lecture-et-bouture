@@ -59,6 +59,7 @@ export async function createEvenement(formData: FormData) {
         entityLabel: parsed.titre,
     });
     revalidatePath('/admin/evenements');
+    revalidatePath('/evenements');
     redirect('/admin/evenements');
 }
 
@@ -85,6 +86,7 @@ export async function updateEvenement(id: string, formData: FormData) {
         entityLabel: parsed.titre,
     });
     revalidatePath('/admin/evenements');
+    revalidatePath('/evenements');
     redirect('/admin/evenements');
 }
 
@@ -104,6 +106,7 @@ export async function deleteEvenement(id: string) {
         entityLabel: row?.titre,
     });
     revalidatePath('/admin/evenements');
+    revalidatePath('/evenements');
 }
 
 export async function toggleEvenementPublie(id: string) {
@@ -126,6 +129,7 @@ export async function toggleEvenementPublie(id: string) {
         entityLabel: row.titre,
     });
     revalidatePath('/admin/evenements');
+    revalidatePath('/evenements');
 }
 
 export type EvenementsFilter = 'tous' | 'a-venir' | 'en-cours' | 'passes';
