@@ -51,6 +51,12 @@ export async function ensureBucket() {
     if (bucketReady) return;
     const exists = await minioClient.bucketExists(BUCKET);
     if (!exists) await minioClient.makeBucket(BUCKET);
-    await minioClient.setBucketPolicy(BUCKET, PUBLIC_POLICY);
+    try {
+        await minioClient.setBucketPolicy(BUCKET, PUBLIC_POLICY);
+    } catch (error) {
+        // Certains providers S3-compatible (ex: bucket Railway) n'implémentent
+        // pas l'API de bucket policy — le bucket doit alors être public par défaut
+        console.warn('setBucketPolicy non supporté par ce provider:', error);
+    }
     bucketReady = true;
 }
