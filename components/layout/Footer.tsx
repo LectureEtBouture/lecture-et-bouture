@@ -157,11 +157,19 @@ export async function Footer() {
                     />
                 </div>
 
-                <div className="py-5">
-                    <p className="text-xs text-muted">
+                <div className="py-5 flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-xs text-foreground/70">
                         © {new Date().getFullYear()} {siteConfig.name}. Tous
                         droits réservés.
                     </p>
+                    <a
+                        href="https://www.jsankare.dev"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-foreground/70 hover:text-primary transition-colors"
+                    >
+                        Site créé par Jordan Sankaré
+                    </a>
                 </div>
             </div>
         </footer>
