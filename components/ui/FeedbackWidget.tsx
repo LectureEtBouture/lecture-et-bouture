@@ -38,7 +38,10 @@ export function FeedbackWidget() {
     return (
         <div className="fixed bottom-6 right-6 z-40">
             {open && (
-                <div className="absolute bottom-14 right-0 w-[300px] bg-white border border-border shadow-md">
+                <div
+                    id="feedback-panel"
+                    className="absolute bottom-14 right-0 w-[min(300px,calc(100vw-3rem))] bg-white border border-border shadow-md"
+                >
                     <div className="px-4 py-3 border-b border-border flex items-center justify-between">
                         <p className="font-serif text-sm font-bold text-foreground">
                             Votre avis nous intéresse
@@ -131,8 +134,10 @@ export function FeedbackWidget() {
             <button
                 type="button"
                 onClick={() => setOpen(!open)}
-                className="flex items-center gap-2 bg-primary text-background text-xs uppercase tracking-[0.1em] px-4 py-2.5 shadow-md hover:opacity-90 transition-opacity"
-                aria-label="Donner mon avis"
+                className="flex items-center gap-2 bg-primary text-background text-xs uppercase tracking-[0.1em] px-3 sm:px-4 py-2.5 shadow-md hover:opacity-90 transition-opacity"
+                aria-label={open ? 'Fermer le formulaire d’avis' : 'Donner mon avis'}
+                aria-expanded={open}
+                aria-controls="feedback-panel"
             >
                 <svg
                     width="14"
@@ -148,7 +153,25 @@ export function FeedbackWidget() {
                         strokeLinejoin="round"
                     />
                 </svg>
-                Votre avis nous intéresse
+                <span className="hidden sm:inline">
+                    Votre avis nous intéresse
+                </span>
+                <svg
+                    width="10"
+                    height="10"
+                    viewBox="0 0 10 10"
+                    fill="none"
+                    aria-hidden="true"
+                    className={`transition-transform duration-200 ease-out ${open ? 'rotate-180' : ''}`}
+                >
+                    <path
+                        d="M1.5 3.5L5 7L8.5 3.5"
+                        stroke="currentColor"
+                        strokeWidth="1.3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    />
+                </svg>
             </button>
         </div>
     );

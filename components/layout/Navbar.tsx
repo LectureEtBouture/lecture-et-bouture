@@ -66,6 +66,13 @@ function WishlistNavIcon() {
 export function Navbar({ publishedSlugs }: { publishedSlugs?: string[] }) {
     const [open, setOpen] = useState(false);
 
+    useEffect(() => {
+        document.body.style.overflow = open ? 'hidden' : '';
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [open]);
+
     const navLinks = publishedSlugs
         ? ALL_NAV_LINKS.filter(
               ({ editorialSlug }) =>
@@ -117,7 +124,7 @@ export function Navbar({ publishedSlugs }: { publishedSlugs?: string[] }) {
                     <button
                         type="button"
                         onClick={() => setOpen((v) => !v)}
-                        className="lg:hidden flex flex-col justify-center items-center w-9 h-9 gap-[6px] text-foreground -mr-1"
+                        className="lg:hidden flex flex-col justify-center items-center w-11 h-11 gap-[6px] text-foreground -mr-1"
                         aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
                         aria-expanded={open}
                         aria-controls="mobile-menu"
@@ -139,19 +146,19 @@ export function Navbar({ publishedSlugs }: { publishedSlugs?: string[] }) {
             <div
                 id="mobile-menu"
                 aria-hidden={!open}
-                className={`lg:hidden absolute top-full left-0 right-0 bg-background border-b border-border transition-all duration-200 ease-out ${
+                className={`lg:hidden fixed inset-x-0 top-16 bottom-0 z-40 bg-background overflow-y-auto transition-all duration-200 ease-out ${
                     open
                         ? 'opacity-100 translate-y-0 pointer-events-auto'
                         : 'opacity-0 -translate-y-1 pointer-events-none'
                 }`}
             >
-                <ul className="max-w-6xl mx-auto px-6 py-3 flex flex-col">
+                <ul className="min-h-full flex flex-col justify-center px-6 py-8">
                     {navLinks.map(({ href, label }) => (
                         <li key={href}>
                             <Link
                                 href={href}
                                 onClick={() => setOpen(false)}
-                                className="flex items-center h-11 text-sm text-foreground/80 hover:text-primary transition-colors border-b border-border/50 last:border-0"
+                                className="flex items-center h-16 font-serif text-2xl text-foreground hover:text-primary transition-colors border-b border-border/50 last:border-0"
                             >
                                 {label}
                             </Link>
@@ -161,7 +168,7 @@ export function Navbar({ publishedSlugs }: { publishedSlugs?: string[] }) {
                         <Link
                             href="/ma-liste"
                             onClick={() => setOpen(false)}
-                            className="flex items-center h-11 text-sm text-foreground/80 hover:text-primary transition-colors border-t border-border/50"
+                            className="flex items-center h-16 font-serif text-2xl text-foreground hover:text-primary transition-colors border-t border-border/50"
                         >
                             Ma liste
                         </Link>
