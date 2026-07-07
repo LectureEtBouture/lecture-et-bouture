@@ -162,14 +162,22 @@ export async function Footer() {
                         © {new Date().getFullYear()} {siteConfig.name}. Tous
                         droits réservés.
                     </p>
-                    <a
-                        href="https://www.jsankare.dev"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs text-foreground/70 hover:text-primary transition-colors"
-                    >
-                        Site créé par Jordan Sankaré
-                    </a>
+                    <div className="flex items-center gap-4">
+                        <Link
+                            href="/admin/login"
+                            className="text-xs text-foreground/40 hover:text-primary transition-colors"
+                        >
+                            Espace pro
+                        </Link>
+                        <a
+                            href="https://www.jsankare.dev"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-foreground/70 hover:text-primary transition-colors"
+                        >
+                            Site créé par Jordan Sankaré
+                        </a>
+                    </div>
                 </div>
             </div>
         </footer>
