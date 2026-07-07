@@ -26,7 +26,12 @@ import {
 import { SelectionSortableItem } from './SelectionSortableItem';
 import { SelectionAddControls } from './SelectionAddControls';
 import { SelectionSaveBar } from './SelectionSaveBar';
-import { localItemKey, type SelectionItem, type LivreMeta, type LocalItem } from './types';
+import {
+    localItemKey,
+    type SelectionItem,
+    type LivreMeta,
+    type LocalItem,
+} from './types';
 import type { LivreEnrichi } from './SelectionLivrePicker';
 import type { ArticleEnrichi } from './SelectionArticlePicker';
 
@@ -149,7 +154,9 @@ export function SelectionManager({
 
     function handleRemove(key: string) {
         setSaved(false);
-        setItems((current) => current.filter((item) => localItemKey(item) !== key));
+        setItems((current) =>
+            current.filter((item) => localItemKey(item) !== key),
+        );
     }
 
     function handleDragEnd(event: DragEndEvent) {
@@ -172,7 +179,9 @@ export function SelectionManager({
         const saveErrors: string[] = [];
 
         const keptIds = new Set(
-            items.filter((item) => item.kind === 'existing').map((item) => item.id),
+            items
+                .filter((item) => item.kind === 'existing')
+                .map((item) => item.id),
         );
         const removedIds = originalIds.filter((id) => !keptIds.has(id));
         for (const id of removedIds) {
@@ -182,9 +191,15 @@ export function SelectionManager({
         const tempToReal = new Map<string, string>();
         for (const item of items) {
             if (item.kind === 'pending-livre') {
-                const result = await addSelectionLivreByUri(selectionId, item.uri);
+                const result = await addSelectionLivreByUri(
+                    selectionId,
+                    item.uri,
+                );
                 if ('ok' in result) tempToReal.set(item.tempId, result.id);
-                else saveErrors.push(`« ${item.titre ?? item.uri} » : déjà présent, ignoré`);
+                else
+                    saveErrors.push(
+                        `« ${item.titre ?? item.uri} » : déjà présent, ignoré`,
+                    );
             } else if (item.kind === 'pending-plante') {
                 const result = await addSelectionItem(
                     selectionId,
@@ -204,7 +219,9 @@ export function SelectionManager({
 
         const finalIds = items
             .map((item) =>
-                item.kind === 'existing' ? item.id : tempToReal.get(item.tempId),
+                item.kind === 'existing'
+                    ? item.id
+                    : tempToReal.get(item.tempId),
             )
             .filter((id): id is string => !!id);
         await reorderSelectionItems(selectionId, finalIds);
@@ -258,7 +275,9 @@ export function SelectionManager({
                                             item={item}
                                             onRemove={() => handleRemove(key)}
                                             livreMeta={
-                                                uri ? livresMeta.get(uri) : undefined
+                                                uri
+                                                    ? livresMeta.get(uri)
+                                                    : undefined
                                             }
                                         />
                                     );

@@ -6,7 +6,10 @@ import { PreviewBanner } from '@/components/ui/PreviewBanner';
 import { FeedbackWidget } from '@/components/ui/FeedbackWidget';
 import { NudgeListener } from '@/components/ui/NudgeListener';
 import { getAnnonce, getMaintenance } from '@/lib/queries/parametres';
-import { getPublishedEditorialSlugs } from '@/lib/queries/pages';
+import {
+    getPublishedEditorialSlugs,
+    getCustomEditorialPages,
+} from '@/lib/queries/pages';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,11 +18,13 @@ export default async function FrontLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const [annonce, maintenance, publishedSlugs] = await Promise.all([
-        getAnnonce(),
-        getMaintenance(),
-        getPublishedEditorialSlugs(),
-    ]);
+    const [annonce, maintenance, publishedSlugs, customPages] =
+        await Promise.all([
+            getAnnonce(),
+            getMaintenance(),
+            getPublishedEditorialSlugs(),
+            getCustomEditorialPages(),
+        ]);
 
     if (maintenance.active) {
         return <MaintenanceScreen message={maintenance.message} />;
@@ -34,7 +39,7 @@ export default async function FrontLayout({
         <div className="min-h-screen flex flex-col">
             <PreviewBanner />
             {annonceActive && <AnnonceBar annonce={annonce} />}
-            <Navbar publishedSlugs={publishedSlugs} />
+            <Navbar publishedSlugs={publishedSlugs} customPages={customPages} />
             <main className="flex-1">{children}</main>
             <Footer />
             <FeedbackWidget />

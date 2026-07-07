@@ -24,9 +24,7 @@ export const bookProvider: BookProvider = {
         const googleUris = uris.filter(
             (uri) => uri.startsWith('isbn:') || uri.startsWith('gbid:'),
         );
-        const inventaireUris = uris.filter(
-            (uri) => !googleUris.includes(uri),
-        );
+        const inventaireUris = uris.filter((uri) => !googleUris.includes(uri));
         const [googleResults, inventaireResults] = await Promise.all([
             discoveryProvider.rechercherParUris(googleUris),
             inventaireProvider.rechercherParUris(inventaireUris),

@@ -103,10 +103,10 @@ export function BlogEnAvant({
             <div className="flex items-end justify-between">
                 <div className="space-y-1.5">
                     <p className="text-[11px] uppercase tracking-[0.14em] text-muted">
-                        Chroniques
+                        Le Blog
                     </p>
                     <h2 className="font-serif text-[clamp(1.5rem,2.5vw,2rem)] font-bold text-foreground leading-[1.1] tracking-[-0.01em]">
-                        Du côté de la plume
+                        Découvrez les articles de notre librairie
                     </h2>
                 </div>
                 <Link

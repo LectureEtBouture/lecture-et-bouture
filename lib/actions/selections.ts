@@ -245,6 +245,7 @@ export async function getSelectionWithItems(id: string) {
             planteId: selectionItems.planteId,
             articleId: selectionItems.articleId,
             livreUri: livres.inventaireUri,
+            livreImage: livres.image,
             planteNom: plantes.nom,
             articleTitre: articles.titre,
             articleImage: articles.image,

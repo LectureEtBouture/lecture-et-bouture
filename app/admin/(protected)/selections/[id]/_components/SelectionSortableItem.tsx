@@ -36,7 +36,7 @@ function itemImage(item: LocalItem, livreMeta?: LivreMeta): string | null {
     if (item.kind === 'pending-livre') return item.imageUrl;
     if (item.kind === 'pending-article') return item.imageUrl;
     if (item.kind === 'existing' && item.type === 'livre')
-        return livreMeta?.imageUrl ?? null;
+        return item.livreImage ?? livreMeta?.imageUrl ?? null;
     if (item.kind === 'existing' && item.type === 'article')
         return item.articleImage;
     return null;

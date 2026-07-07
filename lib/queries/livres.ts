@@ -213,7 +213,7 @@ export const getLivresMisEnAvant = unstable_cache(
         return fusionnerListe(metas, enrichMap, uris);
     },
     ['livres-mis-en-avant'],
-    { tags: ['livres'] },
+    { tags: ['livres'], revalidate: 1800 },
 );
 
 export async function getLivreBySlug(

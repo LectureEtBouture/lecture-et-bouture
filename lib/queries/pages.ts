@@ -47,3 +47,32 @@ export const getPublishedEditorialSlugs = unstable_cache(
     ['published-editorial-slugs'],
     { tags: ['pages'] },
 );
+
+// Slugs déjà présents en dur dans Navbar/Footer (routes fixes) — le reste
+// des pages publiées est "custom" et affiché via le menu déroulant Navbar.
+const FIXED_EDITORIAL_SLUGS = [
+    'concept',
+    'mentions-legales',
+    'politique-de-confidentialite',
+    'cgv',
+    'cgu',
+    'cookies',
+];
+
+export const getCustomEditorialPages = unstable_cache(
+    async () =>
+        db
+            .select({
+                slug: pagesEditoriales.slug,
+                titre: pagesEditoriales.titre,
+            })
+            .from(pagesEditoriales)
+            .where(eq(pagesEditoriales.publiee, true))
+            .then((rows) =>
+                rows.filter(
+                    (row) => !FIXED_EDITORIAL_SLUGS.includes(row.slug),
+                ),
+            ),
+    ['custom-editorial-pages'],
+    { tags: ['pages'] },
+);

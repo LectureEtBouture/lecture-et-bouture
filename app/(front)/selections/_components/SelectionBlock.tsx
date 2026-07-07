@@ -29,7 +29,8 @@ function ItemRow({ item }: { item: SelectionItemPublique }) {
             : item.type === 'plante'
               ? 'Bouture'
               : 'Article';
-    const prix = item.type === 'livre' || item.type === 'plante' ? item.prix : null;
+    const prix =
+        item.type === 'livre' || item.type === 'plante' ? item.prix : null;
 
     return (
         <Link

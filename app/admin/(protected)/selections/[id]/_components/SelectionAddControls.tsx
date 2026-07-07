@@ -31,7 +31,11 @@ export function SelectionAddControls({
         auteur: string | null;
     }) => void;
     onAddPlante: (planteId: string, planteNom: string) => void;
-    onAddArticle: (articleId: string, titre: string, imageUrl: string | null) => void;
+    onAddArticle: (
+        articleId: string,
+        titre: string,
+        imageUrl: string | null,
+    ) => void;
 }) {
     const [planteId, setPlanteId] = useState(plantesList[0]?.id ?? '');
 

@@ -44,7 +44,7 @@ export default async function BlogPage({
         <div className="max-w-6xl mx-auto px-6 py-section">
             <header className="space-y-4 mb-2">
                 <p className="text-[11px] uppercase tracking-[0.14em] text-muted">
-                    Chroniques
+                    Blogs
                 </p>
                 <h1 className="font-serif text-[clamp(2rem,4vw,3rem)] font-bold text-foreground leading-[1.05] tracking-[-0.02em]">
                     Blog
@@ -67,7 +67,7 @@ export default async function BlogPage({
                 <p className="text-sm text-muted py-16 text-center">
                     {categorie || tag
                         ? 'Aucun article pour ce filtre.'
-                        : 'Les premières chroniques arrivent bientôt.'}
+                        : 'Les premièrs blogs arrivent bientôt.'}
                 </p>
             ) : (
                 <div className="space-y-10 md:space-y-14 mt-8">

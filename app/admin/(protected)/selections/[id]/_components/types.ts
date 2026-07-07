@@ -2,6 +2,7 @@ export type SelectionItem = {
     id: string;
     type: string;
     livreUri: string | null;
+    livreImage: string | null;
     planteNom: string | null;
     articleId: string | null;
     articleTitre: string | null;
@@ -22,6 +23,7 @@ export type LocalItem =
           id: string;
           type: string;
           livreUri: string | null;
+          livreImage: string | null;
           planteNom: string | null;
           articleId: string | null;
           articleTitre: string | null;
@@ -35,7 +37,12 @@ export type LocalItem =
           imageUrl: string | null;
           auteur: string | null;
       }
-    | { kind: 'pending-plante'; tempId: string; planteId: string; planteNom: string }
+    | {
+          kind: 'pending-plante';
+          tempId: string;
+          planteId: string;
+          planteNom: string;
+      }
     | {
           kind: 'pending-article';
           tempId: string;

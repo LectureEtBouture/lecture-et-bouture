@@ -63,8 +63,15 @@ function WishlistNavIcon() {
     );
 }
 
-export function Navbar({ publishedSlugs }: { publishedSlugs?: string[] }) {
+export function Navbar({
+    publishedSlugs,
+    customPages = [],
+}: {
+    publishedSlugs?: string[];
+    customPages?: { slug: string; titre: string }[];
+}) {
     const [open, setOpen] = useState(false);
+    const [pagesOpen, setPagesOpen] = useState(false);
 
     useEffect(() => {
         document.body.style.overflow = open ? 'hidden' : '';
@@ -116,6 +123,51 @@ export function Navbar({ publishedSlugs }: { publishedSlugs?: string[] }) {
                             </Link>
                         </li>
                     ))}
+                    {customPages.length > 0 && (
+                        <li className="relative">
+                            <button
+                                type="button"
+                                onClick={() => setPagesOpen((v) => !v)}
+                                onBlur={() =>
+                                    setTimeout(() => setPagesOpen(false), 150)
+                                }
+                                className="text-sm text-foreground/70 hover:text-primary transition-colors flex items-center gap-1"
+                                aria-expanded={pagesOpen}
+                            >
+                                Pages
+                                <svg
+                                    width="10"
+                                    height="10"
+                                    viewBox="0 0 10 10"
+                                    fill="none"
+                                    aria-hidden="true"
+                                    className={`transition-transform ${pagesOpen ? 'rotate-180' : ''}`}
+                                >
+                                    <path
+                                        d="M2 3.5L5 6.5L8 3.5"
+                                        stroke="currentColor"
+                                        strokeWidth="1.25"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    />
+                                </svg>
+                            </button>
+                            {pagesOpen && (
+                                <ul className="absolute right-0 top-full mt-2 w-48 border border-border bg-background shadow-md py-1 z-50">
+                                    {customPages.map((page) => (
+                                        <li key={page.slug}>
+                                            <Link
+                                                href={`/${page.slug}`}
+                                                className="block px-4 py-2 text-sm text-foreground/70 hover:text-primary hover:bg-surface transition-colors"
+                                            >
+                                                {page.titre}
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </li>
+                    )}
                 </ul>
 
                 {/* Right controls */}
@@ -161,6 +213,17 @@ export function Navbar({ publishedSlugs }: { publishedSlugs?: string[] }) {
                                 className="flex items-center h-16 font-serif text-2xl text-foreground hover:text-primary transition-colors border-b border-border/50 last:border-0"
                             >
                                 {label}
+                            </Link>
+                        </li>
+                    ))}
+                    {customPages.map((page) => (
+                        <li key={page.slug}>
+                            <Link
+                                href={`/${page.slug}`}
+                                onClick={() => setOpen(false)}
+                                className="flex items-center h-16 font-serif text-2xl text-foreground hover:text-primary transition-colors border-b border-border/50 last:border-0"
+                            >
+                                {page.titre}
                             </Link>
                         </li>
                     ))}

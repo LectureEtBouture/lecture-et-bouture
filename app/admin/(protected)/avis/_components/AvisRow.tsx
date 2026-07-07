@@ -18,7 +18,11 @@ export function AvisRow({
     const stars =
         a.note != null ? '★'.repeat(a.note) + '☆'.repeat(5 - a.note) : null;
     const typeLabel =
-        a.type === 'livre' ? 'Livre' : a.type === 'article' ? 'Article' : 'Bouture';
+        a.type === 'livre'
+            ? 'Livre'
+            : a.type === 'article'
+              ? 'Article'
+              : 'Bouture';
     const uri = a.inventaireUri;
     const titre =
         a.type === 'article'

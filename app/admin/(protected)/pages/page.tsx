@@ -3,6 +3,8 @@ import {
     getPagesList,
     togglePagePubliee,
     deletePage,
+    getMissingFixedPages,
+    createMissingFixedPages,
 } from '@/lib/actions/pages';
 
 const ROUTE_LABELS: Record<string, string> = {
@@ -18,7 +20,10 @@ const ROUTE_LABELS: Record<string, string> = {
 const FIXED_SLUGS = Object.keys(ROUTE_LABELS);
 
 export default async function AdminPagesPage() {
-    const pages = await getPagesList();
+    const [pages, missingFixed] = await Promise.all([
+        getPagesList(),
+        getMissingFixedPages(),
+    ]);
 
     return (
         <div className="space-y-6">
@@ -38,6 +43,29 @@ export default async function AdminPagesPage() {
                     Ajouter
                 </Link>
             </div>
+
+            {missingFixed.length > 0 && (
+                <div className="flex items-center justify-between gap-4 border border-amber-600/40 bg-amber-600/5 px-4 py-3">
+                    <p className="text-[11px] text-foreground">
+                        {missingFixed.length} page
+                        {missingFixed.length > 1 ? 's' : ''} attendue
+                        {missingFixed.length > 1 ? 's' : ''} par le site
+                        manque{missingFixed.length > 1 ? 'nt' : ''} en base :{' '}
+                        {missingFixed.map((page) => page.titre).join(', ')}.
+                    </p>
+                    <form
+                        action={createMissingFixedPages}
+                        className="contents"
+                    >
+                        <button
+                            type="submit"
+                            className="px-4 py-2 bg-primary text-background text-[11px] uppercase tracking-[0.1em] hover:bg-primary-light transition-colors shrink-0"
+                        >
+                            Créer
+                        </button>
+                    </form>
+                </div>
+            )}
             <div className="divide-y divide-border">
                 {pages.map((page) => (
                     <div

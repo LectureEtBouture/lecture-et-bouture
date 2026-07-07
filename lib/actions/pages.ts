@@ -35,6 +35,51 @@ const RESERVED_SLUGS = [
     'api',
 ];
 
+// Pages que le front attend en dur (routes statiques app/(front)/<slug>/page.tsx
+// + liens Navbar/Footer) mais que seul le script db:seed crée — absentes si
+// db:seed n'a jamais tourné sur cet environnement (ex: prod bootstrappée via
+// db:migrate uniquement).
+const FIXED_PAGES = [
+    { slug: 'concept', titre: 'Notre concept' },
+    { slug: 'mentions-legales', titre: 'Mentions légales' },
+    { slug: 'cgv', titre: 'Conditions Générales de Vente' },
+    { slug: 'cgu', titre: "Conditions Générales d'Utilisation" },
+    { slug: 'cookies', titre: 'Politique de cookies' },
+    {
+        slug: 'politique-de-confidentialite',
+        titre: 'Politique de confidentialité',
+    },
+];
+
+export async function getMissingFixedPages() {
+    const existing = await db
+        .select({ slug: pagesEditoriales.slug })
+        .from(pagesEditoriales);
+    const existingSlugs = new Set(existing.map((row) => row.slug));
+    return FIXED_PAGES.filter((page) => !existingSlugs.has(page.slug));
+}
+
+export async function createMissingFixedPages() {
+    await requireAdmin();
+    const missing = await getMissingFixedPages();
+    if (missing.length === 0) return;
+    await db.insert(pagesEditoriales).values(
+        missing.map((page) => ({
+            slug: page.slug,
+            titre: page.titre,
+            contenu: null,
+            publiee: false,
+        })),
+    );
+    await createLog({
+        action: 'page.create',
+        entityType: 'page',
+        entityLabel: `${missing.length} page(s) fixe(s) créée(s)`,
+    });
+    revalidateTag('pages', { expire: 0 });
+    revalidatePath('/admin/pages');
+}
+
 const createPageSchema = z.object({
     titre: z.string().min(1),
     slug: z
@@ -83,11 +128,11 @@ export async function createPage(formData: FormData) {
 export async function deletePage(slug: string) {
     await requireAdmin();
     if (RESERVED_SLUGS.includes(slug)) {
-        throw new Error('Cette page est liée à une route fixe du site, suppression impossible.');
+        throw new Error(
+            'Cette page est liée à une route fixe du site, suppression impossible.',
+        );
     }
-    await db
-        .delete(pagesEditoriales)
-        .where(eq(pagesEditoriales.slug, slug));
+    await db.delete(pagesEditoriales).where(eq(pagesEditoriales.slug, slug));
     await createLog({
         action: 'page.delete',
         entityType: 'page',
