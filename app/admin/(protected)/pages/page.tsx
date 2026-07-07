@@ -49,14 +49,11 @@ export default async function AdminPagesPage() {
                     <p className="text-[11px] text-foreground">
                         {missingFixed.length} page
                         {missingFixed.length > 1 ? 's' : ''} attendue
-                        {missingFixed.length > 1 ? 's' : ''} par le site
-                        manque{missingFixed.length > 1 ? 'nt' : ''} en base :{' '}
+                        {missingFixed.length > 1 ? 's' : ''} par le site manque
+                        {missingFixed.length > 1 ? 'nt' : ''} en base :{' '}
                         {missingFixed.map((page) => page.titre).join(', ')}.
                     </p>
-                    <form
-                        action={createMissingFixedPages}
-                        className="contents"
-                    >
+                    <form action={createMissingFixedPages} className="contents">
                         <button
                             type="submit"
                             className="px-4 py-2 bg-primary text-background text-[11px] uppercase tracking-[0.1em] hover:bg-primary-light transition-colors shrink-0"

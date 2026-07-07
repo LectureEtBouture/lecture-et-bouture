@@ -69,9 +69,7 @@ export const getCustomEditorialPages = unstable_cache(
             .from(pagesEditoriales)
             .where(eq(pagesEditoriales.publiee, true))
             .then((rows) =>
-                rows.filter(
-                    (row) => !FIXED_EDITORIAL_SLUGS.includes(row.slug),
-                ),
+                rows.filter((row) => !FIXED_EDITORIAL_SLUGS.includes(row.slug)),
             ),
     ['custom-editorial-pages'],
     { tags: ['pages'] },
