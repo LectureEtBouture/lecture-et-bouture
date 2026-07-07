@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { DIFFICULTE_LABELS, LUMIERE_LABELS, ARROSAGE_LABELS } from '@/lib/data';
 import type { BouturePublique } from '@/lib/queries/boutures';
 
@@ -74,12 +75,12 @@ export function CoverPanel({
             </div>
 
             <div className="space-y-3">
-                <a
-                    href="mailto:contact@lectureetboutures.fr"
+                <Link
+                    href="/contact"
                     className="block w-full py-3 bg-primary text-background text-xs uppercase tracking-widest text-center hover:bg-primary-light transition-colors"
                 >
                     Renseignez-vous en boutique
-                </a>
+                </Link>
                 <p className="text-xs text-muted text-center">
                     Disponibilités variables — contactez-nous
                 </p>

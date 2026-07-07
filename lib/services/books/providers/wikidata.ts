@@ -26,7 +26,8 @@ export class WikidataProvider implements BookProvider {
         const headers: Record<string, string> = {
             'Content-Type': 'application/x-www-form-urlencoded',
             Accept: 'application/sparql-results+json',
-            'User-Agent': 'LectureEtBouture/1.0 (contact@lectureetboutures.fr)',
+            'User-Agent':
+                'LectureEtBouture/1.0 (contact@lecture-et-bouture.fr)',
         };
 
         const token = process.env.WIKIDATA_ACCESS_TOKEN;

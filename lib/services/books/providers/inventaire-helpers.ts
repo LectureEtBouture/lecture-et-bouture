@@ -1,7 +1,7 @@
 export const BASE_URL = 'https://inventaire.io';
 export const OL_BASE = 'https://openlibrary.org';
 export const LANG_FR = 'wd:Q150';
-export const USER_AGENT = 'LectureEtBouture/1.0 (contact@lectureetboutures.fr)';
+export const USER_AGENT = 'LectureEtBouture/1.0 (contact@lecture-et-bouture.fr)';
 
 export type InventaireEntity = {
     uri: string;
