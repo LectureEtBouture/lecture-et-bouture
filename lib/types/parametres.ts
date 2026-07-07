@@ -1,6 +1,10 @@
 export type JourSemaine = 'lun' | 'mar' | 'mer' | 'jeu' | 'ven' | 'sam' | 'dim';
 
-export type PlageHoraire = { open: string; close: string };
+export type PlageHoraire = {
+    open: string;
+    close: string;
+    pause?: { debut: string; fin: string } | null;
+};
 export type Horaires = Record<JourSemaine, PlageHoraire | null>;
 
 export type FermetureExceptionnelle = {

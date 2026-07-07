@@ -4,7 +4,8 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 import { BUCKET, minioClient } from '@/lib/minio';
-import { isUrlInUse } from '@/lib/queries/storage';
+import { getStorageOverview, isUrlInUse } from '@/lib/queries/storage';
+import type { StorageItem } from '@/lib/queries/storage';
 import { createLog } from './admin-logs';
 
 async function requireAdmin() {
@@ -60,4 +61,12 @@ export async function deleteStorageObjects(keys: string[]): Promise<{
 
     revalidatePath('/admin/stockage');
     return { deleted, failed };
+}
+
+export async function listStorageAssets(): Promise<StorageItem[]> {
+    const session = await auth();
+    if (!session) redirect('/admin/login');
+
+    const { items } = await getStorageOverview();
+    return items;
 }

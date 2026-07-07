@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { InferSelectModel } from 'drizzle-orm';
 import type { plantes } from '@/db/schema';
 import { PlanteFormIdentite } from './PlanteFormIdentite';
@@ -26,12 +27,12 @@ export function PlanteForm({ action, plante }: Props) {
                 >
                     Enregistrer
                 </button>
-                <a
+                <Link
                     href="/admin/boutures"
                     className="text-sm text-muted hover:text-foreground transition-colors"
                 >
                     Annuler
-                </a>
+                </Link>
             </div>
         </form>
     );

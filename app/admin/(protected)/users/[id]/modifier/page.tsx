@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { auth } from '@/auth';
 import { getUser, updateUser } from '@/lib/actions/users';
@@ -81,12 +82,12 @@ export default async function ModifierUtilisateurPage({ params }: Props) {
                     >
                         Enregistrer
                     </button>
-                    <a
+                    <Link
                         href="/admin/users"
                         className="px-6 py-2 border border-border text-[11px] uppercase tracking-[0.1em] text-muted hover:text-foreground transition-colors"
                     >
                         Annuler
-                    </a>
+                    </Link>
                 </div>
             </form>
         </div>

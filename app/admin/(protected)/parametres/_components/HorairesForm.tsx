@@ -74,7 +74,7 @@ export function HorairesForm({ initial }: { initial: Horaires }) {
                             Ouvert
                         </label>
                         {ouvert && plage && (
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 flex-wrap">
                                 <input
                                     type="time"
                                     value={plage.open}
@@ -105,6 +105,65 @@ export function HorairesForm({ initial }: { initial: Horaires }) {
                                     }
                                     className={inputCls}
                                 />
+                                <label className="flex items-center gap-1.5 text-[11px] text-muted cursor-pointer select-none ml-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={!!plage.pause}
+                                        onChange={(evt) =>
+                                            setJour(key, {
+                                                ...plage,
+                                                pause: evt.target.checked
+                                                    ? {
+                                                          debut: '12:00',
+                                                          fin: '13:00',
+                                                      }
+                                                    : null,
+                                            })
+                                        }
+                                        className="accent-primary"
+                                    />
+                                    Pause
+                                </label>
+                                {plage.pause && (
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="time"
+                                            value={plage.pause.debut}
+                                            aria-label={`${label} — début de pause`}
+                                            onChange={(evt) =>
+                                                setJour(key, {
+                                                    ...plage,
+                                                    pause: {
+                                                        ...plage.pause!,
+                                                        debut: evt.target.value,
+                                                    },
+                                                })
+                                            }
+                                            className={inputCls}
+                                        />
+                                        <span
+                                            className="text-muted text-sm"
+                                            aria-hidden="true"
+                                        >
+                                            –
+                                        </span>
+                                        <input
+                                            type="time"
+                                            value={plage.pause.fin}
+                                            aria-label={`${label} — fin de pause`}
+                                            onChange={(evt) =>
+                                                setJour(key, {
+                                                    ...plage,
+                                                    pause: {
+                                                        ...plage.pause!,
+                                                        fin: evt.target.value,
+                                                    },
+                                                })
+                                            }
+                                            className={inputCls}
+                                        />
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>

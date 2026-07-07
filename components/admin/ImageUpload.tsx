@@ -2,8 +2,9 @@
 
 import { useState, useRef } from 'react';
 import { inputClass, labelClass } from './formStyles';
+import { AssetPickerModal } from '@/components/ui/AssetPickerModal';
 
-type Mode = 'fichier' | 'url';
+type Mode = 'fichier' | 'bibliotheque' | 'url';
 
 interface Props {
     defaultValue?: string | null;
@@ -24,6 +25,7 @@ export function ImageUpload({
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [dragging, setDragging] = useState(false);
+    const [pickerOpen, setPickerOpen] = useState(false);
     const fileRef = useRef<HTMLInputElement>(null);
 
     const upload = async (file: File) => {
@@ -78,6 +80,13 @@ export function ImageUpload({
                 </button>
                 <button
                     type="button"
+                    onClick={() => setMode('bibliotheque')}
+                    className={tabBtn('bibliotheque')}
+                >
+                    Bibliothèque
+                </button>
+                <button
+                    type="button"
                     onClick={() => setMode('url')}
                     className={tabBtn('url')}
                 >
@@ -118,6 +127,29 @@ export function ImageUpload({
                     <p className="text-[10px] text-muted/60 mt-1">
                         JPG, PNG, WebP, GIF — 10 Mo max
                     </p>
+                </div>
+            )}
+
+            {mode === 'bibliotheque' && (
+                <div>
+                    <button
+                        type="button"
+                        onClick={() => setPickerOpen(true)}
+                        className="border border-dashed border-border hover:border-primary p-8 w-full text-center transition-colors"
+                    >
+                        <p className="text-[11px] text-muted">
+                            Choisir une image déjà uploadée
+                        </p>
+                    </button>
+                    <AssetPickerModal
+                        open={pickerOpen}
+                        defaultFolder={folder}
+                        onSelect={(selectedUrl) => {
+                            setUrl(selectedUrl);
+                            setPickerOpen(false);
+                        }}
+                        onClose={() => setPickerOpen(false)}
+                    />
                 </div>
             )}
 

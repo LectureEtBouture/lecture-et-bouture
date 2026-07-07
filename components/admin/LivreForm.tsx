@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import type { InferSelectModel } from 'drizzle-orm';
 import type { livres, genres, rayons } from '@/db/schema';
 import type { LivreMetadata } from '@/lib/services/books/types';
@@ -140,12 +141,12 @@ export function LivreForm({
                 >
                     Enregistrer
                 </button>
-                <a
+                <Link
                     href="/admin/livres"
                     className="text-sm text-muted hover:text-foreground transition-colors"
                 >
                     Annuler
-                </a>
+                </Link>
             </div>
         </form>
     );

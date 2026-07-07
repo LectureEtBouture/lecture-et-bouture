@@ -1,5 +1,11 @@
 import { db } from '@/db';
-import { selections, selectionItems, livres, plantes } from '@/db/schema';
+import {
+    selections,
+    selectionItems,
+    livres,
+    plantes,
+    articles,
+} from '@/db/schema';
 import { eq, asc, sql } from 'drizzle-orm';
 import { bookProvider } from '@/lib/services/books';
 import { uriToSlug } from '@/lib/services/books/slug';
@@ -29,6 +35,14 @@ export type SelectionItemPublique =
               | 'lumiere-vive'
               | 'plein-soleil'
               | null;
+      }
+    | {
+          id: string;
+          type: 'article';
+          ordre: number;
+          titre: string;
+          slug: string;
+          image: string | null;
       };
 
 export type SelectionPublique = {
@@ -59,11 +73,17 @@ export async function getPublicSelections(): Promise<SelectionPublique[]> {
             planteSlug: plantes.slug,
             plantePrix: plantes.prix,
             planteLumiere: plantes.lumiere,
+            articleId: selectionItems.articleId,
+            articleTitre: articles.titre,
+            articleSlug: articles.slug,
+            articleImage: articles.image,
+            articlePublie: articles.publie,
         })
         .from(selections)
         .leftJoin(selectionItems, eq(selectionItems.selectionId, selections.id))
         .leftJoin(livres, eq(selectionItems.livreId, livres.id))
         .leftJoin(plantes, eq(selectionItems.planteId, plantes.id))
+        .leftJoin(articles, eq(selectionItems.articleId, articles.id))
         .where(eq(selections.active, true))
         .orderBy(
             asc(selections.ordre),
@@ -129,6 +149,21 @@ export async function getPublicSelections(): Promise<SelectionPublique[]> {
                 slug: row.planteSlug,
                 prix: row.plantePrix,
                 lumiere: row.planteLumiere ?? null,
+            });
+        } else if (
+            row.itemType === 'article' &&
+            row.articleId &&
+            row.articleTitre &&
+            row.articleSlug &&
+            row.articlePublie
+        ) {
+            sel.items.push({
+                id: row.itemId,
+                type: 'article',
+                ordre: row.itemOrdre ?? 0,
+                titre: row.articleTitre,
+                slug: row.articleSlug,
+                image: row.articleImage ?? null,
             });
         }
     }

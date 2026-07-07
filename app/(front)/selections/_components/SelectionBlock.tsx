@@ -8,10 +8,28 @@ function ItemRow({ item }: { item: SelectionItemPublique }) {
     const href =
         item.type === 'livre'
             ? `/livres/${item.slug}`
-            : `/boutures/${item.slug}`;
-    const titre = item.type === 'livre' ? item.titre : item.nom;
-    const meta = item.type === 'livre' ? item.auteur : item.espece;
-    const typeLabel = item.type === 'livre' ? 'Livre' : 'Bouture';
+            : item.type === 'plante'
+              ? `/boutures/${item.slug}`
+              : `/blog/${item.slug}`;
+    const titre =
+        item.type === 'livre'
+            ? item.titre
+            : item.type === 'plante'
+              ? item.nom
+              : item.titre;
+    const meta =
+        item.type === 'livre'
+            ? item.auteur
+            : item.type === 'plante'
+              ? item.espece
+              : null;
+    const typeLabel =
+        item.type === 'livre'
+            ? 'Livre'
+            : item.type === 'plante'
+              ? 'Bouture'
+              : 'Article';
+    const prix = item.type === 'livre' || item.type === 'plante' ? item.prix : null;
 
     return (
         <Link
@@ -32,9 +50,9 @@ function ItemRow({ item }: { item: SelectionItemPublique }) {
                 <span className="text-[9px] uppercase tracking-[0.12em] text-muted/60">
                     {typeLabel}
                 </span>
-                {item.prix && (
+                {prix && (
                     <span className="text-[13px] text-foreground tabular-nums">
-                        {item.prix} €
+                        {prix} €
                     </span>
                 )}
             </span>

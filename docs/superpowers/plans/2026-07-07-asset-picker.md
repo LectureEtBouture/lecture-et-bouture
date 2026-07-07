@@ -147,9 +147,7 @@ export function AssetPickerModal({
 
     const filtered = (items ?? [])
         .filter((item) => folder === 'tous' || item.folder === folder)
-        .filter((item) =>
-            item.key.toLowerCase().includes(search.toLowerCase()),
-        )
+        .filter((item) => item.key.toLowerCase().includes(search.toLowerCase()))
         .sort((a, b) =>
             sort === 'date-desc'
                 ? b.lastModified.getTime() - a.lastModified.getTime()
@@ -382,28 +380,30 @@ devient :
 Juste après le bloc `{mode === 'fichier' && (...)}` existant (avant `{mode === 'url' && (...)}`), ajouter :
 
 ```tsx
-{mode === 'bibliotheque' && (
-    <div>
-        <button
-            type="button"
-            onClick={() => setPickerOpen(true)}
-            className="border border-dashed border-border hover:border-primary p-8 w-full text-center transition-colors"
-        >
-            <p className="text-[11px] text-muted">
-                Choisir une image déjà uploadée
-            </p>
-        </button>
-        <AssetPickerModal
-            open={pickerOpen}
-            defaultFolder={folder}
-            onSelect={(selectedUrl) => {
-                setUrl(selectedUrl);
-                setPickerOpen(false);
-            }}
-            onClose={() => setPickerOpen(false)}
-        />
-    </div>
-)}
+{
+    mode === 'bibliotheque' && (
+        <div>
+            <button
+                type="button"
+                onClick={() => setPickerOpen(true)}
+                className="border border-dashed border-border hover:border-primary p-8 w-full text-center transition-colors"
+            >
+                <p className="text-[11px] text-muted">
+                    Choisir une image déjà uploadée
+                </p>
+            </button>
+            <AssetPickerModal
+                open={pickerOpen}
+                defaultFolder={folder}
+                onSelect={(selectedUrl) => {
+                    setUrl(selectedUrl);
+                    setPickerOpen(false);
+                }}
+                onClose={() => setPickerOpen(false)}
+            />
+        </div>
+    );
+}
 ```
 
 - [ ] **Step 5: Vérifier les types**

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { InferSelectModel } from 'drizzle-orm';
 import type { evenements } from '@/db/schema';
 import {
@@ -7,14 +8,13 @@ import {
     legendClass,
 } from './formStyles';
 import { ImageUpload } from './ImageUpload';
+import { utcToParisDatetimeLocal } from '@/lib/timezone';
 
 type Evenement = InferSelectModel<typeof evenements>;
 
 function toDatetimeLocal(date?: Date | null) {
     if (!date) return '';
-    const d = new Date(date);
-    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-    return d.toISOString().slice(0, 16);
+    return utcToParisDatetimeLocal(new Date(date));
 }
 
 export function EvenementForm({
@@ -89,12 +89,12 @@ export function EvenementForm({
                 >
                     Enregistrer
                 </button>
-                <a
+                <Link
                     href="/admin/evenements"
                     className="text-sm text-muted hover:text-foreground transition-colors"
                 >
                     Annuler
-                </a>
+                </Link>
             </div>
         </form>
     );

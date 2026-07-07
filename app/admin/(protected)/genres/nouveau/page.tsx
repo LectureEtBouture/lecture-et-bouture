@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { createGenre } from '@/lib/actions/genres';
 
 export default function NouveauGenrePage() {
@@ -24,12 +25,12 @@ export default function NouveauGenrePage() {
                     >
                         Créer
                     </button>
-                    <a
+                    <Link
                         href="/admin/genres"
                         className="px-6 py-2 border border-border text-[11px] uppercase tracking-[0.1em] text-muted hover:text-foreground transition-colors"
                     >
                         Annuler
-                    </a>
+                    </Link>
                 </div>
             </form>
         </div>

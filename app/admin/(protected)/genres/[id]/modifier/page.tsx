@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getGenre, updateGenre } from '@/lib/actions/genres';
 
@@ -34,12 +35,12 @@ export default async function ModifierGenrePage({ params }: Props) {
                     >
                         Enregistrer
                     </button>
-                    <a
+                    <Link
                         href="/admin/genres"
                         className="px-6 py-2 border border-border text-[11px] uppercase tracking-[0.1em] text-muted hover:text-foreground transition-colors"
                     >
                         Annuler
-                    </a>
+                    </Link>
                 </div>
             </form>
         </div>

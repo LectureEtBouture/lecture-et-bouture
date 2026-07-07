@@ -33,7 +33,7 @@ function AvisArticleForm({ itemId }: { itemId: string }) {
     if (status === 'success') {
         return (
             <p className="text-sm text-primary">
-                Merci pour votre commentaire — il sera publié après modération.
+                Merci — votre avis sera visible sous peu.
             </p>
         );
     }

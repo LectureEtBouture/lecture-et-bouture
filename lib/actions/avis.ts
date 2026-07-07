@@ -2,7 +2,7 @@
 
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { db } from '@/db';
-import { avis, livres } from '@/db/schema';
+import { avis, livres, articles } from '@/db/schema';
 import { eq, desc, asc } from 'drizzle-orm';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
@@ -125,8 +125,12 @@ export async function getAvis(sort: AvisSort = 'date-desc') {
             createdAt: avis.createdAt,
             livreId: avis.livreId,
             boutureId: avis.boutureId,
+            articleId: avis.articleId,
+            articleTitre: articles.titre,
+            articleSlug: articles.slug,
         })
         .from(avis)
         .leftJoin(livres, eq(avis.livreId, livres.id))
+        .leftJoin(articles, eq(avis.articleId, articles.id))
         .orderBy(order);
 }

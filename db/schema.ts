@@ -135,11 +135,14 @@ export const selectionItems = pgTable('selection_items', {
     selectionId: uuid('selection_id')
         .notNull()
         .references(() => selections.id, { onDelete: 'cascade' }),
-    type: avisType('type').notNull(),
+    type: text('type').notNull(), // 'livre' | 'plante' | 'article'
     livreId: uuid('livre_id').references(() => livres.id, {
         onDelete: 'cascade',
     }),
     planteId: uuid('plante_id').references(() => plantes.id, {
+        onDelete: 'cascade',
+    }),
+    articleId: uuid('article_id').references(() => articles.id, {
         onDelete: 'cascade',
     }),
     ordre: integer('ordre').notNull().default(0),

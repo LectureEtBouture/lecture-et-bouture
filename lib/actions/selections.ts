@@ -3,7 +3,13 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { db } from '@/db';
-import { selections, selectionItems, livres, plantes } from '@/db/schema';
+import {
+    selections,
+    selectionItems,
+    livres,
+    plantes,
+    articles,
+} from '@/db/schema';
 import { eq, asc, count, sql, getTableColumns, and } from 'drizzle-orm';
 import { getOrCreateEnrichissement } from '@/lib/queries/enrichissements';
 import { auth } from '@/auth';
@@ -113,30 +119,35 @@ export async function reorderSelections(orderedIds: string[]) {
 
 export async function addSelectionItem(
     selectionId: string,
-    type: 'livre' | 'plante',
+    type: 'livre' | 'plante' | 'article',
     itemId: string,
-) {
+): Promise<{ id: string }> {
     await requireAdmin();
     const [{ count: existingCount }] = await db
         .select({ count: count() })
         .from(selectionItems)
         .where(eq(selectionItems.selectionId, selectionId));
-    await db.insert(selectionItems).values({
-        selectionId,
-        type,
-        livreId: type === 'livre' ? itemId : null,
-        planteId: type === 'plante' ? itemId : null,
-        ordre: existingCount,
-    });
+    const [row] = await db
+        .insert(selectionItems)
+        .values({
+            selectionId,
+            type,
+            livreId: type === 'livre' ? itemId : null,
+            planteId: type === 'plante' ? itemId : null,
+            articleId: type === 'article' ? itemId : null,
+            ordre: existingCount,
+        })
+        .returning({ id: selectionItems.id });
     revalidatePath('/admin/selections');
     revalidatePath(`/admin/selections/${selectionId}`);
     revalidatePath('/selections');
+    return { id: row.id };
 }
 
 export async function addSelectionLivreByUri(
     selectionId: string,
     uri: string,
-): Promise<{ ok: true } | { error: 'doublon' | 'invalid' }> {
+): Promise<{ ok: true; id: string } | { error: 'doublon' | 'invalid' }> {
     await requireAdmin();
     if (!uri) return { error: 'invalid' };
     const enrichissement = await getOrCreateEnrichissement(uri);
@@ -155,17 +166,20 @@ export async function addSelectionLivreByUri(
         .select({ count: count() })
         .from(selectionItems)
         .where(eq(selectionItems.selectionId, selectionId));
-    await db.insert(selectionItems).values({
-        selectionId,
-        type: 'livre',
-        livreId: enrichissement.localId,
-        planteId: null,
-        ordre: existingCount,
-    });
+    const [row] = await db
+        .insert(selectionItems)
+        .values({
+            selectionId,
+            type: 'livre',
+            livreId: enrichissement.localId,
+            planteId: null,
+            ordre: existingCount,
+        })
+        .returning({ id: selectionItems.id });
     revalidatePath('/admin/selections');
     revalidatePath(`/admin/selections/${selectionId}`);
     revalidatePath('/selections');
-    return { ok: true };
+    return { ok: true, id: row.id };
 }
 
 export async function removeSelectionItem(selectionId: string, itemId: string) {
@@ -229,12 +243,16 @@ export async function getSelectionWithItems(id: string) {
             ordre: selectionItems.ordre,
             livreId: selectionItems.livreId,
             planteId: selectionItems.planteId,
+            articleId: selectionItems.articleId,
             livreUri: livres.inventaireUri,
             planteNom: plantes.nom,
+            articleTitre: articles.titre,
+            articleImage: articles.image,
         })
         .from(selectionItems)
         .leftJoin(livres, eq(selectionItems.livreId, livres.id))
         .leftJoin(plantes, eq(selectionItems.planteId, plantes.id))
+        .leftJoin(articles, eq(selectionItems.articleId, articles.id))
         .where(eq(selectionItems.selectionId, id))
         .orderBy(asc(selectionItems.ordre));
 

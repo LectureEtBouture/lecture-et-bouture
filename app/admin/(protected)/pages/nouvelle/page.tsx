@@ -1,33 +1,37 @@
 import Link from 'next/link';
-import { createRayon } from '@/lib/actions/rayons';
+import { createPage } from '@/lib/actions/pages';
 
-export default function NouveauRayonPage() {
+export default function NouvellePageEditorialePage() {
     return (
         <div className="space-y-6">
             <h1 className="font-serif text-2xl font-bold text-foreground">
-                Nouveau rayon
+                Nouvelle page éditoriale
             </h1>
-            <form action={createRayon} className="space-y-4 max-w-md">
+            <form action={createPage} className="space-y-4 max-w-md">
                 <div className="space-y-1.5">
                     <label className="text-[11px] uppercase tracking-[0.1em] text-muted">
-                        Nom
+                        Titre
                     </label>
                     <input
-                        name="nom"
+                        name="titre"
                         required
                         className="w-full border border-border bg-white px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary"
                     />
                 </div>
                 <div className="space-y-1.5">
                     <label className="text-[11px] uppercase tracking-[0.1em] text-muted">
-                        Description{' '}
-                        <span className="normal-case">(optionnel)</span>
+                        Slug (URL : /votre-slug)
                     </label>
-                    <textarea
-                        name="description"
-                        rows={3}
-                        className="w-full border border-border bg-white px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary resize-none"
+                    <input
+                        name="slug"
+                        required
+                        pattern="[a-z0-9]+(-[a-z0-9]+)*"
+                        placeholder="ex : livraison"
+                        className="w-full border border-border bg-white px-3 py-2 text-sm text-foreground font-mono focus:outline-none focus:border-primary"
                     />
+                    <p className="text-[11px] text-muted">
+                        Minuscules, chiffres et tirets uniquement.
+                    </p>
                 </div>
                 <div className="flex gap-3">
                     <button
@@ -37,7 +41,7 @@ export default function NouveauRayonPage() {
                         Créer
                     </button>
                     <Link
-                        href="/admin/rayons"
+                        href="/admin/pages"
                         className="px-6 py-2 border border-border text-[11px] uppercase tracking-[0.1em] text-muted hover:text-foreground transition-colors"
                     >
                         Annuler

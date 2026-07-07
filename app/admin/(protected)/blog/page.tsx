@@ -4,6 +4,7 @@ import { getTagsBlog } from '@/lib/queries/tags-blog';
 import { getCategoriesBlog } from '@/lib/queries/categories-blog';
 import { getAuteursBlog } from '@/lib/queries/auteurs-blog';
 import { ArticleRow } from './_components/ArticleRow';
+import { CreatedToast } from './_components/CreatedToast';
 
 export default async function AdminBlogPage({
     searchParams,
@@ -20,6 +21,7 @@ export default async function AdminBlogPage({
 
     return (
         <div className="space-y-6">
+            <CreatedToast />
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h1 className="font-serif text-2xl font-bold text-foreground">

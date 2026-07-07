@@ -81,7 +81,11 @@ export function HorairesDisplay({
                             ? groupe.debut
                             : `${groupe.debut}–${groupe.fin}`;
                     const valeur = groupe.plage
-                        ? `${formaterHeure(groupe.plage.open)}–${formaterHeure(groupe.plage.close)}`
+                        ? `${formaterHeure(groupe.plage.open)}–${formaterHeure(groupe.plage.close)}${
+                              groupe.plage.pause
+                                  ? ` (pause ${formaterHeure(groupe.plage.pause.debut)}–${formaterHeure(groupe.plage.pause.fin)})`
+                                  : ''
+                          }`
                         : 'Fermé';
                     return (
                         <li key={i} className="flex gap-3 text-sm text-muted">

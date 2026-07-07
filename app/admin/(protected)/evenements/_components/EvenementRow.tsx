@@ -28,6 +28,7 @@ function formatDate(date: Date) {
         year: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
+        timeZone: 'Europe/Paris',
     });
 }
 
@@ -37,6 +38,7 @@ function formatDateShort(date: Date) {
         month: 'short',
         hour: '2-digit',
         minute: '2-digit',
+        timeZone: 'Europe/Paris',
     });
 }
 

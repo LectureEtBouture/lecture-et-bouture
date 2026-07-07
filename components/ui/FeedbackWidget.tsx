@@ -135,7 +135,9 @@ export function FeedbackWidget() {
                 type="button"
                 onClick={() => setOpen(!open)}
                 className="flex items-center gap-2 bg-primary text-background text-xs uppercase tracking-[0.1em] px-3 sm:px-4 py-2.5 shadow-md hover:opacity-90 transition-opacity"
-                aria-label={open ? 'Fermer le formulaire d’avis' : 'Donner mon avis'}
+                aria-label={
+                    open ? 'Fermer le formulaire d’avis' : 'Donner mon avis'
+                }
                 aria-expanded={open}
                 aria-controls="feedback-panel"
             >

@@ -92,7 +92,7 @@ export async function createArticle(formData: FormData) {
     }
 
     invalidate();
-    redirect(`/admin/blog/${article.id}/modifier`);
+    redirect('/admin/blog?created=1');
 }
 
 export async function updateArticle(id: string, formData: FormData) {

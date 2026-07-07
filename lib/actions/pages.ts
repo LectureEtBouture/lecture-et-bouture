@@ -6,11 +6,97 @@ import { db } from '@/db';
 import { pagesEditoriales } from '@/db/schema';
 import { asc, eq } from 'drizzle-orm';
 import { auth } from '@/auth';
+import { z } from 'zod';
 import { createLog } from './admin-logs';
 
 async function requireAdmin() {
     const session = await auth();
     if (!session) redirect('/admin/login');
+}
+
+// Slugs déjà pris par des routes front statiques — une page créée avec l'un
+// de ces slugs serait invisible (la route statique passe toujours avant).
+const RESERVED_SLUGS = [
+    'concept',
+    'cgu',
+    'cgv',
+    'cookies',
+    'mentions-legales',
+    'politique-de-confidentialite',
+    'livres',
+    'boutures',
+    'blog',
+    'evenements',
+    'contact',
+    'ma-liste',
+    'selections',
+    'surprendre',
+    'admin',
+    'api',
+];
+
+const createPageSchema = z.object({
+    titre: z.string().min(1),
+    slug: z
+        .string()
+        .min(1)
+        .regex(
+            /^[a-z0-9]+(-[a-z0-9]+)*$/,
+            'Slug invalide (minuscules, chiffres, tirets)',
+        ),
+});
+
+export async function createPage(formData: FormData) {
+    await requireAdmin();
+    const parsed = createPageSchema.parse({
+        titre: formData.get('titre'),
+        slug: formData.get('slug'),
+    });
+    if (RESERVED_SLUGS.includes(parsed.slug)) {
+        throw new Error('Ce slug est réservé à une route existante.');
+    }
+    const existing = await db
+        .select({ slug: pagesEditoriales.slug })
+        .from(pagesEditoriales)
+        .where(eq(pagesEditoriales.slug, parsed.slug))
+        .limit(1)
+        .then((rows) => rows[0]);
+    if (existing) {
+        throw new Error('Ce slug existe déjà.');
+    }
+    await db.insert(pagesEditoriales).values({
+        slug: parsed.slug,
+        titre: parsed.titre,
+        publiee: false,
+    });
+    await createLog({
+        action: 'page.create',
+        entityType: 'page',
+        entityId: parsed.slug,
+        entityLabel: parsed.titre,
+    });
+    revalidateTag('pages', { expire: 0 });
+    revalidatePath('/admin/pages');
+    redirect('/admin/pages');
+}
+
+export async function deletePage(slug: string) {
+    await requireAdmin();
+    if (RESERVED_SLUGS.includes(slug)) {
+        throw new Error('Cette page est liée à une route fixe du site, suppression impossible.');
+    }
+    await db
+        .delete(pagesEditoriales)
+        .where(eq(pagesEditoriales.slug, slug));
+    await createLog({
+        action: 'page.delete',
+        entityType: 'page',
+        entityId: slug,
+        entityLabel: slug,
+    });
+    revalidateTag('pages', { expire: 0 });
+    revalidatePath('/admin/pages');
+    revalidatePath(`/${slug}`);
 }
 
 export async function getPagesList() {

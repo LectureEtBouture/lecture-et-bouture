@@ -1,6 +1,7 @@
 'use client';
 
 import { useActionState } from 'react';
+import Link from 'next/link';
 import { login } from '@/lib/actions/auth';
 import { siteConfig } from '@/lib/metadata';
 
@@ -67,12 +68,12 @@ export default function LoginPage() {
                     </button>
 
                     <div className="text-center">
-                        <a
+                        <Link
                             href="/admin/forgot-password"
                             className="text-xs text-neutral-400 hover:text-neutral-600 transition-colors"
                         >
                             Mot de passe oublié ?
-                        </a>
+                        </Link>
                     </div>
                 </form>
             </div>

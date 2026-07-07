@@ -8,6 +8,7 @@ import { and, eq, gt, gte, isNotNull, lt, lte, asc, desc } from 'drizzle-orm';
 import { auth } from '@/auth';
 import { z } from 'zod';
 import { createLog } from './admin-logs';
+import { parisLocalToUTC } from '@/lib/timezone';
 
 async function requireAdmin() {
     const session = await auth();
@@ -36,8 +37,8 @@ function parseFormData(formData: FormData) {
         ...raw,
         image,
         imageAlt,
-        dateDebut: new Date(raw.dateDebut),
-        dateFin: raw.dateFin ? new Date(raw.dateFin) : null,
+        dateDebut: parisLocalToUTC(raw.dateDebut),
+        dateFin: raw.dateFin ? parisLocalToUTC(raw.dateFin) : null,
     };
 }
 

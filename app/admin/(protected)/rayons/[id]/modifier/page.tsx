@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getRayon, updateRayon } from '@/lib/actions/rayons';
 
@@ -46,12 +47,12 @@ export default async function ModifierRayonPage({ params }: Props) {
                     >
                         Enregistrer
                     </button>
-                    <a
+                    <Link
                         href="/admin/rayons"
                         className="px-6 py-2 border border-border text-[11px] uppercase tracking-[0.1em] text-muted hover:text-foreground transition-colors"
                     >
                         Annuler
-                    </a>
+                    </Link>
                 </div>
             </form>
         </div>

@@ -1,5 +1,9 @@
 import Link from 'next/link';
-import { getPagesList, togglePagePubliee } from '@/lib/actions/pages';
+import {
+    getPagesList,
+    togglePagePubliee,
+    deletePage,
+} from '@/lib/actions/pages';
 
 const ROUTE_LABELS: Record<string, string> = {
     concept: 'Notre concept',
@@ -10,18 +14,29 @@ const ROUTE_LABELS: Record<string, string> = {
     'politique-de-confidentialite': 'Politique de confidentialité',
 };
 
+// Pages liées à des routes front fixes — pas de suppression possible (voir deletePage).
+const FIXED_SLUGS = Object.keys(ROUTE_LABELS);
+
 export default async function AdminPagesPage() {
     const pages = await getPagesList();
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="font-serif text-2xl font-bold text-foreground">
-                    Pages éditoriales
-                </h1>
-                <p className="text-[11px] text-muted mt-0.5">
-                    {pages.length} page{pages.length > 1 ? 's' : ''}
-                </p>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="font-serif text-2xl font-bold text-foreground">
+                        Pages éditoriales
+                    </h1>
+                    <p className="text-[11px] text-muted mt-0.5">
+                        {pages.length} page{pages.length > 1 ? 's' : ''}
+                    </p>
+                </div>
+                <Link
+                    href="/admin/pages/nouvelle"
+                    className="px-4 py-2 bg-primary text-background text-[11px] uppercase tracking-[0.1em] hover:bg-primary-light transition-colors"
+                >
+                    Ajouter
+                </Link>
             </div>
             <div className="divide-y divide-border">
                 {pages.map((page) => (
@@ -75,6 +90,19 @@ export default async function AdminPagesPage() {
                             >
                                 Modifier
                             </Link>
+                            {!FIXED_SLUGS.includes(page.slug) && (
+                                <form
+                                    action={deletePage.bind(null, page.slug)}
+                                    className="contents"
+                                >
+                                    <button
+                                        type="submit"
+                                        className="text-xs text-muted hover:text-red-600 transition-colors"
+                                    >
+                                        Supprimer
+                                    </button>
+                                </form>
+                            )}
                         </div>
                     </div>
                 ))}

@@ -234,6 +234,19 @@ const statements = [
         sent_at timestamptz NOT NULL DEFAULT now(),
         recipient_count integer NOT NULL
     )`,
+
+    // selection_items: type passe d'enum (livre|plante) à text pour supporter 'article'
+    // (même contournement que avis.type), + FK article_id pour lier des articles de blog.
+    `ALTER TABLE selection_items ALTER COLUMN type TYPE text USING type::text`,
+    `ALTER TABLE selection_items ADD COLUMN IF NOT EXISTS article_id uuid`,
+    `DO $$ BEGIN
+        IF NOT EXISTS (
+            SELECT 1 FROM pg_constraint WHERE conname = 'selection_items_article_id_fkey'
+        ) THEN
+            ALTER TABLE selection_items ADD CONSTRAINT selection_items_article_id_fkey
+                FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE;
+        END IF;
+    END $$`,
 ];
 
 async function main() {

@@ -17,12 +17,15 @@ export function AvisRow({
 }) {
     const stars =
         a.note != null ? '★'.repeat(a.note) + '☆'.repeat(5 - a.note) : null;
-    const typeLabel = a.type === 'livre' ? 'Livre' : 'Bouture';
+    const typeLabel =
+        a.type === 'livre' ? 'Livre' : a.type === 'article' ? 'Article' : 'Bouture';
     const uri = a.inventaireUri;
     const titre =
-        bookMeta?.titre ??
-        a.produitNom ??
-        (uri ? uri.replace('isbn:', 'ISBN ') : null);
+        a.type === 'article'
+            ? (a.articleTitre ?? a.produitNom)
+            : (bookMeta?.titre ??
+              a.produitNom ??
+              (uri ? uri.replace('isbn:', 'ISBN ') : null));
     const imageUrl = bookMeta?.imageUrl ?? null;
 
     return (
@@ -43,7 +46,19 @@ export function AvisRow({
                         </p>
                         <p className="text-xs text-muted">
                             {typeLabel} ·{' '}
-                            {uri ? (
+                            {a.type === 'article' && a.articleSlug ? (
+                                <Link
+                                    href={`/blog/${a.articleSlug}`}
+                                    target="_blank"
+                                    className="underline hover:text-primary"
+                                >
+                                    {titre ?? (
+                                        <span className="italic">
+                                            Article inconnu
+                                        </span>
+                                    )}
+                                </Link>
+                            ) : uri ? (
                                 <Link
                                     href={`/livres/${uriToSlug(uri)}`}
                                     target="_blank"

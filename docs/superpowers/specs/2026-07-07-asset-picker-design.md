@@ -20,7 +20,7 @@ utilisées par tous les rôles (`editor`, `moderator`, `contributor`, etc).
 
 ```ts
 'use server';
-export async function listStorageAssets(): Promise<StorageItem[]>
+export async function listStorageAssets(): Promise<StorageItem[]>;
 ```
 
 - Check `auth()` (session existe) — pas de `requireAdmin()`.
