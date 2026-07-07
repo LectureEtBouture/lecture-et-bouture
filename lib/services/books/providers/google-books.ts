@@ -8,6 +8,30 @@ import {
 // Google serves a ~9KB "image not available" PNG for books without scans
 const COVER_MIN_BYTES = 10_000;
 
+// L'API Google Books renvoie occasionnellement des 503 "Service temporarily
+// unavailable" transitoires — sans retry, un seul blip fait disparaître le
+// livre du cache (unstable_cache) jusqu'à la prochaine revalidation.
+async function fetchWithRetry(
+    url: string,
+    init: RequestInit,
+    attempts = 3,
+): Promise<Response | null> {
+    let lastRes: Response | null = null;
+    for (let attempt = 0; attempt < attempts; attempt++) {
+        if (attempt > 0) {
+            await new Promise((resolve) => setTimeout(resolve, 300 * attempt));
+        }
+        try {
+            const res = await fetch(url, init);
+            if (res.ok) return res;
+            lastRes = res;
+        } catch {
+            lastRes = null;
+        }
+    }
+    return lastRes;
+}
+
 async function validateCoverUrl(url: string): Promise<boolean> {
     try {
         const controller = new AbortController();
@@ -30,8 +54,8 @@ export class GoogleBooksProvider implements BookProvider {
     async rechercherParISBN(isbn: string): Promise<LivreMetadata | null> {
         const clean = isbn.replace(/[-\s]/g, '');
         const url = buildUrl({ q: `isbn:${clean}`, maxResults: '1' });
-        const res = await fetch(url, { next: { revalidate: 86400 } });
-        if (!res.ok) return null;
+        const res = await fetchWithRetry(url, { next: { revalidate: 86400 } });
+        if (!res || !res.ok) return null;
         const data: GoogleBooksResponse = await res.json();
         const volume = data.items?.[0];
         if (!volume) return null;
@@ -50,8 +74,10 @@ export class GoogleBooksProvider implements BookProvider {
             const id = uri.slice(5);
             const key = process.env.GOOGLE_BOOKS_API_KEY;
             const url = `https://www.googleapis.com/books/v1/volumes/${id}?hl=fr${key ? `&key=${key}` : ''}`;
-            const res = await fetch(url, { next: { revalidate: 86400 } });
-            if (!res.ok) return null;
+            const res = await fetchWithRetry(url, {
+                next: { revalidate: 86400 },
+            });
+            if (!res || !res.ok) return null;
             const volume = await res.json();
             return volumeToMeta(volume);
         }

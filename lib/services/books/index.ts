@@ -25,12 +25,19 @@ export const bookProvider: BookProvider = {
             (uri) => uri.startsWith('isbn:') || uri.startsWith('gbid:'),
         );
         const inventaireUris = uris.filter((uri) => !googleUris.includes(uri));
-        const [googleResults, inventaireResults] = await Promise.all([
+        // allSettled : un échec Inventaire (ou Google) ne doit jamais faire
+        // disparaître les résultats de l'autre provider.
+        const [googleOutcome, inventaireOutcome] = await Promise.allSettled([
             discoveryProvider.rechercherParUris(googleUris),
             inventaireProvider.rechercherParUris(inventaireUris),
         ]);
-        const result = new Map<string, LivreMetadata>(googleResults);
-        for (const [uri, meta] of inventaireResults) result.set(uri, meta);
+        const result = new Map<string, LivreMetadata>(
+            googleOutcome.status === 'fulfilled' ? googleOutcome.value : [],
+        );
+        if (inventaireOutcome.status === 'fulfilled') {
+            for (const [uri, meta] of inventaireOutcome.value)
+                result.set(uri, meta);
+        }
         return result;
     },
 };
