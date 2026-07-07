@@ -191,6 +191,7 @@ export async function togglePagePubliee(slug: string) {
         .update(pagesEditoriales)
         .set({ publiee: !row.publiee, updatedAt: new Date() })
         .where(eq(pagesEditoriales.slug, slug));
+    revalidateTag('pages', { expire: 0 });
     revalidatePath('/admin/pages');
     revalidatePath(`/${slug}`);
 }
